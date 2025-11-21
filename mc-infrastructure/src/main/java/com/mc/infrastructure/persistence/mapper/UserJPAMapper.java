@@ -11,6 +11,6 @@ public interface UserJPAMapper extends JpaRepository<User, Long> {
 
 //    User findByEmail(String email, boolean ignoreCase);
 
-    User findByResetToken(String token);
+//    User findByResetToken(String token);
 
 }
