@@ -1,4 +1,4 @@
-package com.mc.infrastructure.security;
+package com.mc.infrastructure.config.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

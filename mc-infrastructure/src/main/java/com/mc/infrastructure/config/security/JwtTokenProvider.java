@@ -1,4 +1,4 @@
-package com.mc.infrastructure.security;
+package com.mc.infrastructure.config.security;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
