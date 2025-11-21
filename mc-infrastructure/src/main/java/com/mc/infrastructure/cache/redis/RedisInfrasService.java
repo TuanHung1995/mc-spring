@@ -1,4 +1,4 @@
-package com.mc.ddd.infrastructure.cache.redis;
+package com.mc.infrastructure.cache.redis;
 
 import java.util.concurrent.TimeUnit;
 

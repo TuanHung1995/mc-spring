@@ -15,7 +15,7 @@ server:
 spring:
   # application
   application:
-    name: sg.com
+    name: mc.com
   #DBS
   datasource:
     hikari:
