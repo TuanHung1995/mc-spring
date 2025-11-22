@@ -24,4 +24,24 @@ public class UserInfrasRepositoryImpl implements UserRepository {
     public Optional<User> findByEmail(String email) {
         return userJPAMapper.findByEmail(email);
     }
+
+    @Override
+    public User save(String email, String password, String fullName) {
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setFullName(fullName);
+        user.setStatus("ACTIVE");
+        return userJPAMapper.save(user);
+    }
+
+    @Override
+    public void save(User user) {
+        userJPAMapper.save(user);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userJPAMapper.findByEmail(email).isPresent();
+    }
 }
