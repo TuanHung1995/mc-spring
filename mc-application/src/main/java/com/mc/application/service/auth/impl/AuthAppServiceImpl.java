@@ -4,13 +4,11 @@ import com.mc.application.model.auth.LoginRequest;
 import com.mc.application.model.auth.RegisterRequest;
 import com.mc.application.model.auth.RegisterResponse;
 import com.mc.application.service.auth.AuthAppService;
-import com.mc.domain.model.entity.Role;
-import com.mc.domain.model.entity.Team;
-import com.mc.domain.model.entity.User;
-import com.mc.domain.model.entity.UserRole;
+import com.mc.domain.model.entity.*;
 import com.mc.domain.repository.TeamRepository;
 import com.mc.domain.repository.UserRepository;
 import com.mc.domain.repository.UserRoleDomainRepository;
+import com.mc.domain.repository.WorkspaceRepository;
 import com.mc.domain.service.AuthDomainService;
 import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
@@ -31,9 +29,10 @@ public class AuthAppServiceImpl implements AuthAppService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final UserRoleDomainRepository userRoleDomainRepository;
+    private final WorkspaceRepository workspaceRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthAppServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDomainService authDomainService, RoleDomainService roleDomainService, UserRepository userRepository, TeamRepository teamRepository, UserRoleDomainRepository userRoleDomainRepository, PasswordEncoder passwordEncoder) {
+    public AuthAppServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDomainService authDomainService, RoleDomainService roleDomainService, UserRepository userRepository, TeamRepository teamRepository, UserRoleDomainRepository userRoleDomainRepository, WorkspaceRepository workspaceRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authDomainService = authDomainService;
@@ -41,6 +40,7 @@ public class AuthAppServiceImpl implements AuthAppService {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.userRoleDomainRepository = userRoleDomainRepository;
+        this.workspaceRepository = workspaceRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -90,6 +90,9 @@ public class AuthAppServiceImpl implements AuthAppService {
 
         UserRole userRole = UserRole.of(user, defaultRole, team);
         userRoleDomainRepository.save(userRole);
+
+        Workspace workspace = Workspace.create("Default Workspace", user, team);
+        workspaceRepository.save(workspace);
 
         // Return response
         return new RegisterResponse(
