@@ -26,7 +26,7 @@ public class Team {
     private String name;
     private String description;
     private String slug;
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")

@@ -7,8 +7,10 @@ import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.Role;
 import com.mc.domain.model.entity.Team;
 import com.mc.domain.model.entity.User;
+import com.mc.domain.model.entity.UserRole;
 import com.mc.domain.repository.TeamRepository;
 import com.mc.domain.repository.UserRepository;
+import com.mc.domain.repository.UserRoleDomainRepository;
 import com.mc.domain.service.AuthDomainService;
 import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
@@ -28,15 +30,17 @@ public class AuthAppServiceImpl implements AuthAppService {
     private final RoleDomainService roleDomainService;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
+    private final UserRoleDomainRepository userRoleDomainRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthAppServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDomainService authDomainService, RoleDomainService roleDomainService, UserRepository userRepository, TeamRepository teamRepository, PasswordEncoder passwordEncoder) {
+    public AuthAppServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDomainService authDomainService, RoleDomainService roleDomainService, UserRepository userRepository, TeamRepository teamRepository, UserRoleDomainRepository userRoleDomainRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authDomainService = authDomainService;
         this.roleDomainService = roleDomainService;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
+        this.userRoleDomainRepository = userRoleDomainRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -81,22 +85,18 @@ public class AuthAppServiceImpl implements AuthAppService {
         teamRepository.save(team);
 
         // Assign default role (Domain rule)
-        Role defaultRole = roleDomainService.getDefaultRole(); // e.g ADMIN
-        user.assignRole(defaultRole, team);
+        Role defaultRole = roleDomainService.getDefaultRole();
+//        user.assignRole(defaultRole, team);
+
+        UserRole userRole = UserRole.of(user, defaultRole, team);
+        userRoleDomainRepository.save(userRole);
 
         // Return response
         return new RegisterResponse(
-                user.getId(),
-                team.getId(),
-                defaultRole.getName()
+                userRole.getUser().getId(),
+                userRole.getTeam().getId(),
+                userRole.getRole().getName()
         );
-//
-//        return authDomainService.register(
-//                registerRequest.getFullName(),
-//                registerRequest.getEmail(),
-//                registerRequest.getPassword(),
-//                registerRequest.getConfirmPassword()
-//        );
     }
 
 }
