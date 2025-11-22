@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Accessors(chain = true)
 @Getter
 @Setter
@@ -20,5 +23,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name; // e.g., ADMIN, USER, etc.
+
+//    @OneToMany(mappedBy = "role")
+//    private Set<UserRole> userRoles = new HashSet<>();
 
 }
