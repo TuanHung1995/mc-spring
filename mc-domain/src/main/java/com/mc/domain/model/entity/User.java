@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -29,10 +30,29 @@ public class User {
     private Date createdAt;
     private Date updatedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private Set<Role> roles;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRole> userRoles = new HashSet<>();
+
+    private User(String fullName, String email, String password, String status) {
+        this.status = status;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+    }
+
+    // Factory
+    public static User create(String fullName, String email, String password, String status) {
+        return new User(fullName, email, password, status);
+    }
+
+    // assign role to user within a team
+    public void assignRole(Role role, Team team) {
+        UserRole userRole = new UserRole();
+        userRole.setUser(this);
+        userRole.setRole(role);
+        userRole.setTeam(team);
+
+        this.userRoles.add(userRole);
+    }
 
 }
