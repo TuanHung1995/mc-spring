@@ -1,3 +1,8 @@
+constants:
+  auth-api-url: "/api/v1/auth"
+  development: true
+  app-url: ""
+
 jwt:
   secret: "f382b7233634548f3f29cb8720f505a5300c24ac22c5b21bf020bc481b27e44d"
   expiration: 86400000 # 1 day in milliseconds

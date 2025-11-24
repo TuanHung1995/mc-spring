@@ -70,6 +70,6 @@ public class AuthDomainServiceImpl implements AuthDomainService {
 
     @Override
     public void forgotPassword(String email) {
-
+        userRepository.forgotPassword(email);
     }
 }

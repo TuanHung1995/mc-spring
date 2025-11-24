@@ -12,7 +12,7 @@ public interface UserRepository {
     User save(String email, String password, String fullName);
     void save(User user);
     boolean existsByEmail(String email);
-//    void forgotPassword(String email);
+    void forgotPassword(String email);
 //    void resetPassword(String token, String newPassword, String confirmNewPassword);
     // List<User> findAll();
     // void deleteById(Long id);
