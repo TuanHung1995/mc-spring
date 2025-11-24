@@ -80,4 +80,9 @@ public class AuthAppServiceImpl implements AuthAppService {
         authDomainService.forgotPassword(email);
     }
 
+    @Override
+    public void resetPassword(String token, String newPassword, String confirmNewPassword) {
+        authDomainService.resetPassword(token, newPassword, confirmNewPassword);
+    }
+
 }

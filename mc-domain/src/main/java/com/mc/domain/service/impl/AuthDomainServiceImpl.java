@@ -72,4 +72,9 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     public void forgotPassword(String email) {
         userRepository.forgotPassword(email);
     }
+
+    @Override
+    public void resetPassword(String token, String newPassword, String confirmNewPassword) {
+        userRepository.resetPassword(token, newPassword, confirmNewPassword);
+    }
 }

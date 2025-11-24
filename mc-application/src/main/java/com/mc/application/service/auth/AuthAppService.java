@@ -13,4 +13,6 @@ public interface AuthAppService {
 
     void forgotPassword(String email);
 
+    void resetPassword(String token, String newPassword, String confirmNewPassword);
+
 }

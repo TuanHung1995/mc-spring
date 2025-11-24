@@ -6,6 +6,7 @@ import com.mc.domain.repository.UserRepository;
 import com.mc.infrastructure.persistence.mapper.UserJPAMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,10 +30,12 @@ public class UserInfrasRepositoryImpl implements UserRepository {
 
     private final UserJPAMapper userJPAMapper;
     private final MailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserInfrasRepositoryImpl(UserJPAMapper userJPAMapper, MailSender mailSender) {
+    public UserInfrasRepositoryImpl(UserJPAMapper userJPAMapper, MailSender mailSender, PasswordEncoder passwordEncoder) {
         this.userJPAMapper = userJPAMapper;
         this.mailSender = mailSender;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -89,6 +92,26 @@ public class UserInfrasRepositoryImpl implements UserRepository {
         String content = "Click on link below to reset your password:\n" + link;
 
         mailSender.send(user.getEmail(), "Reset Password", content);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword, String confirmNewPassword) {
+        if (!newPassword.equals(confirmNewPassword)) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
+        // Find user by reset token
+        User user = userJPAMapper.findByResetToken(token);
+        if (user == null) {
+            log.warn("Invalid reset token: {}", token);
+            return;
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        // Set token to null after reset
+        user.setResetToken(null);
+        userJPAMapper.save(user);
     }
 
 }

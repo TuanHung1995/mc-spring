@@ -8,4 +8,6 @@ public interface AuthDomainService {
 
     void forgotPassword(String email);
 
+    void resetPassword(String token, String newPassword, String confirmNewPassword);
+
 }
