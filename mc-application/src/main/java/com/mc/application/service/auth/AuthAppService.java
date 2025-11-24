@@ -11,4 +11,6 @@ public interface AuthAppService {
 
     RegisterResponse register(RegisterRequest registerRequest);
 
+    void forgotPassword(String email);
+
 }

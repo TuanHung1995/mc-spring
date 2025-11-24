@@ -60,46 +60,24 @@ public class AuthAppServiceImpl implements AuthAppService {
     @Override
     public RegisterResponse register(RegisterRequest request) {
 
-        // 1. Validate input
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already in use");
-        }
-
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match");
-        }
-
-        // Create User Aggregate Root
-        User user = User.create(
-                request.getFullName(),
+        User user = authDomainService.register(
                 request.getEmail(),
-                passwordEncoder.encode(request.getPassword()),
-                "ACTIVE"
+                request.getPassword(),
+                request.getConfirmPassword(),
+                request.getFullName()
         );
 
-        // Persist using Repository
-        userRepository.save(user);
+        RegisterResponse response = new RegisterResponse();
+        response.setUserId(user.getId());
+        response.setFullName(user.getFullName());
 
-        // Create default team
-        Team team = Team.createDefault(user.getFullName(), user);
-        teamRepository.save(team);
+        return response;
 
-        // Assign default role (Domain rule)
-        Role defaultRole = roleDomainService.getDefaultRole();
-//        user.assignRole(defaultRole, team);
+    }
 
-        UserRole userRole = UserRole.of(user, defaultRole, team);
-        userRoleDomainRepository.save(userRole);
-
-        Workspace workspace = Workspace.create("Default Workspace", user, team);
-        workspaceRepository.save(workspace);
-
-        // Return response
-        return new RegisterResponse(
-                userRole.getUser().getId(),
-                userRole.getTeam().getId(),
-                userRole.getRole().getName()
-        );
+    @Override
+    public void forgotPassword(String email) {
+        authDomainService.forgotPassword(email);
     }
 
 }

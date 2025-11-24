@@ -26,6 +26,7 @@ public class User {
     private String phone;
     private String password;
     private String status; // ACTIVE, INACTIVE, SUSPENDED
+    private String resetToken;
     private Date createdAt = new Date();
     private Date updatedAt;
 

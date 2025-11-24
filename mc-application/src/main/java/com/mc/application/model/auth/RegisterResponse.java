@@ -12,7 +12,6 @@ import lombok.Setter;
 public class RegisterResponse {
 
     private Long userId;
-    private Long teamId;
-    private String role;
+    private String fullName;
 
 }

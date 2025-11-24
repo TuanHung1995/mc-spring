@@ -1,9 +1,6 @@
 package com.mc.controller.http.auth;
 
-import com.mc.application.model.auth.JwtAuthResponse;
-import com.mc.application.model.auth.LoginRequest;
-import com.mc.application.model.auth.RegisterRequest;
-import com.mc.application.model.auth.RegisterResponse;
+import com.mc.application.model.auth.*;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -43,4 +40,9 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
+//    @PostMapping("/forgot-password")
+//    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+//
+//    }
 }
