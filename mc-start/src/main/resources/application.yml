@@ -3,8 +3,16 @@ constants:
   development: true
   app-url: ""
 
+app:
+  oauth2:
+    google:
+      token-uri: https://oauth2.googleapis.com/token
+      userinfo-uri: https://openidconnect.googleapis.com/v1/userinfo
+      client-id: ${GOOGLE_CLIENT_ID}
+      client-secret: ${GOOGLE_CLIENT_SECRET}
+
 jwt:
-  secret: "f382b7233634548f3f29cb8720f505a5300c24ac22c5b21bf020bc481b27e44d"
+  secret: ${JWT_SECRET}
   expiration: 86400000 # 1 day in milliseconds
 
 weather:
@@ -18,6 +26,8 @@ server:
       max: 200 #
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   # application
   application:
     name: mc.com
@@ -70,6 +80,16 @@ spring:
           auth: true
           starttls:
             enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
 resilience4j:
   circuitbreaker:
     instances:
