@@ -4,10 +4,10 @@ import com.mc.domain.model.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -15,9 +15,19 @@ public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
+    private Map<String, Object> attributes;
+
+    public CustomUserDetails(User user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
+    }
+
     public CustomUserDetails(User user) {
         this.user = user;
     }
+
+    // Load principal attributes from OAuth2 provider
+//    public OAuth2User getOAuth2User() {}
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -58,7 +68,4 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 
-    public User getUser() {
-        return user;
-    }
 }

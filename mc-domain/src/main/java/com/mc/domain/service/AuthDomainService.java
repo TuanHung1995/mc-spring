@@ -10,4 +10,6 @@ public interface AuthDomainService {
 
     void resetPassword(String token, String newPassword, String confirmNewPassword);
 
+    User processOAuthPostLogin(String email, String name, String imageUrl);
+
 }

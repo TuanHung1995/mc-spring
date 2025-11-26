@@ -1,6 +1,7 @@
 package com.mc.infrastructure.persistence.repository;
 
 import com.mc.domain.model.entity.User;
+import com.mc.domain.model.enums.AccountStatus;
 import com.mc.domain.port.MailSender;
 import com.mc.domain.repository.UserRepository;
 import com.mc.infrastructure.persistence.mapper.UserJPAMapper;
@@ -49,7 +50,7 @@ public class UserInfrasRepositoryImpl implements UserRepository {
         user.setEmail(email);
         user.setPassword(password);
         user.setFullName(fullName);
-        user.setStatus("ACTIVE");
+        user.setStatus(AccountStatus.ACTIVE.name());
         return userJPAMapper.save(user);
     }
 
@@ -112,6 +113,11 @@ public class UserInfrasRepositoryImpl implements UserRepository {
         // Set token to null after reset
         user.setResetToken(null);
         userJPAMapper.save(user);
+    }
+
+    @Override
+    public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
+        return userJPAMapper.findByProviderAndProviderId(provider, providerId);
     }
 
 }

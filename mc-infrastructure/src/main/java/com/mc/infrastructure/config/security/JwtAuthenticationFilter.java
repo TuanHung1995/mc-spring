@@ -1,5 +1,6 @@
 package com.mc.infrastructure.config.security;
 
+import com.mc.infrastructure.constant.SecurityConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,9 +43,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromRequest(HttpServletRequest request) {
 
-        String bearerToken = request.getHeader("Authorization");
+        String bearerToken = request.getHeader(SecurityConstants.HEADER_STRING);
 
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             return bearerToken.substring(7);
         }
 
