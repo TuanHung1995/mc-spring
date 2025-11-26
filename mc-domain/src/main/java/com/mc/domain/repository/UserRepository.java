@@ -9,6 +9,7 @@ public interface UserRepository {
 
     // Define methods for user repository, e.g.:
     Optional<User> findByEmail(String email);
+//    User findByEmail(String email, boolean throwIfNotFound);
     User save(String email, String password, String fullName);
     void save(User user);
     boolean existsByEmail(String email);
@@ -17,7 +18,6 @@ public interface UserRepository {
     // List<User> findAll();
     // void deleteById(Long id);
 
-    // Example method signature
-//    String getUserRole(String email);  // Example method to get user role by email
+    Optional<User> findByProviderAndProviderId(String provider, String providerId);
 
 }

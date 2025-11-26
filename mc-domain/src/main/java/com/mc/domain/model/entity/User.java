@@ -1,5 +1,6 @@
 package com.mc.domain.model.entity;
 
+import com.mc.domain.model.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -27,21 +28,24 @@ public class User {
     private String password;
     private String status; // ACTIVE, INACTIVE, SUSPENDED
     private String resetToken;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+    private String providerId;
+    private String avatarUrl;
     private Date createdAt = new Date();
     private Date updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> userRoles = new HashSet<>();
 
-    private User(String fullName, String email, String password, String status) {
-        this.status = status;
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-    }
-
-    public static User create(String fullName, String email, String password, String status) {
-        return new User(fullName, email, password, status);
+    public static User create(String fullName, String email, String password, String status, AuthProvider provider) {
+        User user = new User();
+        user.setFullName(fullName);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setStatus(status);
+        user.setProvider(provider);
+        return user;
     }
 
 //    public void assignRole(Role role, Team team) {
