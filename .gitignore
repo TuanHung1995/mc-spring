@@ -1,3 +1,5 @@
+.env
+gg-oauth-web-client-1.json
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
