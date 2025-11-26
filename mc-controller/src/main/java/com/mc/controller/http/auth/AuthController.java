@@ -51,4 +51,10 @@ public class AuthController {
         authAppService.resetPassword(request.getToken(), request.getNewPassword(), request.getConfirmPassword());
         return ResponseEntity.ok("Password reset successful");
     }
+
+    // return default login page
+    @GetMapping("/login")
+    public String getLoginPage() {
+        return "Please use POST /api/v1/auth/login to login.";
+    }
 }

@@ -13,4 +13,6 @@ public interface UserJPAMapper extends JpaRepository<User, Long> {
 
     User findByResetToken(String token);
 
+    Optional<User> findByProviderAndProviderId(String provider, String providerId);
+
 }

@@ -5,6 +5,7 @@ constants:
 
 app:
   oauth2:
+    authorized-redirect-uris: "${FRONTEND_URL}/oauth2/redirect"
     google:
       token-uri: https://oauth2.googleapis.com/token
       userinfo-uri: https://openidconnect.googleapis.com/v1/userinfo
@@ -26,8 +27,6 @@ server:
       max: 200 #
 
 spring:
-  main:
-    allow-bean-definition-overriding: true
   # application
   application:
     name: mc.com
@@ -50,6 +49,11 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true # Quan trọng: Nếu DB đã có dữ liệu cũ, dòng này giúp Flyway không bị lỗi khi chạy lần đầu
+    baseline-version: 0
+    locations: classpath:db/migration # Đường dẫn chứa file SQL
   jackson:
     serialization:
       indent-output: true
