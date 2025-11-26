@@ -11,4 +11,8 @@ public interface AuthAppService {
 
     RegisterResponse register(RegisterRequest registerRequest);
 
+    void forgotPassword(String email);
+
+    void resetPassword(String token, String newPassword, String confirmNewPassword);
+
 }

@@ -4,11 +4,11 @@ import com.mc.application.model.auth.LoginRequest;
 import com.mc.application.model.auth.RegisterRequest;
 import com.mc.application.model.auth.RegisterResponse;
 import com.mc.application.service.auth.AuthAppService;
-import com.mc.domain.model.entity.Role;
-import com.mc.domain.model.entity.Team;
-import com.mc.domain.model.entity.User;
+import com.mc.domain.model.entity.*;
 import com.mc.domain.repository.TeamRepository;
 import com.mc.domain.repository.UserRepository;
+import com.mc.domain.repository.UserRoleDomainRepository;
+import com.mc.domain.repository.WorkspaceRepository;
 import com.mc.domain.service.AuthDomainService;
 import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
@@ -28,15 +28,19 @@ public class AuthAppServiceImpl implements AuthAppService {
     private final RoleDomainService roleDomainService;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
+    private final UserRoleDomainRepository userRoleDomainRepository;
+    private final WorkspaceRepository workspaceRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthAppServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDomainService authDomainService, RoleDomainService roleDomainService, UserRepository userRepository, TeamRepository teamRepository, PasswordEncoder passwordEncoder) {
+    public AuthAppServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDomainService authDomainService, RoleDomainService roleDomainService, UserRepository userRepository, TeamRepository teamRepository, UserRoleDomainRepository userRoleDomainRepository, WorkspaceRepository workspaceRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authDomainService = authDomainService;
         this.roleDomainService = roleDomainService;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
+        this.userRoleDomainRepository = userRoleDomainRepository;
+        this.workspaceRepository = workspaceRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -56,47 +60,29 @@ public class AuthAppServiceImpl implements AuthAppService {
     @Override
     public RegisterResponse register(RegisterRequest request) {
 
-        // 1. Validate input
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already in use");
-        }
-
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match");
-        }
-
-        // Create User Aggregate Root
-        User user = User.create(
-                request.getFullName(),
+        User user = authDomainService.register(
                 request.getEmail(),
-                passwordEncoder.encode(request.getPassword()),
-                "ACTIVE"
+                request.getPassword(),
+                request.getConfirmPassword(),
+                request.getFullName()
         );
 
-        // Persist using Repository
-        userRepository.save(user);
+        RegisterResponse response = new RegisterResponse();
+        response.setUserId(user.getId());
+        response.setFullName(user.getFullName());
 
-        // Create default team
-        Team team = Team.createDefault(user.getFullName(), user);
-        teamRepository.save(team);
+        return response;
 
-        // Assign default role (Domain rule)
-        Role defaultRole = roleDomainService.getDefaultRole(); // e.g ADMIN
-        user.assignRole(defaultRole, team);
+    }
 
-        // Return response
-        return new RegisterResponse(
-                user.getId(),
-                team.getId(),
-                defaultRole.getName()
-        );
-//
-//        return authDomainService.register(
-//                registerRequest.getFullName(),
-//                registerRequest.getEmail(),
-//                registerRequest.getPassword(),
-//                registerRequest.getConfirmPassword()
-//        );
+    @Override
+    public void forgotPassword(String email) {
+        authDomainService.forgotPassword(email);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword, String confirmNewPassword) {
+        authDomainService.resetPassword(token, newPassword, confirmNewPassword);
     }
 
 }
