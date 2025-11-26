@@ -3,6 +3,7 @@ package com.mc;
 import com.mc.infrastructure.config.security.JwtAuthenticationEntryPoint;
 import com.mc.infrastructure.config.security.JwtAuthenticationFilter;
 import com.mc.infrastructure.config.security.oauth2.CustomOAuth2UserService;
+import com.mc.infrastructure.config.security.oauth2.CustomOidcUserService;
 import com.mc.infrastructure.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,17 +25,19 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOidcUserService customOidcUserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
 
     @Lazy
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                          CustomOAuth2UserService customOAuth2UserService,
+                          CustomOAuth2UserService customOAuth2UserService, CustomOidcUserService customOidcUserService,
                           OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.customOAuth2UserService = customOAuth2UserService;
+        this.customOidcUserService = customOidcUserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     }
 
@@ -57,9 +60,10 @@ public class SecurityConfig {
                 .formLogin(Customizer.withDefaults())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService) // Đăng ký Service xử lý user
+                                .userService(customOAuth2UserService) // Dùng cho Github, Facebook (OAuth2 chuẩn)
+                                .oidcUserService(customOidcUserService) // Dùng cho Google (OIDC) -> Quan trọng!
                         )
-                        .successHandler(oAuth2AuthenticationSuccessHandler) // Đăng ký Handler sau khi login thành công
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
 //                .exceptionHandling(exception -> exception
 //                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
