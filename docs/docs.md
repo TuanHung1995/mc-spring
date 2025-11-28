@@ -1,0 +1,1 @@
+Google authorize url: http://localhost:1122/login/oauth2/code/google

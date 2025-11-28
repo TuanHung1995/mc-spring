@@ -1,5 +1,6 @@
 package com.mc;
 
+import com.mc.infrastructure.config.security.CustomPermissionEvaluator;
 import com.mc.infrastructure.config.security.JwtAuthenticationEntryPoint;
 import com.mc.infrastructure.config.security.JwtAuthenticationFilter;
 import com.mc.infrastructure.config.security.oauth2.CustomOAuth2UserService;
@@ -8,9 +9,12 @@ import com.mc.infrastructure.config.security.oauth2.OAuth2AuthenticationSuccessH
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -47,12 +52,19 @@ public class SecurityConfig {
     }
 
     @Bean
+    public MethodSecurityExpressionHandler createExpressionHandler(CustomPermissionEvaluator customPermissionEvaluator) {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setPermissionEvaluator(customPermissionEvaluator);
+        return expressionHandler;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
 //                .securityMatcher("/api/**", "/test/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/"
+                                "/api/v1/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/"
                         ).permitAll()
 //                        .requestMatchers("/test/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -60,8 +72,8 @@ public class SecurityConfig {
                 .formLogin(Customizer.withDefaults())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService) // Dùng cho Github, Facebook (OAuth2 chuẩn)
-                                .oidcUserService(customOidcUserService) // Dùng cho Google (OIDC) -> Quan trọng!
+                                .userService(customOAuth2UserService) // Github, Facebook (OAuth2 standard)
+                                .oidcUserService(customOidcUserService) // Google (OIDC)
                         )
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
