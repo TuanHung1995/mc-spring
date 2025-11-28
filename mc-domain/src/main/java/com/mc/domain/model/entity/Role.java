@@ -24,6 +24,14 @@ public class Role {
     private Long id;
     private String name; // e.g., ADMIN, USER, etc.
 
+    @ManyToMany(fetch = FetchType.EAGER) // Load Eager để Security context có quyền ngay lập tức
+    @JoinTable(
+            name = "role_permissions",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions = new HashSet<>();
+
 //    @OneToMany(mappedBy = "role")
 //    private Set<UserRole> userRoles = new HashSet<>();
 
