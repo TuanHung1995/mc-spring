@@ -15,8 +15,8 @@ public class BoardController {
     private final BoardRepository boardRepository;
 
     // CHỈ user nào có quyền 'BOARD:VIEW' trên Board có ID = boardId mới được gọi API này
+    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:VIEW')")
     @GetMapping("/{boardId}")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD:VIEW')")
     public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
 
         Board board = boardRepository.findById(boardId)

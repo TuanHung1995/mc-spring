@@ -50,7 +50,7 @@ public class AuthDomainServiceImpl implements AuthDomainService {
                 fullName,
                 email,
                 passwordEncoder.encode(password),
-                AccountStatus.ACTIVE.name(),
+                AccountStatus.ACTIVE,
                 AuthProvider.LOCAL
         );
         userRepository.save(user);
@@ -71,7 +71,7 @@ public class AuthDomainServiceImpl implements AuthDomainService {
             user.setEmail(email);
             user.setFullName(name);
             user.setProvider(AuthProvider.GOOGLE);
-            user.setStatus(AccountStatus.ACTIVE.name());
+            user.setStatus(AccountStatus.ACTIVE);
             user.setAvatarUrl(imageUrl);
             userRepository.save(user);
 
@@ -110,8 +110,6 @@ public class AuthDomainServiceImpl implements AuthDomainService {
         workspaceRepository.save(workspace);
 
         // Assign default role
-        Role defaultRole = roleDomainService.getDefaultRole();
-        UserRole userRole = UserRole.of(user, defaultRole, team);
-        userRoleDomainRepository.save(userRole);
+
     }
 }
