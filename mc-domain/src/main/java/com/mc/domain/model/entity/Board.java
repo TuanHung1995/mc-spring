@@ -1,44 +1,35 @@
 package com.mc.domain.model.entity;
 
+import com.mc.domain.model.enums.BoardType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
-@Accessors(chain = true)
+@Entity
+@Table(name = "boards")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "teams")
-public class Team {
+public class Board {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
-    private String slug;
+    @Enumerated(EnumType.STRING)
+    private BoardType type;
     private Date createdAt = new Date();
+    private Date updatedAt = new Date();
+    private Date deletedAt;
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
-
-    public static Team createDefault(String fullName, User owner) {
-        Team team = new Team();
-        team.setCreatedBy(owner);
-        team.setName(fullName + "'s Team");
-        team.setSlug("team-" + owner.getId());
-        return team;
-    }
-
 
 }

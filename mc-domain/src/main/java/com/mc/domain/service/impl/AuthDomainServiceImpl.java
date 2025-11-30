@@ -3,35 +3,33 @@ package com.mc.domain.service.impl;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.model.enums.AccountStatus;
 import com.mc.domain.model.enums.AuthProvider;
-import com.mc.domain.repository.TeamRepository;
-import com.mc.domain.repository.UserRepository;
-import com.mc.domain.repository.UserRoleDomainRepository;
-import com.mc.domain.repository.WorkspaceRepository;
+import com.mc.domain.repository.*;
 import com.mc.domain.service.AuthDomainService;
 import com.mc.domain.service.RoleDomainService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AuthDomainServiceImpl implements AuthDomainService {
 
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final WorkspaceRepository workspaceRepository;
     private final RoleDomainService roleDomainService;
-    private final UserRoleDomainRepository userRoleDomainRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthDomainServiceImpl(UserRepository userRepository, TeamRepository teamRepository, WorkspaceRepository workspaceRepository, RoleDomainService roleDomainService, UserRoleDomainRepository userRoleDomainRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.teamRepository = teamRepository;
-        this.workspaceRepository = workspaceRepository;
-        this.roleDomainService = roleDomainService;
-        this.userRoleDomainRepository = userRoleDomainRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Value("${jwt.expiration}")
+    private final Long refreshTokenDurationMs;
 
     @Override
     public User register(String email, String password, String confirmPassword, String fullName) {
@@ -50,7 +48,7 @@ public class AuthDomainServiceImpl implements AuthDomainService {
                 fullName,
                 email,
                 passwordEncoder.encode(password),
-                AccountStatus.ACTIVE.name(),
+                AccountStatus.ACTIVE,
                 AuthProvider.LOCAL
         );
         userRepository.save(user);
@@ -71,7 +69,7 @@ public class AuthDomainServiceImpl implements AuthDomainService {
             user.setEmail(email);
             user.setFullName(name);
             user.setProvider(AuthProvider.GOOGLE);
-            user.setStatus(AccountStatus.ACTIVE.name());
+            user.setStatus(AccountStatus.ACTIVE);
             user.setAvatarUrl(imageUrl);
             userRepository.save(user);
 
@@ -105,13 +103,38 @@ public class AuthDomainServiceImpl implements AuthDomainService {
         Team team = Team.createDefault(user.getFullName(), user);
         teamRepository.save(team);
 
+        // Assign Role to User in Team
+        Role role = roleDomainService.getDefaultRole();
+        TeamMember teamMember = TeamMember.createDefault(user, team, role);
+        teamMemberRepository.save(teamMember);
+
         // Create Default Workspace
         Workspace workspace = Workspace.create("DEFAULT_WORKSPACE", user, team);
         workspaceRepository.save(workspace);
 
-        // Assign default role
-        Role defaultRole = roleDomainService.getDefaultRole();
-        UserRole userRole = UserRole.of(user, defaultRole, team);
-        userRoleDomainRepository.save(userRole);
+    }
+
+    @Override
+    public RefreshToken createRefreshToken(String email) {
+        /* Delete existing refresh tokens for the user */
+        refreshTokenRepository.deleteByUserEmail(email);
+
+        RefreshToken refreshToken = new RefreshToken();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        refreshToken.setUser(user);
+        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        refreshToken.setToken(UUID.randomUUID().toString());
+
+        return refreshTokenRepository.save(refreshToken);
+    }
+
+    @Override
+    public RefreshToken verifyExpiration(RefreshToken token) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            refreshTokenRepository.deleteByUserEmail(token.getUser().getEmail());
+            throw new RuntimeException("Refresh token was expired. Please make a new signin request");
+        }
+        return token;
     }
 }

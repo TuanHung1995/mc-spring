@@ -1,17 +1,13 @@
 package com.mc.application.service.auth.impl;
 
-import com.mc.application.model.auth.LoginRequest;
-import com.mc.application.model.auth.RegisterRequest;
-import com.mc.application.model.auth.RegisterResponse;
+import com.mc.application.model.auth.*;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.*;
-import com.mc.domain.repository.TeamRepository;
-import com.mc.domain.repository.UserRepository;
-import com.mc.domain.repository.UserRoleDomainRepository;
-import com.mc.domain.repository.WorkspaceRepository;
+import com.mc.domain.repository.*;
 import com.mc.domain.service.AuthDomainService;
 import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthAppServiceImpl implements AuthAppService {
 
     private final AuthenticationManager authenticationManager;
@@ -28,24 +25,12 @@ public class AuthAppServiceImpl implements AuthAppService {
     private final RoleDomainService roleDomainService;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
-    private final UserRoleDomainRepository userRoleDomainRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthAppServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, AuthDomainService authDomainService, RoleDomainService roleDomainService, UserRepository userRepository, TeamRepository teamRepository, UserRoleDomainRepository userRoleDomainRepository, WorkspaceRepository workspaceRepository, PasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authDomainService = authDomainService;
-        this.roleDomainService = roleDomainService;
-        this.userRepository = userRepository;
-        this.teamRepository = teamRepository;
-        this.userRoleDomainRepository = userRoleDomainRepository;
-        this.workspaceRepository = workspaceRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
-    public String login(LoginRequest loginRequest) {
+    public JwtAuthResponse login(LoginRequest loginRequest) {
 
         // Authenticate the user using the provided credentials
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -53,7 +38,18 @@ public class AuthAppServiceImpl implements AuthAppService {
 
         // Set the authentication in the security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return jwtTokenProvider.generateToken(authentication);
+
+        // 2. Generate Access Token
+        String accessToken = jwtTokenProvider.generateToken(authentication);
+
+        // 3. Generate Refresh Token
+        RefreshToken refreshToken = authDomainService.createRefreshToken(loginRequest.getEmail());
+
+        JwtAuthResponse response = new JwtAuthResponse();
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(refreshToken.getToken());
+
+        return response;
 
     }
 
@@ -83,6 +79,23 @@ public class AuthAppServiceImpl implements AuthAppService {
     @Override
     public void resetPassword(String token, String newPassword, String confirmNewPassword) {
         authDomainService.resetPassword(token, newPassword, confirmNewPassword);
+    }
+
+    @Override
+    public JwtAuthResponse refreshToken(RefreshTokenRequest request) {
+        return refreshTokenRepository.findByToken(request.getRefreshToken())
+                .map(authDomainService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    // Tạo Access Token mới
+                    String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
+
+                    JwtAuthResponse response = new JwtAuthResponse();
+                    response.setAccessToken(token);
+                    response.setRefreshToken(request.getRefreshToken()); // Giữ nguyên refresh token cũ (hoặc rotate mới tùy bạn)
+                    return response;
+                })
+                .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
 
 }

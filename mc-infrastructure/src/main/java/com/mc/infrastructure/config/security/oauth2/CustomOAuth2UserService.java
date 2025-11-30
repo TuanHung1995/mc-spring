@@ -24,19 +24,25 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        // Lấy thông tin từ Google
         String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
-        String avatarUrl = oAuth2User.getAttribute("picture");
+        String name = oAuth2User.getAttribute("name"); // Với Github có thể là "login"
+        // Github avatar thường là "avatar_url"
+        String avatarUrl = oAuth2User.getAttribute("avatar_url");
+        if (avatarUrl == null) {
+            avatarUrl = oAuth2User.getAttribute("picture");
+        }
 
+        log.info("OAuth2 login detected: email={}, name={}", email, name);
 
-        log.info("email={}, name={}, avatarUrl={}", email, name, avatarUrl);
-        // Gọi Domain Service để xử lý logic nghiệp vụ (Tạo hoặc Update)
+        if (email == null) {
+            // Github có thể không trả về email nếu user để private, cần logic gọi thêm API Github nếu cần
+            // Ở đây tạm thời log warning
+            log.warn("Email not found in OAuth2 provider response");
+        }
+
         User user = authDomainService.processOAuthPostLogin(email, name, avatarUrl);
 
-        // Trả về Principal cho Spring Security Context
-        new CustomUserDetails(user, oAuth2User.getAttributes());
-
+        // Trả về oAuth2User gốc (hoặc có thể bọc lại nếu muốn custom attributes)
         return oAuth2User;
     }
 }
