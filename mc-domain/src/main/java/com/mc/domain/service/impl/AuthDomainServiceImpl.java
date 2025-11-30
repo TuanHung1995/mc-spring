@@ -3,18 +3,21 @@ package com.mc.domain.service.impl;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.model.enums.AccountStatus;
 import com.mc.domain.model.enums.AuthProvider;
-import com.mc.domain.repository.TeamRepository;
-import com.mc.domain.repository.UserRepository;
-import com.mc.domain.repository.UserRoleDomainRepository;
-import com.mc.domain.repository.WorkspaceRepository;
+import com.mc.domain.repository.*;
 import com.mc.domain.service.AuthDomainService;
 import com.mc.domain.service.RoleDomainService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AuthDomainServiceImpl implements AuthDomainService {
 
     private final UserRepository userRepository;
@@ -22,16 +25,11 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     private final WorkspaceRepository workspaceRepository;
     private final RoleDomainService roleDomainService;
     private final UserRoleDomainRepository userRoleDomainRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthDomainServiceImpl(UserRepository userRepository, TeamRepository teamRepository, WorkspaceRepository workspaceRepository, RoleDomainService roleDomainService, UserRoleDomainRepository userRoleDomainRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.teamRepository = teamRepository;
-        this.workspaceRepository = workspaceRepository;
-        this.roleDomainService = roleDomainService;
-        this.userRoleDomainRepository = userRoleDomainRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Value("${jwt.expiration}")
+    private final Long refreshTokenDurationMs;
 
     @Override
     public User register(String email, String password, String confirmPassword, String fullName) {
@@ -109,7 +107,29 @@ public class AuthDomainServiceImpl implements AuthDomainService {
         Workspace workspace = Workspace.create("DEFAULT_WORKSPACE", user, team);
         workspaceRepository.save(workspace);
 
-        // Assign default role
+    }
 
+    @Override
+    public RefreshToken createRefreshToken(String email) {
+        /* Delete existing refresh tokens for the user */
+        refreshTokenRepository.deleteByUserEmail(email);
+
+        RefreshToken refreshToken = new RefreshToken();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        refreshToken.setUser(user);
+        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        refreshToken.setToken(UUID.randomUUID().toString());
+
+        return refreshTokenRepository.save(refreshToken);
+    }
+
+    @Override
+    public RefreshToken verifyExpiration(RefreshToken token) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            refreshTokenRepository.deleteByUserEmail(token.getUser().getEmail());
+            throw new RuntimeException("Refresh token was expired. Please make a new signin request");
+        }
+        return token;
     }
 }

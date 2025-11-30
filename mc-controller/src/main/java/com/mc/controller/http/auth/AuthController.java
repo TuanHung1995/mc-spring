@@ -20,14 +20,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
-        // Retrieve user by email
-        String token = authAppService.login(request);
-
-        JwtAuthResponse response = new JwtAuthResponse();
-        response.setAccessToken(token);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authAppService.login(request));
     }
 
     @PostMapping("/register")
@@ -50,6 +43,11 @@ public class AuthController {
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         authAppService.resetPassword(request.getToken(), request.getNewPassword(), request.getConfirmPassword());
         return ResponseEntity.ok("Password reset successful");
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<JwtAuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authAppService.refreshToken(request));
     }
 
     // return default login page
