@@ -50,7 +50,7 @@ public class UserInfrasRepositoryImpl implements UserRepository {
         user.setEmail(email);
         user.setPassword(password);
         user.setFullName(fullName);
-        user.setStatus(AccountStatus.ACTIVE.name());
+        user.setStatus(AccountStatus.ACTIVE);
         return userJPAMapper.save(user);
     }
 

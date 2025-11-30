@@ -75,4 +75,16 @@ public class JwtTokenProvider {
                 .getExpiration();
         return expirationDate.before(new Date());
     }
+
+    public String generateTokenFromEmail(String email) {
+        Date currentDate = new Date();
+        Date expirationDate = new Date(currentDate.getTime() + jwtExpirationMs);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(currentDate)
+                .setExpiration(expirationDate)
+                .signWith(key())
+                .compact();
+    }
 }

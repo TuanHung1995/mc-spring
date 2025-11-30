@@ -1,5 +1,7 @@
 package com.mc.domain.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mc.domain.model.enums.AccountStatus;
 import com.mc.domain.model.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +28,8 @@ public class User {
     private String email;
     private String phone;
     private String password;
-    private String status; // ACTIVE, INACTIVE, SUSPENDED
+    @Enumerated(EnumType.STRING)
+    private AccountStatus status;
     private String resetToken;
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
@@ -35,10 +38,15 @@ public class User {
     private Date createdAt = new Date();
     private Date updatedAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole> userRoles = new HashSet<>();
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Set<TeamMember> teamMembers = new HashSet<>();
 
-    public static User create(String fullName, String email, String password, String status, AuthProvider provider) {
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Set<BoardMember> boardMembers = new HashSet<>();
+
+    public static User create(String fullName, String email, String password, AccountStatus status, AuthProvider provider) {
         User user = new User();
         user.setFullName(fullName);
         user.setEmail(email);

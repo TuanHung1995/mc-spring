@@ -26,16 +26,17 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
-    // Load principal attributes from OAuth2 provider
-//    public OAuth2User getOAuth2User() {}
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getUserRoles().stream()
-                .map(userRole -> new SimpleGrantedAuthority(
-                        userRole.getRole().getName() + "_TEAM_" + userRole.getTeam().getId()
+        return user.getTeamMembers().stream()
+                .map(teamMember -> new SimpleGrantedAuthority(
+                        teamMember.getRole().getName() + "_TEAM_" + teamMember.getTeam().getId()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public Long getUserId() {
+        return user.getId();
     }
 
     @Override
