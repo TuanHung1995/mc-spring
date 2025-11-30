@@ -1,5 +1,7 @@
 package com.mc.domain.model.entity;
 
+import com.mc.domain.model.enums.AccountStatus;
+import com.mc.domain.model.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,5 +31,13 @@ public class TeamMember {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    public static TeamMember createDefault(User user, Team team, Role role) {
+        TeamMember teamMember = new TeamMember();
+        teamMember.setUser(user);
+        teamMember.setTeam(team);
+        teamMember.setRole(role);
+        return teamMember;
+    }
 
 }

@@ -24,8 +24,8 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     private final TeamRepository teamRepository;
     private final WorkspaceRepository workspaceRepository;
     private final RoleDomainService roleDomainService;
-    private final UserRoleDomainRepository userRoleDomainRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.expiration}")
@@ -102,6 +102,11 @@ public class AuthDomainServiceImpl implements AuthDomainService {
         // Create default team
         Team team = Team.createDefault(user.getFullName(), user);
         teamRepository.save(team);
+
+        // Assign Role to User in Team
+        Role role = roleDomainService.getDefaultRole();
+        TeamMember teamMember = TeamMember.createDefault(user, team, role);
+        teamMemberRepository.save(teamMember);
 
         // Create Default Workspace
         Workspace workspace = Workspace.create("DEFAULT_WORKSPACE", user, team);

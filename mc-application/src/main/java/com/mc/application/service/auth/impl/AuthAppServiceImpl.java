@@ -25,7 +25,6 @@ public class AuthAppServiceImpl implements AuthAppService {
     private final RoleDomainService roleDomainService;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
-    private final UserRoleDomainRepository userRoleDomainRepository;
     private final WorkspaceRepository workspaceRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;

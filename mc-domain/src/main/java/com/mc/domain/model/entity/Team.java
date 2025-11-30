@@ -32,9 +32,6 @@ public class Team {
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
 
-    @OneToMany(mappedBy = "team")
-    private Set<UserRole> userRoles = new HashSet<>();
-
     public static Team createDefault(String fullName, User owner) {
         Team team = new Team();
         team.setCreatedBy(owner);
