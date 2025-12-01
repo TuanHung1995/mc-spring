@@ -3,8 +3,10 @@ package com.mc.application.service.auth.impl;
 import com.mc.application.model.auth.*;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.*;
+import com.mc.domain.port.MailSender;
 import com.mc.domain.repository.*;
 import com.mc.domain.service.AuthDomainService;
+import com.mc.domain.service.InviteDomainService;
 import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,19 +17,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthAppServiceImpl implements AuthAppService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final MailSender mailSender;
+
     private final AuthDomainService authDomainService;
     private final RoleDomainService roleDomainService;
+    private final InviteDomainService inviteDomainService;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final WorkspaceRepository workspaceRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public JwtAuthResponse login(LoginRequest loginRequest) {
@@ -60,7 +67,8 @@ public class AuthAppServiceImpl implements AuthAppService {
                 request.getEmail(),
                 request.getPassword(),
                 request.getConfirmPassword(),
-                request.getFullName()
+                request.getFullName(),
+                request.getInviteToken()
         );
 
         RegisterResponse response = new RegisterResponse();

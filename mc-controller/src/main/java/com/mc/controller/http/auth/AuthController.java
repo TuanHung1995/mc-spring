@@ -2,6 +2,7 @@ package com.mc.controller.http.auth;
 
 import com.mc.application.model.auth.*;
 import com.mc.application.service.auth.AuthAppService;
+import com.mc.application.service.invite.InviteAppService;
 import com.mc.domain.model.entity.User;
 import com.nimbusds.openid.connect.sdk.LogoutRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthAppService authAppService;
+    private final InviteAppService inviteAppService;
 
-    public AuthController(AuthAppService authAppService) {
+    public AuthController(AuthAppService authAppService, InviteAppService inviteAppService) {
         this.authAppService = authAppService;
+        this.inviteAppService = inviteAppService;
     }
 
     @PostMapping("/login")
@@ -29,6 +32,10 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
         RegisterResponse response = authAppService.register(request);
+
+        if (request.getInviteToken() != null && !request.getInviteToken().isEmpty()) {
+            inviteAppService.acceptInvitation(request.getInviteToken());
+        }
 
         return ResponseEntity.ok(response);
     }
@@ -52,7 +59,7 @@ public class AuthController {
         return ResponseEntity.ok(authAppService.refreshToken(request));
     }
 
-    @PostMapping
+    @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
 

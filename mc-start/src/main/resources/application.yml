@@ -14,7 +14,9 @@ app:
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 86400000 # 1 day in milliseconds
+  expiration: 86400000
+  invite:
+    expiration: 86400000
 
 weather:
   api:

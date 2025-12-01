@@ -27,6 +27,9 @@ public class JwtTokenProvider implements TokenHelperPort {
     @Value("${jwt.expiration}")
     private long jwtExpirationMs;
 
+    @Value("${jwt.invite.expiration}")
+    private long inviteTokenExpirationMs;
+
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
@@ -112,5 +115,29 @@ public class JwtTokenProvider implements TokenHelperPort {
                 .setExpiration(expirationDate)
                 .signWith(key())
                 .compact();
+    }
+
+    /* Generate invite token with boardId and role */
+    public String generateInviteToken(String email, Long boardId, String role) {
+        Date currentDate = new Date();
+        Date expirationDate = new Date(currentDate.getTime() + inviteTokenExpirationMs);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("boardId", boardId)
+                .claim("role", role)
+                .setIssuedAt(currentDate)
+                .setExpiration(expirationDate)
+                .signWith(key())
+                .compact();
+    }
+
+    /* Get claims from invite token */
+    public Claims getInviteClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

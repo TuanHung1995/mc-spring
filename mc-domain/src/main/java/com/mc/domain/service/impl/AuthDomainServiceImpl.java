@@ -34,10 +34,10 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     private final TokenHelperPort tokenHelperPort;
 
     @Value("${jwt.expiration}")
-    private final Long refreshTokenDurationMs;
+    private long refreshTokenDurationMs;
 
     @Override
-    public User register(String email, String password, String confirmPassword, String fullName) {
+    public User register(String email, String password, String confirmPassword, String fullName, String inviteToken) {
 
         if (!password.equals(confirmPassword)) {
             throw new IllegalArgumentException("Passwords do not match");
@@ -59,7 +59,10 @@ public class AuthDomainServiceImpl implements AuthDomainService {
         userRepository.save(user);
 
         // Initialize User Data
-        initUserData(user);
+        if (inviteToken == null && inviteToken.isEmpty()) {
+            // Nếu không có inviteToken, tạo data mặc định
+            initUserData(user);
+        }
 
         return user;
     }

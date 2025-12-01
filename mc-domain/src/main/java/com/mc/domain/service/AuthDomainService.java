@@ -5,7 +5,7 @@ import com.mc.domain.model.entity.User;
 
 public interface AuthDomainService {
 
-    User register(String email, String password, String confirmPassword, String fullName);
+    User register(String email, String password, String confirmPassword, String fullName, String inviteToken);
 
     void forgotPassword(String email);
 
