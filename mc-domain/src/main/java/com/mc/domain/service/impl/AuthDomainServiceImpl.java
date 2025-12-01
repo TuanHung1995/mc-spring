@@ -1,8 +1,11 @@
 package com.mc.domain.service.impl;
 
+import com.mc.domain.exception.BusinessLogicException;
+import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.model.enums.AccountStatus;
 import com.mc.domain.model.enums.AuthProvider;
+import com.mc.domain.port.MailSender;
 import com.mc.domain.port.TokenHelperPort;
 import com.mc.domain.repository.*;
 import com.mc.domain.service.AuthDomainService;
@@ -32,6 +35,13 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     private final TokenBlacklistRepository tokenBlacklistRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenHelperPort tokenHelperPort;
+    private final MailSender mailSender;
+
+    @Value("${constants.max-failed-login-attempts}")
+    private int MAX_FAILED_ATTEMPTS;
+
+    @Value("${constants.frontend}")
+    private String appUrl;
 
     @Value("${jwt.expiration}")
     private long refreshTokenDurationMs;
@@ -40,12 +50,12 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     public User register(String email, String password, String confirmPassword, String fullName, String inviteToken) {
 
         if (!password.equals(confirmPassword)) {
-            throw new IllegalArgumentException("Passwords do not match");
+            throw new BusinessLogicException("Passwords do not match");
         }
 
         // Validate input
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new BusinessLogicException("Email already in use");
         }
 
         // Create User Aggregate Root
@@ -160,5 +170,55 @@ public class AuthDomainServiceImpl implements AuthDomainService {
         blacklist.setExpiryDate(expiration.toInstant());
 
         tokenBlacklistRepository.save(blacklist);
+    }
+
+    @Override
+    public void handleFailedLogin(String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) return;
+
+        // Nếu đã khóa rồi thì không làm gì thêm (hoặc có thể gửi lại mail)
+        if (AccountStatus.LOCKED.equals(user.getStatus())) {
+            return;
+        }
+
+        int attempts = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
+        user.setFailedLoginAttempts(attempts + 1);
+
+        if (user.getFailedLoginAttempts() >= MAX_FAILED_ATTEMPTS) {
+            user.setStatus(AccountStatus.LOCKED);
+            String token = UUID.randomUUID().toString();
+            user.setUnlockToken(token);
+
+            // Gửi email
+            String unlockLink = appUrl + "/unlock-account?token=" + token; // Link trỏ về Frontend
+            String subject = "Account Locked - Action Required";
+            String body = "Your account has been locked due to multiple failed login attempts.\n"
+                    + "Please click the link below to unlock your account:\n" + unlockLink;
+
+            mailSender.send(email, subject, body);
+        }
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resetFailedLogin(String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user != null && user.getFailedLoginAttempts() > 0) {
+            user.setFailedLoginAttempts(0);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public void unlockAccount(String token) {
+        User user = userRepository.findByUnlockToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "unlockToken", token));
+
+        user.setStatus(AccountStatus.ACTIVE);
+        user.setFailedLoginAttempts(0);
+        user.setUnlockToken(null);
+        userRepository.save(user);
     }
 }

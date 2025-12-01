@@ -16,4 +16,6 @@ public interface AuthAppService {
     JwtAuthResponse refreshToken(RefreshTokenRequest refreshTokenRequest);
 
     void logout(String accessToken);
+
+    void unlockAccount(String token);
 }

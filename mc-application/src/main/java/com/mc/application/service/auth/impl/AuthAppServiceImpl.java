@@ -11,6 +11,8 @@ import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,24 +41,29 @@ public class AuthAppServiceImpl implements AuthAppService {
     @Override
     public JwtAuthResponse login(LoginRequest loginRequest) {
 
-        // Authenticate the user using the provided credentials
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getEmail(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-        // Set the authentication in the security context
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            authDomainService.resetFailedLogin(loginRequest.getEmail());
 
-        // 2. Generate Access Token
-        String accessToken = jwtTokenProvider.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 3. Generate Refresh Token
-        RefreshToken refreshToken = authDomainService.createRefreshToken(loginRequest.getEmail());
+            String accessToken = jwtTokenProvider.generateToken(authentication);
+            RefreshToken refreshToken = authDomainService.createRefreshToken(loginRequest.getEmail());
 
-        JwtAuthResponse response = new JwtAuthResponse();
-        response.setAccessToken(accessToken);
-        response.setRefreshToken(refreshToken.getToken());
+            return new JwtAuthResponse(accessToken, refreshToken.getToken(), "Bearer");
 
-        return response;
+        } catch (BadCredentialsException e) {
+            authDomainService.handleFailedLogin(loginRequest.getEmail());
+            throw e;
+        } catch (LockedException e) {
+            throw new RuntimeException("Account is locked. Please check your email to unlock.");
+        }
 
     }
 
@@ -118,6 +125,11 @@ public class AuthAppServiceImpl implements AuthAppService {
         String email = jwtTokenProvider.getUsername(token);
 
         authDomainService.logout(token, email);
+    }
+
+    @Override
+    public void unlockAccount(String token) {
+        authDomainService.unlockAccount(token);
     }
 
 }

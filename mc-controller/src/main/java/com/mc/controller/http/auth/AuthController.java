@@ -5,6 +5,7 @@ import com.mc.application.service.auth.AuthAppService;
 import com.mc.application.service.invite.InviteAppService;
 import com.mc.domain.model.entity.User;
 import com.nimbusds.openid.connect.sdk.LogoutRequest;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +19,21 @@ public class AuthController {
     private final AuthAppService authAppService;
     private final InviteAppService inviteAppService;
 
+    private static final String AUTH_RATE_LIMITER = "authRateLimiter";
+
     public AuthController(AuthAppService authAppService, InviteAppService inviteAppService) {
         this.authAppService = authAppService;
         this.inviteAppService = inviteAppService;
     }
 
     @PostMapping("/login")
+    @RateLimiter(name = AUTH_RATE_LIMITER)
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authAppService.login(request));
     }
 
     @PostMapping("/register")
+    @RateLimiter(name = AUTH_RATE_LIMITER)
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
         RegisterResponse response = authAppService.register(request);
@@ -41,6 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
+    @RateLimiter(name = AUTH_RATE_LIMITER)
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
 
         authAppService.forgotPassword(request.getEmail());
@@ -70,6 +76,13 @@ public class AuthController {
 
         return ResponseEntity.badRequest().body("No Authorization header found");
 
+    }
+
+    @PostMapping("/unlock-account")
+    @RateLimiter(name = AUTH_RATE_LIMITER)
+    public ResponseEntity<?> unlockAccount(@RequestParam String token) {
+        authAppService.unlockAccount(token);
+        return ResponseEntity.ok("Account unlocked successfully. You can now login.");
     }
 
     // return default login page

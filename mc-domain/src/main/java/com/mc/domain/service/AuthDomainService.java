@@ -19,4 +19,10 @@ public interface AuthDomainService {
 
     void logout(String accessToken, String email);
 
+    void handleFailedLogin(String email);
+
+    void resetFailedLogin(String email);
+
+    void unlockAccount(String token);
+
 }
