@@ -3,6 +3,8 @@ package com.mc.controller.http.auth;
 import com.mc.application.model.auth.*;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.User;
+import com.nimbusds.openid.connect.sdk.LogoutRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +50,19 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<JwtAuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authAppService.refreshToken(request));
+    }
+
+    @PostMapping
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && !authHeader.isEmpty()) {
+            authAppService.logout(authHeader);
+            return ResponseEntity.ok("Logged out successfully");
+        }
+
+        return ResponseEntity.badRequest().body("No Authorization header found");
+
     }
 
     // return default login page

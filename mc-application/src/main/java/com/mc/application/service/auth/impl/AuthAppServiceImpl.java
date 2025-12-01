@@ -98,4 +98,18 @@ public class AuthAppServiceImpl implements AuthAppService {
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
 
+    @Override
+    public void logout(String accessToken) {
+        // accessToken thường có prefix "Bearer ", cần cắt bỏ
+        String token = accessToken;
+        if (accessToken.startsWith("Bearer ")) {
+            token = accessToken.substring(7);
+        }
+
+        // Lấy email từ token để xóa refresh token tương ứng
+        String email = jwtTokenProvider.getUsername(token);
+
+        authDomainService.logout(token, email);
+    }
+
 }

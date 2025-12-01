@@ -17,4 +17,6 @@ public interface AuthDomainService {
 
     RefreshToken verifyExpiration(RefreshToken token);
 
+    void logout(String accessToken, String email);
+
 }

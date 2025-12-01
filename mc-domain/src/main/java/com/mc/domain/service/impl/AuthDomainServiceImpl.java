@@ -3,6 +3,7 @@ package com.mc.domain.service.impl;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.model.enums.AccountStatus;
 import com.mc.domain.model.enums.AuthProvider;
+import com.mc.domain.port.TokenHelperPort;
 import com.mc.domain.repository.*;
 import com.mc.domain.service.AuthDomainService;
 import com.mc.domain.service.RoleDomainService;
@@ -11,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -26,7 +29,9 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     private final RoleDomainService roleDomainService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final TokenBlacklistRepository tokenBlacklistRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenHelperPort tokenHelperPort;
 
     @Value("${jwt.expiration}")
     private final Long refreshTokenDurationMs;
@@ -136,5 +141,21 @@ public class AuthDomainServiceImpl implements AuthDomainService {
             throw new RuntimeException("Refresh token was expired. Please make a new signin request");
         }
         return token;
+    }
+
+    @Override
+    @Transactional
+    public void logout(String accessToken, String email) {
+        // 1. Xóa Refresh Token
+        refreshTokenRepository.deleteByUserEmail(email);
+
+        // 2. Lấy thời gian hết hạn thông qua Port
+        Date expiration = tokenHelperPort.getExpirationDateFromToken(accessToken);
+
+        TokenBlacklist blacklist = new TokenBlacklist();
+        blacklist.setToken(accessToken);
+        blacklist.setExpiryDate(expiration.toInstant());
+
+        tokenBlacklistRepository.save(blacklist);
     }
 }
