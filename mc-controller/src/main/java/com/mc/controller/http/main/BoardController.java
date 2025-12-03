@@ -1,5 +1,7 @@
 package com.mc.controller.http.main;
 
+import com.mc.application.model.board.InviteRequest;
+import com.mc.application.service.invite.InviteAppService;
 import com.mc.domain.model.entity.Board;
 import com.mc.domain.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class BoardController {
 
     private final BoardRepository boardRepository;
+    private final InviteAppService inviteAppService;
 
-    // CHỈ user nào có quyền 'BOARD:VIEW' trên Board có ID = boardId mới được gọi API này
     @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:VIEW')")
     @GetMapping("/{boardId}")
     public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
@@ -25,11 +27,23 @@ public class BoardController {
         return ResponseEntity.ok(board);
     }
 
-    // CHỈ user nào có quyền 'BOARD:DELETE' trên Board đó mới được xóa
     @DeleteMapping("/{boardId}")
     @PreAuthorize("hasPermission(#boardId, 'BOARD:DELETE')")
     public ResponseEntity<?> deleteBoard(@PathVariable Long boardId) {
-        // ... logic xóa
+
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{boardId}/invite")
+    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:INVITE')")
+    public ResponseEntity<?> inviteMember(@PathVariable Long boardId, @RequestBody InviteRequest request) {
+        inviteAppService.inviteMember(boardId, request);
+        return ResponseEntity.ok("Invitation sent");
+    }
+
+    @PostMapping("/accept-invite")
+    public ResponseEntity<?> acceptInvite(@RequestParam String token) {
+        inviteAppService.acceptInvitation(token);
+        return ResponseEntity.ok("Joined board successfully");
     }
 }

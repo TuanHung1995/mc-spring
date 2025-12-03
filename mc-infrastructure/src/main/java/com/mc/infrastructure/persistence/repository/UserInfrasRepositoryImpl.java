@@ -26,7 +26,7 @@ public class UserInfrasRepositoryImpl implements UserRepository {
     @Value("${constants.development}")
     private boolean isDevelopment;
 
-    @Value("${constants.app-url}")
+    @Value("${constants.frontend}")
     private String appUrl;
 
     private final UserJPAMapper userJPAMapper;
@@ -118,6 +118,11 @@ public class UserInfrasRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
         return userJPAMapper.findByProviderAndProviderId(provider, providerId);
+    }
+
+    @Override
+    public Optional<User> findByUnlockToken(String token) {
+        return userJPAMapper.findByUnlockToken(token);
     }
 
 }
