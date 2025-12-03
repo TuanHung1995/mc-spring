@@ -15,4 +15,6 @@ public interface UserJPAMapper extends JpaRepository<User, Long> {
 
     Optional<User> findByProviderAndProviderId(String provider, String providerId);
 
+    Optional<User> findByUnlockToken(String token);
+
 }

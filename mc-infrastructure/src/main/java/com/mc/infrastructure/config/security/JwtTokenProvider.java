@@ -1,5 +1,7 @@
 package com.mc.infrastructure.config.security;
 
+import com.mc.domain.port.TokenHelperPort;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,16 +15,20 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class JwtTokenProvider {
+public class JwtTokenProvider implements TokenHelperPort {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Value("${jwt.expiration}")
     private long jwtExpirationMs;
+
+    @Value("${jwt.invite.expiration}")
+    private long inviteTokenExpirationMs;
 
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
@@ -43,6 +49,16 @@ public class JwtTokenProvider {
                 .compact();
 
         return token;
+    }
+
+    @Override
+    public String getUsernameFromToken(String token) {
+        return getClaimFromToken(token, Claims::getSubject);
+    }
+
+    @Override
+    public Date getExpirationDateFromToken(String token) {
+        return getClaimFromToken(token, Claims::getExpiration);
     }
 
     public String getUsername(String token) {
@@ -76,6 +92,19 @@ public class JwtTokenProvider {
         return expirationDate.before(new Date());
     }
 
+    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public String generateTokenFromEmail(String email) {
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + jwtExpirationMs);
@@ -86,5 +115,29 @@ public class JwtTokenProvider {
                 .setExpiration(expirationDate)
                 .signWith(key())
                 .compact();
+    }
+
+    /* Generate invite token with boardId and role */
+    public String generateInviteToken(String email, Long boardId, String role) {
+        Date currentDate = new Date();
+        Date expirationDate = new Date(currentDate.getTime() + inviteTokenExpirationMs);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("boardId", boardId)
+                .claim("role", role)
+                .setIssuedAt(currentDate)
+                .setExpiration(expirationDate)
+                .signWith(key())
+                .compact();
+    }
+
+    /* Get claims from invite token */
+    public Claims getInviteClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

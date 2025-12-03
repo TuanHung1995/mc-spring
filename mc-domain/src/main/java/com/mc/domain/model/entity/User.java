@@ -36,6 +36,8 @@ public class User {
     private String providerId;
     private String avatarUrl;
     private Date createdAt = new Date();
+    private Integer failedLoginAttempts = 0;
+    private String unlockToken;
     private Date updatedAt;
 
     @OneToMany(mappedBy = "user")
@@ -55,14 +57,5 @@ public class User {
         user.setProvider(provider);
         return user;
     }
-
-//    public void assignRole(Role role, Team team) {
-//        UserRole userRole = new UserRole();
-//        userRole.setUser(this);
-//        userRole.setRole(role);
-//        userRole.setTeam(team);
-//
-//        this.userRoles.add(userRole);
-//    }
 
 }

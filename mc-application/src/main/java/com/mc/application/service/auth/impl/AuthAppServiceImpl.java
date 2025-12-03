@@ -3,17 +3,23 @@ package com.mc.application.service.auth.impl;
 import com.mc.application.model.auth.*;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.*;
+import com.mc.domain.port.MailSender;
 import com.mc.domain.repository.*;
 import com.mc.domain.service.AuthDomainService;
+import com.mc.domain.service.InviteDomainService;
 import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,35 +27,43 @@ public class AuthAppServiceImpl implements AuthAppService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final MailSender mailSender;
+
     private final AuthDomainService authDomainService;
     private final RoleDomainService roleDomainService;
+    private final InviteDomainService inviteDomainService;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final WorkspaceRepository workspaceRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public JwtAuthResponse login(LoginRequest loginRequest) {
 
-        // Authenticate the user using the provided credentials
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getEmail(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-        // Set the authentication in the security context
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            authDomainService.resetFailedLogin(loginRequest.getEmail());
 
-        // 2. Generate Access Token
-        String accessToken = jwtTokenProvider.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 3. Generate Refresh Token
-        RefreshToken refreshToken = authDomainService.createRefreshToken(loginRequest.getEmail());
+            String accessToken = jwtTokenProvider.generateToken(authentication);
+            RefreshToken refreshToken = authDomainService.createRefreshToken(loginRequest.getEmail());
 
-        JwtAuthResponse response = new JwtAuthResponse();
-        response.setAccessToken(accessToken);
-        response.setRefreshToken(refreshToken.getToken());
+            return new JwtAuthResponse(accessToken, refreshToken.getToken(), "Bearer");
 
-        return response;
+        } catch (BadCredentialsException e) {
+            authDomainService.handleFailedLogin(loginRequest.getEmail());
+            throw e;
+        } catch (LockedException e) {
+            throw new RuntimeException("Account is locked. Please check your email to unlock.");
+        }
 
     }
 
@@ -60,7 +74,8 @@ public class AuthAppServiceImpl implements AuthAppService {
                 request.getEmail(),
                 request.getPassword(),
                 request.getConfirmPassword(),
-                request.getFullName()
+                request.getFullName(),
+                request.getInviteToken()
         );
 
         RegisterResponse response = new RegisterResponse();
@@ -96,6 +111,25 @@ public class AuthAppServiceImpl implements AuthAppService {
                     return response;
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
+    }
+
+    @Override
+    public void logout(String accessToken) {
+        // accessToken thường có prefix "Bearer ", cần cắt bỏ
+        String token = accessToken;
+        if (accessToken.startsWith("Bearer ")) {
+            token = accessToken.substring(7);
+        }
+
+        // Lấy email từ token để xóa refresh token tương ứng
+        String email = jwtTokenProvider.getUsername(token);
+
+        authDomainService.logout(token, email);
+    }
+
+    @Override
+    public void unlockAccount(String token) {
+        authDomainService.unlockAccount(token);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.mc.infrastructure.persistence.repository;
 
+import com.mc.domain.model.entity.BoardMember;
 import com.mc.domain.model.entity.Role;
 import com.mc.domain.repository.BoardMemberRepository;
 import com.mc.infrastructure.persistence.mapper.BoardMemberJPAMapper;
@@ -27,6 +28,16 @@ public class BoardMemberInfrasRepository implements BoardMemberRepository {
         } catch (Exception e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void save(BoardMember boardMember) {
+        boardMemberJPAMapper.save(boardMember);
+    }
+
+    @Override
+    public boolean existsByBoardIdAndUserId(Long boardId, Long userId) {
+        return boardMemberJPAMapper.findRoleByBoardIdAndUserId(boardId, userId).isPresent();
     }
 
 }

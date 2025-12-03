@@ -14,4 +14,8 @@ public interface AuthAppService {
     void resetPassword(String token, String newPassword, String confirmNewPassword);
 
     JwtAuthResponse refreshToken(RefreshTokenRequest refreshTokenRequest);
+
+    void logout(String accessToken);
+
+    void unlockAccount(String token);
 }
