@@ -17,6 +17,10 @@ import java.util.Date;
 @AllArgsConstructor
 public class WorkspaceMember {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private RoleType role;
     private Date joinedAt = new Date();
 
@@ -24,7 +28,6 @@ public class WorkspaceMember {
     @JoinColumn(name = "workspace_id", referencedColumnName = "id")
     private Workspace workspace;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;

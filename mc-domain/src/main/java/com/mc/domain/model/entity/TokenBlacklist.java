@@ -1,6 +1,7 @@
 package com.mc.domain.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
