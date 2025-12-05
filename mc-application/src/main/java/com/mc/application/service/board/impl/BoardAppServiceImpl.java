@@ -2,9 +2,12 @@ package com.mc.application.service.board.impl;
 
 import com.mc.application.service.board.BoardAppService;
 import com.mc.domain.model.entity.Board;
+import com.mc.domain.port.RealTimeUpdatePort;
 import com.mc.domain.service.BoardDomainService;
 import com.mc.infrastructure.config.security.CustomUserDetails;
+import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,11 @@ import java.util.List;
 public class BoardAppServiceImpl implements BoardAppService {
 
     private final BoardDomainService boardDomainService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RealTimeUpdatePort realTimeUpdatePort; // [MỚI] Inject Port
+
+    @Value("${constants.frontend}")
+    private String frontendUrl;
 
     @Override
     public List<Board> getBoardsForUser() {

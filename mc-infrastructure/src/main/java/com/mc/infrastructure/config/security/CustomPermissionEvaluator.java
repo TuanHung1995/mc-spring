@@ -2,8 +2,6 @@ package com.mc.infrastructure.config.security;
 
 import com.mc.domain.model.entity.Board;
 import com.mc.domain.model.entity.Role;
-import com.mc.domain.model.entity.User;
-import com.mc.domain.model.enums.RoleType;
 import com.mc.domain.repository.*;
 import com.mc.infrastructure.constant.UtilMethod;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
 
 @Component
