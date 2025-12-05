@@ -32,4 +32,8 @@ public class Board {
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
 
+    @ManyToOne
+    @JoinColumn(name = "workspace_id", referencedColumnName = "id")
+    Workspace workspace;
+
 }

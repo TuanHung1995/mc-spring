@@ -103,17 +103,19 @@ CREATE TABLE `boards`
 (
     `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `workspace_id` BIGINT          NOT NULL,
+    `created_by`   BIGINT          NOT NULL ,
+    `deleted_by`   BIGINT,
     `name`         VARCHAR(255)    NOT NULL,
     `description`  TEXT,
     `type`         ENUM ('PUBLIC', 'PRIVATE', 'SHAREABLE') DEFAULT 'PUBLIC',
-    `created_by`   BIGINT,
     `created_at`   DATETIME                                DEFAULT CURRENT_TIMESTAMP,
     `updated_at`   DATETIME                                DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at`   DATETIME        NULL, -- Soft Delete
     PRIMARY KEY (`id`),
     KEY `idx_workspace` (`workspace_id`),
     CONSTRAINT `fk_board_ws` FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_board_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+    CONSTRAINT `fk_board_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+    CONSTRAINT `fk_board_deleter` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
