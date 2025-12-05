@@ -6,6 +6,7 @@ import com.mc.infrastructure.persistence.mapper.BoardJPAMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,11 @@ public class BoardInfrasRepository implements BoardRepository {
     @Override
     public Optional<Board> findById(Long boardId) {
         return boardJPAMapper.findById(boardId);
+    }
+
+    @Override
+    public List<Board> findAllByUserId(Long userId) {
+        return boardJPAMapper.findAllByUserId(userId);
     }
 
 }
