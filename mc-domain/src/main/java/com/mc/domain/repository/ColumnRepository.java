@@ -10,4 +10,6 @@ public interface ColumnRepository {
     Optional<Column> findById(Long columnId);
     Double getPosition(Long columnId);
 
+    Optional<Long> findBoardIdByColumnId(Long columnId);
+
 }

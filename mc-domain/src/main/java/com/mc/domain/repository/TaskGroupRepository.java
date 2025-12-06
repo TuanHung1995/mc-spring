@@ -10,4 +10,6 @@ public interface TaskGroupRepository {
     void save(TaskGroup group);
     Double getPosition(Long groupId);
 
+    Optional<Long> findBoardIdByGroupId(Long groupId);
+
 }

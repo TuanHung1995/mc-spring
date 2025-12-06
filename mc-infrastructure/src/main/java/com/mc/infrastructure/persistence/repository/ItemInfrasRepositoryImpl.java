@@ -22,4 +22,9 @@ public class ItemInfrasRepositoryImpl implements ItemRepository {
 
     @Override
     public Double getPosition(Long itemId) { return itemJPAMapper.getPosition(itemId); }
+
+    @Override
+    public Optional<Long> findBoardIdByItemId(Long itemId) {
+        return itemJPAMapper.findBoardIdByItemId(itemId);
+    }
 }

@@ -10,4 +10,6 @@ public interface ItemRepository {
     Item save(Item item);
     Double getPosition(Long itemId);
 
+    Optional<Long> findBoardIdByItemId(Long itemId);
+
 }

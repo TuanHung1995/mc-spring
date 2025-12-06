@@ -24,10 +24,14 @@ public class TaskGroupInfrasRepositoryImpl implements TaskGroupRepository {
         taskGroupJPAMapper.save(group);
     }
 
-
     @Override
     public Double getPosition(Long groupId) {
         return taskGroupJPAMapper.getPosition(groupId);
+    }
+
+    @Override
+    public Optional<Long> findBoardIdByGroupId(Long groupId) {
+        return taskGroupJPAMapper.findBoardIdByGroupId(groupId);
     }
 
 }

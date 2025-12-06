@@ -29,4 +29,9 @@ public class ColumnInfrasRepositoryImpl implements ColumnRepository {
         return columnJPAMapper.findById(columnId);
     }
 
+    @Override
+    public Optional<Long> findBoardIdByColumnId(Long columnId) {
+        return columnJPAMapper.findBoardIdByColumnId(columnId);
+    }
+
 }

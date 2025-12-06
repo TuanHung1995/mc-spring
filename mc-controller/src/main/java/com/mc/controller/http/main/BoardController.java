@@ -55,7 +55,7 @@ public class BoardController {
     }
 
     @PutMapping("/groups/reorder")
-    @PreAuthorize("hasPermission(#request.targetId, 'Board', 'BOARD:EDIT')") // Cần update permission logic để check group thuộc board nào
+    @PreAuthorize("hasPermission(#request.targetId, 'Group', 'BOARD:EDIT')") // Cần update permission logic để check group thuộc board nào
     public ResponseEntity<?> reorderGroup(@RequestBody ReorderRequest request) {
         boardAppService.reorderGroup(request);
         return ResponseEntity.ok().build();
@@ -63,7 +63,7 @@ public class BoardController {
 
     // 2. Kéo thả Column
     @PutMapping("/columns/reorder")
-    @PreAuthorize("hasPermission(#request.targetId, 'Board', 'BOARD:EDIT')")
+    @PreAuthorize("hasPermission(#request.targetId, 'Column', 'BOARD:EDIT')")
     public ResponseEntity<?> reorderColumn(@RequestBody ReorderRequest request) {
         boardAppService.reorderColumn(request);
         return ResponseEntity.ok().build();
@@ -71,7 +71,7 @@ public class BoardController {
 
     // 3. Kéo thả Item (Task)
     @PutMapping("/items/reorder")
-//    @PreAuthorize("hasPermission(#request.targetId, 'Board', 'BOARD:EDIT')")
+    @PreAuthorize("hasPermission(#request.targetId, 'Item', 'BOARD:EDIT')")
     public ResponseEntity<?> reorderItem(@RequestBody ReorderRequest request) {
         boardAppService.reorderItem(request);
         return ResponseEntity.ok("Reorder Successfully");
