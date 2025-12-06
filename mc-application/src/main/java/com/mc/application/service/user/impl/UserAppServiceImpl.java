@@ -3,9 +3,11 @@ package com.mc.application.service.user.impl;
 import com.mc.application.mapper.UserMapper;
 import com.mc.application.model.user.UpdateProfileRequest;
 import com.mc.application.model.user.UpdateProfileResponse;
+import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.user.UserAppService;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.User;
+import com.mc.domain.port.UserContextPort;
 import com.mc.domain.service.UserDomainService;
 import com.mc.infrastructure.config.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class UserAppServiceImpl implements UserAppService {
 
     private final UserDomainService userDomainService;
     private final UserMapper userMapper;
+    private final UserContextPort userContextPort;
 
     @Override
     public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
@@ -41,6 +44,18 @@ public class UserAppServiceImpl implements UserAppService {
         );
 
         return userMapper.toUpdateProfileResponse(user);
+
+    }
+
+    @Override
+    public UserProfileResponse getMyProfile() {
+
+        /* Retrieve from port */
+        Long currentUserId = userContextPort.getCurrentUserId();
+
+        User user = userDomainService.findUserById(currentUserId);
+
+        return userMapper.toUserProfileResponse(user);
 
     }
 
