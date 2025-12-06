@@ -1,5 +1,6 @@
 package com.mc.application.service.auth.impl;
 
+import com.mc.application.mapper.UserMapper;
 import com.mc.application.model.auth.*;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.*;
@@ -29,6 +30,7 @@ public class AuthAppServiceImpl implements AuthAppService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final MailSender mailSender;
+    private final UserMapper userMapper;
 
     private final AuthDomainService authDomainService;
     private final RoleDomainService roleDomainService;

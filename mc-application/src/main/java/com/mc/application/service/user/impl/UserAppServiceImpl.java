@@ -1,6 +1,8 @@
 package com.mc.application.service.user.impl;
 
+import com.mc.application.mapper.UserMapper;
 import com.mc.application.model.user.UpdateProfileRequest;
+import com.mc.application.model.user.UpdateProfileResponse;
 import com.mc.application.service.user.UserAppService;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.User;
@@ -15,9 +17,10 @@ import org.springframework.stereotype.Service;
 public class UserAppServiceImpl implements UserAppService {
 
     private final UserDomainService userDomainService;
+    private final UserMapper userMapper;
 
     @Override
-    public User updateProfile(UpdateProfileRequest request) {
+    public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long currentUserId;
@@ -28,7 +31,7 @@ public class UserAppServiceImpl implements UserAppService {
             throw new ResourceNotFoundException("User", "id", principal);
         }
 
-        return userDomainService.updateProfile(
+        User user = userDomainService.updateProfile(
                 currentUserId,
                 request.getFullName(),
                 request.getPhone(),
@@ -36,6 +39,8 @@ public class UserAppServiceImpl implements UserAppService {
                 request.getJobTitle(),
                 request.getBirthday()
         );
+
+        return userMapper.toUpdateProfileResponse(user);
 
     }
 

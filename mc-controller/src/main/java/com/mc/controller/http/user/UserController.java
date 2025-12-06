@@ -1,6 +1,7 @@
 package com.mc.controller.http.user;
 
 import com.mc.application.model.user.UpdateProfileRequest;
+import com.mc.application.model.user.UpdateProfileResponse;
 import com.mc.application.service.user.UserAppService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,9 @@ public class UserController {
     private final UserAppService userAppService;
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileRequest request) {
-        return ResponseEntity.ok(userAppService.updateProfile(request));
+    public ResponseEntity<UpdateProfileResponse> updateProfile(@RequestBody UpdateProfileRequest request) {
+        UpdateProfileResponse response = userAppService.updateProfile(request);
+        return ResponseEntity.ok(response);
     }
 
 }
