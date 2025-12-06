@@ -13,5 +13,10 @@ public class RegisterResponse {
 
     private Long userId;
     private String fullName;
+    private String phone;
+    private String birthday;
+    private String address;
+    private String jobTitle;
+    private String provider;
 
 }

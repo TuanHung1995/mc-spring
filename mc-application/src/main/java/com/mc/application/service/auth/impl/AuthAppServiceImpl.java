@@ -80,11 +80,7 @@ public class AuthAppServiceImpl implements AuthAppService {
                 request.getInviteToken()
         );
 
-        RegisterResponse response = new RegisterResponse();
-        response.setUserId(user.getId());
-        response.setFullName(user.getFullName());
-
-        return response;
+        return userMapper.toRegisterResponse(user);
 
     }
 

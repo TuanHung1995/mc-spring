@@ -34,7 +34,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @RateLimiter(name = AUTH_RATE_LIMITER)
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
 
         RegisterResponse response = authAppService.register(request);
 
