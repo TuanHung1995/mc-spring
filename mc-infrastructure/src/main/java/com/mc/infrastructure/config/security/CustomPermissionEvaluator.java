@@ -2,8 +2,6 @@ package com.mc.infrastructure.config.security;
 
 import com.mc.domain.model.entity.Board;
 import com.mc.domain.model.entity.Role;
-import com.mc.domain.model.entity.User;
-import com.mc.domain.model.enums.RoleType;
 import com.mc.domain.repository.*;
 import com.mc.infrastructure.constant.UtilMethod;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -23,6 +20,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private final TeamMemberRepository teamMemberRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final BoardRepository boardRepository;
+    private final TaskGroupRepository taskGroupRepository;
+    private final ColumnRepository columnRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -72,7 +72,27 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         if ("Board".equalsIgnoreCase(targetType)) {
 //            roleOpt = boardMemberRepository.findRoleByBoardIdAndUserId(resourceId, userId);
             return  checkBoardPermission(resourceId, userId, requiredPerm);
-        } else if ("Team".equalsIgnoreCase(targetType)) {
+        }
+
+        // --- 2. Xử lý các thành phần con của Board (Group, Column, Item) ---
+        // Logic: Tìm Board ID cha -> Gọi lại checkBoardPermission
+
+        Long parentBoardId = null;
+
+        if ("Group".equalsIgnoreCase(targetType)) {
+            parentBoardId = taskGroupRepository.findBoardIdByGroupId(resourceId).orElse(null);
+        } else if ("Column".equalsIgnoreCase(targetType)) {
+            parentBoardId = columnRepository.findBoardIdByColumnId(resourceId).orElse(null);
+        } else if ("Item".equalsIgnoreCase(targetType)) {
+            parentBoardId = itemRepository.findBoardIdByItemId(resourceId).orElse(null);
+        }
+
+        // Nếu tìm thấy Board cha, check quyền trên Board đó
+        if (parentBoardId != null) {
+            return checkBoardPermission(parentBoardId, userId, requiredPerm);
+        }
+
+        if ("Team".equalsIgnoreCase(targetType)) {
             roleOpt = teamMemberRepository.findRoleByTeamIdAndUserId(resourceId, userId);
         }
 
