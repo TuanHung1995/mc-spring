@@ -125,4 +125,14 @@ public class UserInfrasRepositoryImpl implements UserRepository {
         return userJPAMapper.findByUnlockToken(token);
     }
 
+    @Override
+    public Optional<User> findById(Long userId) {
+        return userJPAMapper.findById(userId);
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return userJPAMapper.save(user);
+    }
+
 }
