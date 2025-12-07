@@ -3,6 +3,7 @@ package com.mc.domain.repository;
 import com.mc.domain.model.entity.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -12,6 +13,7 @@ public interface UserRepository {
 //    User findByEmail(String email, boolean throwIfNotFound);
     User save(String email, String password, String fullName);
     void save(User user);
+    User saveUser(User user);
     boolean existsByEmail(String email);
     void forgotPassword(String email);
     void resetPassword(String token, String newPassword, String confirmNewPassword);
@@ -22,4 +24,7 @@ public interface UserRepository {
 
     Optional<User> findByUnlockToken(String token);
 
+    Optional<User> findById(Long userId);
+
+    List<User> searchUsers(String keyword, Long currentUserId, int limit);
 }

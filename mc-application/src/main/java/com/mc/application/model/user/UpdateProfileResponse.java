@@ -1,22 +1,20 @@
-package com.mc.application.model.auth;
+package com.mc.application.model.user;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@Builder
 @NoArgsConstructor
-public class RegisterResponse {
+@AllArgsConstructor
+public class UpdateProfileResponse {
 
-    private Long userId;
     private String fullName;
     private String phone;
     private String birthday;
     private String address;
     private String jobTitle;
-    private String provider;
 
 }

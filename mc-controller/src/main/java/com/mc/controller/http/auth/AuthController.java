@@ -7,6 +7,7 @@ import com.mc.domain.model.entity.User;
 import com.nimbusds.openid.connect.sdk.LogoutRequest;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @RateLimiter(name = AUTH_RATE_LIMITER)
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
 
         RegisterResponse response = authAppService.register(request);
 
@@ -47,7 +48,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     @RateLimiter(name = AUTH_RATE_LIMITER)
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
 
         authAppService.forgotPassword(request.getEmail());
         return ResponseEntity.ok("Forgot password request processed");
@@ -55,7 +56,7 @@ public class AuthController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authAppService.resetPassword(request.getToken(), request.getNewPassword(), request.getConfirmPassword());
         return ResponseEntity.ok("Password reset successful");
     }
