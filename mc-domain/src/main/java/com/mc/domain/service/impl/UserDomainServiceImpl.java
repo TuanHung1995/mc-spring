@@ -5,6 +5,8 @@ import com.mc.domain.model.entity.User;
 import com.mc.domain.repository.UserRepository;
 import com.mc.domain.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,9 +16,11 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserDomainServiceImpl implements UserDomainService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User updateProfile(Long userId, String fullName, String phone, String address, String jobTitle, String birthday) {
@@ -62,13 +66,13 @@ public class UserDomainServiceImpl implements UserDomainService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        if (!user.getPassword().equals(oldPassword)) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             return "Old password is incorrect";
         } else if (!newPassword.equals(confirmNewPassword)) {
             return "New password and confirm new password do not match";
         } else {
-            user.setPassword(newPassword);
-            userRepository.saveUser(user);
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
             return "Password changed successfully";
         }
     }
