@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface ColumnRepository {
 
-    void save(Column column);
+    Column save(Column column);
     Optional<Column> findById(Long columnId);
     Double getPosition(Long columnId);
 

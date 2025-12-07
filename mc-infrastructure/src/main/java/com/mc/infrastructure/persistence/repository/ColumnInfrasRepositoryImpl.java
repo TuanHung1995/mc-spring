@@ -20,8 +20,8 @@ public class ColumnInfrasRepositoryImpl implements ColumnRepository {
     }
 
     @Override
-    public void save(Column column) {
-        columnJPAMapper.save(column);
+    public Column save(Column column) {
+        return columnJPAMapper.save(column);
     }
 
     @Override

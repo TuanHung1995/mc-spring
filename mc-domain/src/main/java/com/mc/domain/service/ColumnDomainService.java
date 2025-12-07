@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface ColumnDomainService {
 
-    void reorderColumn(Long columnId, Long prevItemId, Long nextItemId);
+    Column reorderColumn(Long columnId, Long prevItemId, Long nextItemId);
 
 }

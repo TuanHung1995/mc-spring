@@ -27,7 +27,7 @@ public class UserAppServiceImpl implements UserAppService {
     public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
 
         User user = userDomainService.updateProfile(
-                getCurrentUserId(),
+                userContextPort.getCurrentUserId(),
                 request.getFullName(),
                 request.getPhone(),
                 request.getAddress(),
@@ -42,7 +42,7 @@ public class UserAppServiceImpl implements UserAppService {
     @Override
     public UserProfileResponse getMyProfile() {
 
-        User user = userDomainService.findUserById(getCurrentUserId());
+        User user = userDomainService.findUserById(userContextPort.getCurrentUserId());
 
         return userMapper.toUserProfileResponse(user);
 
@@ -53,7 +53,7 @@ public class UserAppServiceImpl implements UserAppService {
 
         return new ChangePasswordResponse(
                 userDomainService.changePassword(
-                        getCurrentUserId(),
+                        userContextPort.getCurrentUserId(),
                         request.getOldPassword(),
                         request.getNewPassword(),
                         request.getConfirmNewPassword()
@@ -65,15 +65,11 @@ public class UserAppServiceImpl implements UserAppService {
     @Override
     public List<UserProfileResponse> searchUsers(String keyword) {
 
-        List<User> users = userDomainService.search(keyword, getCurrentUserId());
+        List<User> users = userDomainService.search(keyword, userContextPort.getCurrentUserId());
 
         return users.stream()
                 .map(userMapper::toUserProfileResponse)
                 .collect(Collectors.toList());
-    }
-
-    private Long getCurrentUserId() {
-        return userContextPort.getCurrentUserId();
     }
 
 }
