@@ -1,9 +1,7 @@
 package com.mc.application.service.user.impl;
 
 import com.mc.application.mapper.UserMapper;
-import com.mc.application.model.user.UpdateProfileRequest;
-import com.mc.application.model.user.UpdateProfileResponse;
-import com.mc.application.model.user.UserProfileResponse;
+import com.mc.application.model.user.*;
 import com.mc.application.service.user.UserAppService;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.User;
@@ -56,6 +54,23 @@ public class UserAppServiceImpl implements UserAppService {
         User user = userDomainService.findUserById(currentUserId);
 
         return userMapper.toUserProfileResponse(user);
+
+    }
+
+    @Override
+    public ChangePasswordResponse changePassword(ChangePasswordRequest request) {
+
+        /* Retrieve from port */
+        Long currentUserId = userContextPort.getCurrentUserId();
+
+        return new ChangePasswordResponse(
+                userDomainService.changePassword(
+                        currentUserId,
+                        request.getOldPassword(),
+                        request.getNewPassword(),
+                        request.getConfirmNewPassword()
+                )
+        );
 
     }
 

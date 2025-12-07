@@ -1,8 +1,6 @@
 package com.mc.controller.http.user;
 
-import com.mc.application.model.user.UpdateProfileRequest;
-import com.mc.application.model.user.UpdateProfileResponse;
-import com.mc.application.model.user.UserProfileResponse;
+import com.mc.application.model.user.*;
 import com.mc.application.service.user.UserAppService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +22,13 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getMyProfile() {
         UserProfileResponse response = userAppService.getMyProfile();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestBody ChangePasswordRequest request) {
+        ChangePasswordResponse response = userAppService.changePassword(request);
 
         return ResponseEntity.ok(response);
     }

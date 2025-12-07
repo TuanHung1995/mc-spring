@@ -57,4 +57,20 @@ public class UserDomainServiceImpl implements UserDomainService {
         return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
+    @Override
+    public String changePassword(Long userId, String oldPassword, String newPassword, String confirmNewPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        if (!user.getPassword().equals(oldPassword)) {
+            return "Old password is incorrect";
+        } else if (!newPassword.equals(confirmNewPassword)) {
+            return "New password and confirm new password do not match";
+        } else {
+            user.setPassword(newPassword);
+            userRepository.saveUser(user);
+            return "Password changed successfully";
+        }
+    }
+
 }
