@@ -3,6 +3,7 @@ package com.mc.domain.repository;
 import com.mc.domain.model.entity.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -24,4 +25,6 @@ public interface UserRepository {
     Optional<User> findByUnlockToken(String token);
 
     Optional<User> findById(Long userId);
+
+    List<User> searchUsers(String keyword, Long currentUserId, int limit);
 }

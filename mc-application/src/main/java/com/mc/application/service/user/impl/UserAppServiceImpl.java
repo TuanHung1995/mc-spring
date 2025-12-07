@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class UserAppServiceImpl implements UserAppService {
@@ -23,17 +26,8 @@ public class UserAppServiceImpl implements UserAppService {
     @Override
     public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long currentUserId;
-
-        if (principal instanceof CustomUserDetails) {
-            currentUserId = ((CustomUserDetails) principal).getUserId();
-        } else {
-            throw new ResourceNotFoundException("User", "id", principal);
-        }
-
         User user = userDomainService.updateProfile(
-                currentUserId,
+                getCurrentUserId(),
                 request.getFullName(),
                 request.getPhone(),
                 request.getAddress(),
@@ -48,10 +42,7 @@ public class UserAppServiceImpl implements UserAppService {
     @Override
     public UserProfileResponse getMyProfile() {
 
-        /* Retrieve from port */
-        Long currentUserId = userContextPort.getCurrentUserId();
-
-        User user = userDomainService.findUserById(currentUserId);
+        User user = userDomainService.findUserById(getCurrentUserId());
 
         return userMapper.toUserProfileResponse(user);
 
@@ -60,18 +51,29 @@ public class UserAppServiceImpl implements UserAppService {
     @Override
     public ChangePasswordResponse changePassword(ChangePasswordRequest request) {
 
-        /* Retrieve from port */
-        Long currentUserId = userContextPort.getCurrentUserId();
-
         return new ChangePasswordResponse(
                 userDomainService.changePassword(
-                        currentUserId,
+                        getCurrentUserId(),
                         request.getOldPassword(),
                         request.getNewPassword(),
                         request.getConfirmNewPassword()
                 )
         );
 
+    }
+
+    @Override
+    public List<UserProfileResponse> searchUsers(String keyword) {
+
+        List<User> users = userDomainService.search(keyword, getCurrentUserId());
+
+        return users.stream()
+                .map(userMapper::toUserProfileResponse)
+                .collect(Collectors.toList());
+    }
+
+    private Long getCurrentUserId() {
+        return userContextPort.getCurrentUserId();
     }
 
 }

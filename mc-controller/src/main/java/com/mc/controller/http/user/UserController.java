@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -32,6 +34,15 @@ public class UserController {
         ChangePasswordResponse response = userAppService.changePassword(request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserProfileResponse>> searchUsers(@RequestParam("keyword") String keyword) {
+        if (keyword == null || keyword.trim().length() <= 1) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        return ResponseEntity.ok(userAppService.searchUsers(keyword));
     }
 
 }

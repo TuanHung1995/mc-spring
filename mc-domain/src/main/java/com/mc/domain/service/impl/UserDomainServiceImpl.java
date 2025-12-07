@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -75,6 +76,11 @@ public class UserDomainServiceImpl implements UserDomainService {
             userRepository.save(user);
             return "Password changed successfully";
         }
+    }
+
+    @Override
+    public List<User> search(String keyword, Long currentUserId) {
+        return userRepository.searchUsers(keyword, currentUserId, 20);
     }
 
 }
