@@ -86,11 +86,12 @@ CREATE TABLE `workspaces`
 DROP TABLE IF EXISTS `workspace_members`;
 CREATE TABLE `workspace_members`
 (
-    `workspace_id` BIGINT UNSIGNED NOT NULL,
-    `user_id`      BIGINT UNSIGNED NOT NULL,
+    `id`           BIGINT UNSIGNED AUTO_INCREMENT,
+    `workspace_id` BIGINT  ,
+    `user_id`      BIGINT  ,
     `role`         ENUM ('ADMIN', 'MEMBER', 'VIEWER') DEFAULT 'MEMBER',
     `joined_at`    DATETIME                           DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`workspace_id`, `user_id`),
+    PRIMARY KEY (`id`),
     CONSTRAINT `fk_wsm_workspace` FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_wsm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
@@ -125,8 +126,8 @@ CREATE TABLE `boards`
 -- ==============================================================
 
 -- 7. Board Groups: Nhóm các task (VD: To Do, Doing, Done)
-DROP TABLE IF EXISTS `board_groups`;
-CREATE TABLE `board_groups`
+DROP TABLE IF EXISTS `task_groups`;
+CREATE TABLE `task_groups`
 (
     `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `board_id`     BIGINT UNSIGNED NOT NULL,
@@ -148,6 +149,7 @@ CREATE TABLE `board_columns`
 (
     `id`          BIGINT UNSIGNED                                                                                 NOT NULL AUTO_INCREMENT,
     `board_id`    BIGINT UNSIGNED                                                                                 NOT NULL,
+    `created_by`  BIGINT ,
     `title`       VARCHAR(255)                                                                                    NOT NULL,
     -- Các loại cột được hỗ trợ
     `type`        ENUM ('TEXT', 'STATUS', 'DATE', 'PERSON', 'NUMBER', 'TIMELINE', 'CHECKBOX', 'LINK', 'DROPDOWN') NOT NULL,
@@ -160,7 +162,8 @@ CREATE TABLE `board_columns`
     `created_at`  DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_board_columns` (`board_id`),
-    CONSTRAINT `fk_bc_board` FOREIGN KEY (`board_id`) REFERENCES `boards` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_bc_board` FOREIGN KEY (`board_id`) REFERENCES `boards` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_bc_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -173,14 +176,20 @@ CREATE TABLE `items`
     `group_id`   BIGINT UNSIGNED NOT NULL,
     `board_id`   BIGINT UNSIGNED NOT NULL, -- Denormalization để query nhanh
     `name`       VARCHAR(255)    NOT NULL, -- Tên Task (Cột Name mặc định)
-    `created_by` BIGINT UNSIGNED,
+    `created_by` BIGINT,
+    `deleted_by` BIGINT  DEFAULT NULL,
     `position`   DOUBLE          NOT NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
     KEY `idx_items_group` (`group_id`),
     KEY `idx_items_board` (`board_id`),
-    CONSTRAINT `fk_item_group` FOREIGN KEY (`group_id`) REFERENCES `board_groups` (`id`) ON DELETE CASCADE,
+    KEY `idx_items_created_by` (`created_by`),
+    KEY `idx_items_deleted_by` (`deleted_by`),
+    CONSTRAINT `fk_item_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+    CONSTRAINT `fk_item_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+    CONSTRAINT `fk_item_group` FOREIGN KEY (`group_id`) REFERENCES `task_groups` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_item_board` FOREIGN KEY (`board_id`) REFERENCES `boards` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -210,6 +219,7 @@ CREATE TABLE `column_values`
     PRIMARY KEY (`id`),
     UNIQUE KEY `unique_cell` (`item_id`, `column_id`), -- Một ô chỉ có 1 giá trị
     KEY `idx_cv_column` (`column_id`),
+    CONSTRAINT `fk_cv_board` FOREIGN KEY (`board_id`) REFERENCES `boards` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_cv_item` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_cv_column` FOREIGN KEY (`column_id`) REFERENCES `board_columns` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB

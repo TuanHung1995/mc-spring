@@ -2,6 +2,7 @@ package com.mc.application.service.invite.impl;
 
 import com.mc.application.model.board.InviteRequest;
 import com.mc.application.service.invite.InviteAppService;
+import com.mc.domain.port.RealTimeUpdatePort;
 import com.mc.domain.service.InviteDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
@@ -10,14 +11,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class InviteAppServiceImpl implements InviteAppService {
 
     private final InviteDomainService inviteDomainService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RealTimeUpdatePort realTimeUpdatePort;
 
-    @Value("${app.oauth2.authorized-redirect-uris}")
+    @Value("${constants.frontend}")
     private String frontendUrl;
 
     // API 1: Gửi lời mời
@@ -48,5 +53,13 @@ public class InviteAppServiceImpl implements InviteAppService {
 
         // 2. Add vào Board
         inviteDomainService.addUserToBoard(boardId, email, role);
+
+        Map<String, Object> updatePayload = new HashMap<>();
+        updatePayload.put("type", "MEMBER_JOINED");
+        updatePayload.put("email", email);
+        updatePayload.put("role", role);
+        updatePayload.put("message", "User " + email + " has joined the board.");
+
+        realTimeUpdatePort.sendBoardUpdate(boardId, updatePayload);
     }
 }

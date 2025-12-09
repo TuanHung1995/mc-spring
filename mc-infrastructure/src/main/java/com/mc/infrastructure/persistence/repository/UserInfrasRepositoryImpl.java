@@ -7,9 +7,13 @@ import com.mc.domain.repository.UserRepository;
 import com.mc.infrastructure.persistence.mapper.UserJPAMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -123,6 +127,25 @@ public class UserInfrasRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findByUnlockToken(String token) {
         return userJPAMapper.findByUnlockToken(token);
+    }
+
+    @Override
+    public Optional<User> findById(Long userId) {
+        return userJPAMapper.findById(userId);
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return userJPAMapper.save(user);
+    }
+
+    @Override
+    public List<User> searchUsers(String keyword, Long currentUserId, int limit) {
+        // Tạo Pageable để giới hạn số lượng (Ví dụ: Lấy 10 kết quả đầu tiên)
+        Pageable pageable = PageRequest.of(0, limit);
+
+        Page<User> pageResult = userJPAMapper.searchUsers(keyword, currentUserId, pageable);
+        return pageResult.getContent();
     }
 
 }
