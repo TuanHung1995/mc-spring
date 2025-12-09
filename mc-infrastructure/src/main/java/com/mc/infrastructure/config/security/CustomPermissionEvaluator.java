@@ -1,10 +1,9 @@
 package com.mc.infrastructure.config.security;
 
+import com.mc.domain.model.entity.Board;
 import com.mc.domain.model.entity.Role;
-import com.mc.domain.model.entity.User;
-import com.mc.domain.repository.BoardMemberRepository;
-import com.mc.domain.repository.TeamMemberRepository;
-import com.mc.domain.repository.UserRepository;
+import com.mc.domain.repository.*;
+import com.mc.infrastructure.constant.UtilMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -19,6 +18,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     private final BoardMemberRepository boardMemberRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final BoardRepository boardRepository;
+    private final TaskGroupRepository taskGroupRepository;
+    private final ColumnRepository columnRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -66,19 +70,62 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
         // 1. Phân loại Resource để tìm Role tương ứng
         if ("Board".equalsIgnoreCase(targetType)) {
-            roleOpt = boardMemberRepository.findRoleByBoardIdAndUserId(resourceId, userId);
-        } else if ("Team".equalsIgnoreCase(targetType)) {
+//            roleOpt = boardMemberRepository.findRoleByBoardIdAndUserId(resourceId, userId);
+            return  checkBoardPermission(resourceId, userId, requiredPerm);
+        }
+
+        // --- 2. Xử lý các thành phần con của Board (Group, Column, Item) ---
+        // Logic: Tìm Board ID cha -> Gọi lại checkBoardPermission
+
+        Long parentBoardId = null;
+
+        if ("Group".equalsIgnoreCase(targetType)) {
+            parentBoardId = taskGroupRepository.findBoardIdByGroupId(resourceId).orElse(null);
+        } else if ("Column".equalsIgnoreCase(targetType)) {
+            parentBoardId = columnRepository.findBoardIdByColumnId(resourceId).orElse(null);
+        } else if ("Item".equalsIgnoreCase(targetType)) {
+            parentBoardId = itemRepository.findBoardIdByItemId(resourceId).orElse(null);
+        }
+
+        // Nếu tìm thấy Board cha, check quyền trên Board đó
+        if (parentBoardId != null) {
+            return checkBoardPermission(parentBoardId, userId, requiredPerm);
+        }
+
+        if ("Team".equalsIgnoreCase(targetType)) {
             roleOpt = teamMemberRepository.findRoleByTeamIdAndUserId(resourceId, userId);
         }
 
-        // 2. Check Permission trong Role
-        if (roleOpt.isPresent()) {
-            Role role = roleOpt.get();
-            return role.getPermissions().stream()
-                    .anyMatch(p -> p.getName().equals(requiredPerm));
+        return roleOpt.filter(role -> hasPrivilege(role, requiredPerm)).isPresent();
+
+    }
+
+    private boolean checkBoardPermission(Long boardId, Long userId, String permission) {
+        // 1. Kiểm tra quyền trực tiếp trên Board (Direct Permission)
+        Optional<Role> boardRole = boardMemberRepository.findRoleByBoardIdAndUserId(boardId, userId);
+        if (boardRole.isPresent()) {
+            if (hasPrivilege(boardRole.get(), permission)) return true;
+        }
+
+        Board board = boardRepository.findById(boardId).orElse(null);
+        if (board == null) return false;
+
+        Long workspaceId = board.getWorkspace().getId();
+
+        Optional<Role> workspaceRole = workspaceMemberRepository.findRoleByWorkspaceIdAndUserId(workspaceId, userId);
+
+        if (workspaceRole.isPresent()) {
+            String roleName = workspaceRole.get().getName();
+
+            return UtilMethod.roleList().contains(roleName);
         }
 
         return false;
+    }
+
+    private boolean hasPrivilege(Role role, String permission) {
+        return role.getPermissions().stream()
+                .anyMatch(p -> p.getName().equals(permission));
     }
 
     private Long getUserId(Authentication auth) {

@@ -30,6 +30,9 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
+    private Date birthday;
+    private String address;
+    private String jobTitle;
     private String resetToken;
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;

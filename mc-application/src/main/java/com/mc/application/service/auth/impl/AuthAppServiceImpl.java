@@ -1,6 +1,8 @@
 package com.mc.application.service.auth.impl;
 
+import com.mc.application.mapper.UserMapper;
 import com.mc.application.model.auth.*;
+import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.port.MailSender;
@@ -29,6 +31,7 @@ public class AuthAppServiceImpl implements AuthAppService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final MailSender mailSender;
+    private final UserMapper userMapper;
 
     private final AuthDomainService authDomainService;
     private final RoleDomainService roleDomainService;
@@ -56,6 +59,11 @@ public class AuthAppServiceImpl implements AuthAppService {
             String accessToken = jwtTokenProvider.generateToken(authentication);
             RefreshToken refreshToken = authDomainService.createRefreshToken(loginRequest.getEmail());
 
+//            User user = userRepository.findByEmail(loginRequest.getEmail())
+//                    .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//            UserProfileResponse userProfile = userMapper.toUserProfileResponse(user);
+
             return new JwtAuthResponse(accessToken, refreshToken.getToken(), "Bearer");
 
         } catch (BadCredentialsException e) {
@@ -78,11 +86,7 @@ public class AuthAppServiceImpl implements AuthAppService {
                 request.getInviteToken()
         );
 
-        RegisterResponse response = new RegisterResponse();
-        response.setUserId(user.getId());
-        response.setFullName(user.getFullName());
-
-        return response;
+        return userMapper.toRegisterResponse(user);
 
     }
 
