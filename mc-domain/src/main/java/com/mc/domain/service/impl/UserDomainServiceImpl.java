@@ -1,5 +1,6 @@
 package com.mc.domain.service.impl;
 
+import com.mc.domain.exception.BusinessLogicException;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.User;
 import com.mc.domain.repository.UserRepository;
@@ -68,9 +69,9 @@ public class UserDomainServiceImpl implements UserDomainService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            return "Old password is incorrect";
+            throw new BusinessLogicException("Old password is incorrect");
         } else if (!newPassword.equals(confirmNewPassword)) {
-            return "New password and confirm new password do not match";
+            throw new BusinessLogicException("New password and confirm new password do not match");
         } else {
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);

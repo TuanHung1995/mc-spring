@@ -2,6 +2,7 @@ package com.mc.infrastructure.config.security;
 
 import com.mc.domain.repository.TokenBlacklistRepository;
 import com.mc.infrastructure.constant.SecurityConstants;
+import com.mc.infrastructure.utils.CookieUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,11 +25,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final CookieUtils cookieUtils;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, TokenBlacklistRepository tokenBlacklistRepository) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+                                   UserDetailsService userDetailsService,
+                                   TokenBlacklistRepository tokenBlacklistRepository,
+                                   CookieUtils cookieUtils) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
         this.tokenBlacklistRepository = tokenBlacklistRepository;
+        this.cookieUtils = cookieUtils;
     }
 
     @Override
@@ -59,6 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
 
-        return null;
+        return cookieUtils.getCookieValue(request, CookieUtils.ACCESS_TOKEN_COOKIE_NAME);
     }
 }

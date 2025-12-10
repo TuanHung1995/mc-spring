@@ -20,7 +20,7 @@ public class ColumnDomainServiceImpl implements ColumnDomainService {
     private final PositionCalculationService positionCalculationService;
 
     @Transactional
-    public void reorderColumn(Long columnId, Long prevItemId, Long nextItemId) {
+    public Column reorderColumn(Long columnId, Long prevItemId, Long nextItemId) {
         // 1. Tính vị trí mới
         Double prevPos = (prevItemId != null) ? columnRepository.getPosition(prevItemId) : null;
         Double nextPos = (nextItemId != null) ? columnRepository.getPosition(nextItemId) : null;
@@ -33,7 +33,7 @@ public class ColumnDomainServiceImpl implements ColumnDomainService {
 
         // 4. Cập nhật vị trí
         column.setPosition(newPos);
-        columnRepository.save(column);
+        return columnRepository.save(column);
 
         /*     Next: WebSocket     */
 

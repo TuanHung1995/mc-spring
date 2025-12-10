@@ -19,7 +19,7 @@ public class ItemDomainServiceImpl implements  ItemDomainService {
     private final PositionCalculationService positionCalculationService;
 
     @Transactional
-    public void reorderItem(Long itemId, Long targetGroupId, Long prevItemId, Long nextItemId) {
+    public Item reorderItem(Long itemId, Long targetGroupId, Long prevItemId, Long nextItemId) {
         // 1. Tính vị trí mới
         Double prevPos = (prevItemId != null) ? itemRepository.getPosition(prevItemId) : null;
         Double nextPos = (nextItemId != null) ? itemRepository.getPosition(nextItemId) : null;
@@ -39,9 +39,7 @@ public class ItemDomainServiceImpl implements  ItemDomainService {
 
         // 4. Cập nhật vị trí
         item.setPosition(newPos);
-        itemRepository.save(item);
-
-        /*     Next: WebSocket     */
+        return itemRepository.save(item);
 
     }
 }

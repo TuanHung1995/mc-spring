@@ -2,6 +2,7 @@ package com.mc.application.service.auth.impl;
 
 import com.mc.application.mapper.UserMapper;
 import com.mc.application.model.auth.*;
+import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.auth.AuthAppService;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.port.MailSender;
@@ -57,6 +58,11 @@ public class AuthAppServiceImpl implements AuthAppService {
 
             String accessToken = jwtTokenProvider.generateToken(authentication);
             RefreshToken refreshToken = authDomainService.createRefreshToken(loginRequest.getEmail());
+
+//            User user = userRepository.findByEmail(loginRequest.getEmail())
+//                    .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//            UserProfileResponse userProfile = userMapper.toUserProfileResponse(user);
 
             return new JwtAuthResponse(accessToken, refreshToken.getToken(), "Bearer");
 
