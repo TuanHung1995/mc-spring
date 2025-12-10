@@ -25,4 +25,9 @@ public class BoardInfrasRepository implements BoardRepository {
         return boardJPAMapper.findAllByUserId(userId);
     }
 
+    @Override
+    public Board save(Board board) {
+        return boardJPAMapper.save(board);
+    }
+
 }
