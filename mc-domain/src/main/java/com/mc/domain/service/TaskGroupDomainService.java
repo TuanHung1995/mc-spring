@@ -1,7 +1,9 @@
 package com.mc.domain.service;
 
+import com.mc.domain.model.entity.TaskGroup;
+
 public interface TaskGroupDomainService {
 
-    void reorderGroup(Long targetGroup, Long prevItemId, Long nextItemId);
+    TaskGroup reorderGroup(Long targetGroup, Long prevItemId, Long nextItemId);
 
 }

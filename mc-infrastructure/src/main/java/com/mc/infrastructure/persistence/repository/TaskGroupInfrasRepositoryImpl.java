@@ -20,8 +20,8 @@ public class TaskGroupInfrasRepositoryImpl implements TaskGroupRepository {
     }
 
     @Override
-    public void save(TaskGroup group) {
-        taskGroupJPAMapper.save(group);
+    public TaskGroup save(TaskGroup group) {
+        return taskGroupJPAMapper.save(group);
     }
 
     @Override

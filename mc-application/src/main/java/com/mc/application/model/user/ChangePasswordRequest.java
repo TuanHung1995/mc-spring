@@ -1,4 +1,4 @@
-package com.mc.application.model.auth;
+package com.mc.application.model.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -6,11 +6,12 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ResetPasswordRequest {
+public class ChangePasswordRequest {
 
-    private String token;
+    @NotBlank(message = "Old Password can't be blank")
+    private String oldPassword;
 
-    @NotBlank(message = "Password can't be blank")
+    @NotBlank(message = "New Password can't be blank")
     @Size(min = 6, message = "Password must be at least 6 characters")
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$",
@@ -18,7 +19,7 @@ public class ResetPasswordRequest {
     )
     private String newPassword;
 
-    @NotBlank(message = "Confirm Password can't be blank")
-    private String confirmPassword;
+    @NotBlank(message = "Confirm New Password can't be blank")
+    private String confirmNewPassword;
 
 }

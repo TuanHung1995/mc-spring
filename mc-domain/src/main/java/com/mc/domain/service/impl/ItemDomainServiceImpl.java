@@ -7,13 +7,11 @@ import com.mc.domain.repository.TaskGroupRepository;
 import com.mc.domain.service.ItemDomainService;
 import com.mc.domain.service.util.PositionCalculationService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ItemDomainServiceImpl implements  ItemDomainService {
 
     private final ItemRepository itemRepository;
@@ -21,12 +19,10 @@ public class ItemDomainServiceImpl implements  ItemDomainService {
     private final PositionCalculationService positionCalculationService;
 
     @Transactional
-    public void reorderItem(Long itemId, Long targetGroupId, Long prevItemId, Long nextItemId) {
+    public Item reorderItem(Long itemId, Long targetGroupId, Long prevItemId, Long nextItemId) {
         // 1. Tính vị trí mới
         Double prevPos = (prevItemId != null) ? itemRepository.getPosition(prevItemId) : null;
         Double nextPos = (nextItemId != null) ? itemRepository.getPosition(nextItemId) : null;
-
-        log.info("PREV POSI AND NEXT POSI: {} {}", prevPos, nextPos);
 
         double newPos = positionCalculationService.calculateNewPosition(prevPos, nextPos);
 
@@ -41,18 +37,9 @@ public class ItemDomainServiceImpl implements  ItemDomainService {
             item.setGroup(newGroup);
         }
 
-
-
         // 4. Cập nhật vị trí
         item.setPosition(newPos);
-
-        // new item
-        log.info("NEW ITEM: {}", item);
-
-        itemRepository.save(item);
-
-
-        /*     Next: WebSocket     */
+        return itemRepository.save(item);
 
     }
 }

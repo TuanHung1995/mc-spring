@@ -18,7 +18,7 @@ public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
     private final PositionCalculationService positionCalculationService;
 
     @Transactional
-    public void reorderGroup(Long targetGroupId, Long prevItemId, Long nextItemId) {
+    public TaskGroup reorderGroup(Long targetGroupId, Long prevItemId, Long nextItemId) {
         // 1. Tính vị trí mới
         Double prevPos = (prevItemId != null) ? taskGroupRepository.getPosition(prevItemId) : null;
         Double nextPos = (nextItemId != null) ? taskGroupRepository.getPosition(nextItemId) : null;
@@ -38,7 +38,7 @@ public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
 
         // 4. Cập nhật vị trí
         group.setPosition(newPos);
-        taskGroupRepository.save(group);
+        return taskGroupRepository.save(group);
 
 
         /*     Next: WebSocket     */
