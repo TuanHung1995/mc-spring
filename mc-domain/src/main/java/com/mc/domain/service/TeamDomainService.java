@@ -1,0 +1,15 @@
+package com.mc.domain.service;
+
+import com.mc.domain.model.entity.Apartment;
+import com.mc.domain.model.entity.Team;
+import com.mc.domain.model.entity.User;
+
+import java.util.Optional;
+
+public interface TeamDomainService {
+
+    Optional<Team> findById(Long id);
+
+    Apartment saveApartment(User user, Team team, String name, String description, String backgroundUrl);
+
+}

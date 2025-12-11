@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS teams (
                                      CONSTRAINT fk_teams_created_by FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS
+
 -- Tạo bảng User Roles (Bảng trung gian)
 CREATE TABLE IF NOT EXISTS user_roles (
                                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
