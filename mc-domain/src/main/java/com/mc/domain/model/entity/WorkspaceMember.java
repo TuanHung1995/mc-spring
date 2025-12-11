@@ -21,8 +21,11 @@ public class WorkspaceMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private RoleType role;
     private Date joinedAt = new Date();
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role role;
 
     @ManyToOne
     @JoinColumn(name = "workspace_id", referencedColumnName = "id")

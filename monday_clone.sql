@@ -38,11 +38,13 @@ CREATE TABLE `teams`
 (
     `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`        VARCHAR(100)    NOT NULL,
+    `owner_id`    BIGINT UNSIGNED NOT NULL,
     `description` TEXT,
     `avatar_url`  TEXT,
     `created_at`  DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at`  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_t_owner` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -89,11 +91,12 @@ CREATE TABLE `workspace_members`
     `id`           BIGINT UNSIGNED AUTO_INCREMENT,
     `workspace_id` BIGINT  ,
     `user_id`      BIGINT  ,
-    `role`         ENUM ('ADMIN', 'MEMBER', 'VIEWER') DEFAULT 'MEMBER',
+    `role_id`      BIGINT  ,
     `joined_at`    DATETIME                           DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_wsm_workspace` FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_wsm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_wsm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_wsm_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

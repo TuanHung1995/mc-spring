@@ -1,6 +1,7 @@
 package com.mc.infrastructure.persistence.repository;
 
 import com.mc.domain.model.entity.Role;
+import com.mc.domain.model.entity.WorkspaceMember;
 import com.mc.domain.repository.WorkspaceMemberRepository;
 import com.mc.infrastructure.persistence.mapper.WorkspaceMemberJPAMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,11 @@ public class WorkspaceMemberInfrasRepository implements WorkspaceMemberRepositor
     @Cacheable(value = "workspaceRoles", key = "#workspaceId + '-' + #userId")
     public Optional<Role> findRoleByWorkspaceIdAndUserId(Long workspaceId, Long userId) {
         return workspaceMemberJPAMapper.findRoleByWorkspaceIdAndUserId(workspaceId, userId);
+    }
+
+    @Override
+    public void save(WorkspaceMember workspaceMember) {
+        workspaceMemberJPAMapper.save(workspaceMember);
     }
 
 }
