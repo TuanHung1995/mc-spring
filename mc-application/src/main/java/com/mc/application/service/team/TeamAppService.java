@@ -5,6 +5,8 @@ import com.mc.application.model.team.CreateApartmentResponse;
 
 public interface TeamAppService {
 
+
+
     CreateApartmentResponse createApartment(CreateApartmentRequest createApartmentRequest);
 
 }

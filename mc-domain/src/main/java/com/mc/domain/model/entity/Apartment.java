@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "apartments")
@@ -31,5 +32,13 @@ public class Apartment {
     @ManyToOne
     @JoinColumn(name = "team_id", referencedColumnName = "id")
     private Team team;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "apartment_members",
+            joinColumns = @JoinColumn(name = "apartment_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> members;
 
 }

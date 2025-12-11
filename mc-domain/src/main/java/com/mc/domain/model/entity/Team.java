@@ -32,6 +32,14 @@ public class Team {
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "team_members",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> members = new HashSet<>();
+
     public static Team createDefault(String fullName, User owner) {
         Team team = new Team();
         team.setCreatedBy(owner);

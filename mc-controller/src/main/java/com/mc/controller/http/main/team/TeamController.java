@@ -19,9 +19,11 @@ public class TeamController {
     private final TeamAppService teamAppService;
 
     @PostMapping("/create-apartment")
-//    @PreAuthorize("hasPermission(#request., 'Apartment', 'BOARD:EDIT')")
+    @PreAuthorize("hasPermission(#request.teamId, 'Team', 'APARTMENT:CREATE')")
     public ResponseEntity<CreateApartmentResponse> createApartment(@RequestBody CreateApartmentRequest request){
         return ResponseEntity.ok(teamAppService.createApartment(request));
     }
+
+
 
 }
