@@ -17,7 +17,7 @@ public class WorkspaceMemberInfrasRepository implements WorkspaceMemberRepositor
     private final WorkspaceMemberJPAMapper workspaceMemberJPAMapper;
 
     @Override
-    @Cacheable(value = "workspaceRoles", key = "#workspaceId + '-' + #userId")
+//    @Cacheable(value = "workspaceRoles", key = "#workspaceId + '-' + #userId")
     public Optional<Role> findRoleByWorkspaceIdAndUserId(Long workspaceId, Long userId) {
         return workspaceMemberJPAMapper.findRoleByWorkspaceIdAndUserId(workspaceId, userId);
     }

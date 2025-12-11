@@ -39,7 +39,7 @@ public class BoardController {
     }
 
     @PostMapping("/create")
-//    @PreAuthorize("hasPermission(#request.currentWorkspaceId, 'Board', 'BOARD:VIEW')")
+    @PreAuthorize("hasPermission(#request.currentWorkspaceId, 'Workspace', 'BOARD:CREATE')")
     public ResponseEntity<CreateBoardResponse> createBoard(@RequestBody CreateBoardRequest request) {
         return ResponseEntity.ok(boardAppService.createBoard(request));
     }
