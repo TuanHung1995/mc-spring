@@ -11,4 +11,6 @@ public interface WorkspaceMemberRepository {
 
     void save(WorkspaceMember workspaceMember);
 
+    boolean memberExist(Long userId);
+
 }

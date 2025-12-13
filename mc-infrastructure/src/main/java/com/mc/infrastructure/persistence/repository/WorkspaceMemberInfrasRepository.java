@@ -27,4 +27,9 @@ public class WorkspaceMemberInfrasRepository implements WorkspaceMemberRepositor
         workspaceMemberJPAMapper.save(workspaceMember);
     }
 
+    @Override
+    public boolean memberExist(Long userId) {
+        return workspaceMemberJPAMapper.memberExist(userId);
+    }
+
 }

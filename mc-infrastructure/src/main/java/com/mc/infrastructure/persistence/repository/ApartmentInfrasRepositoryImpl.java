@@ -6,6 +6,8 @@ import com.mc.infrastructure.persistence.mapper.ApartmentJPAMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ApartmentInfrasRepositoryImpl implements ApartmentRepository {
@@ -15,6 +17,11 @@ public class ApartmentInfrasRepositoryImpl implements ApartmentRepository {
     @Override
     public Apartment save(Apartment apartment) {
         return apartmentJPAMapper.save(apartment);
+    }
+
+    @Override
+    public Optional<Apartment> findById(Long apartmentId) {
+        return apartmentJPAMapper.findById(apartmentId);
     }
 
 }

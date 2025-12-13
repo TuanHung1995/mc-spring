@@ -4,6 +4,7 @@ import com.mc.domain.model.entity.Apartment;
 import com.mc.domain.model.entity.Team;
 import com.mc.domain.model.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TeamDomainService {
@@ -12,4 +13,5 @@ public interface TeamDomainService {
 
     Apartment saveApartment(User user, Team team, String name, String description, String backgroundUrl);
 
+    List<User> addApartmentMember(User user, Apartment apartment);
 }

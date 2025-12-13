@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserJPAMapper extends JpaRepository<User, Long> {
@@ -23,5 +24,8 @@ public interface UserJPAMapper extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.id != :currentUserId AND (LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<User> searchUsers(@Param("keyword") String keyword, @Param("currentUserId") Long currentUserId, Pageable pageable);
+
+    @Query("SELECT u FROM User u JOIN ApartmentMember am ON u.id = am.user.id WHERE am.apartment.id = :apartmentId")
+    List<User> findAllByApartmentId(@Param("apartmentId") Long apartmentId);
 
 }

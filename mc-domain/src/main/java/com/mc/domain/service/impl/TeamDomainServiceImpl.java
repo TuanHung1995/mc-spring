@@ -3,14 +3,12 @@ package com.mc.domain.service.impl;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.model.enums.RoleType;
-import com.mc.domain.repository.ApartmentMemberRepository;
-import com.mc.domain.repository.ApartmentRepository;
-import com.mc.domain.repository.RoleRepository;
-import com.mc.domain.repository.TeamRepository;
+import com.mc.domain.repository.*;
 import com.mc.domain.service.TeamDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +19,7 @@ public class TeamDomainServiceImpl implements TeamDomainService {
     private final ApartmentRepository apartmentRepository;
     private final ApartmentMemberRepository apartmentMemberRepository;
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Optional<Team> findById(Long id) {
@@ -48,6 +47,19 @@ public class TeamDomainServiceImpl implements TeamDomainService {
         apartmentMemberRepository.save(apartmentMember);
 
         return apartment;
+    }
+
+    @Override
+    public List<User> addApartmentMember(User user, Apartment apartment) {
+
+        ApartmentMember newMember = new ApartmentMember();
+        newMember.setApartment(apartment);
+        newMember.setUser(user);
+
+        apartmentMemberRepository.save(newMember);
+
+        return userRepository.findAllByApartmentId(apartment.getId());
+
     }
 
 }
