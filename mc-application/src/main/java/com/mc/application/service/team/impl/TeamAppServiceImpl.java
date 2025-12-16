@@ -5,6 +5,7 @@ import com.mc.application.mapper.UserMapper;
 import com.mc.application.model.team.AddApartmentMemberRequest;
 import com.mc.application.model.team.CreateApartmentRequest;
 import com.mc.application.model.team.CreateApartmentResponse;
+import com.mc.application.model.team.DeleteApartmentResponse;
 import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.team.TeamAppService;
 import com.mc.domain.exception.ResourceNotFoundException;
@@ -61,6 +62,17 @@ public class TeamAppServiceImpl implements TeamAppService {
 
         return userMapper.toUserProfileResponseList(teamDomainService.addApartmentMember(member, apartment));
 
+    }
+
+    @Override
+    public DeleteApartmentResponse deleteApartmentById(Long id) {
+
+        Apartment apartment = apartmentDomainService.findApartmentById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Apartment", "id", id));
+
+        apartmentDomainService.deleteTeam(apartment.getId());
+
+        return new DeleteApartmentResponse("Team deleted successfully");
     }
 
 }

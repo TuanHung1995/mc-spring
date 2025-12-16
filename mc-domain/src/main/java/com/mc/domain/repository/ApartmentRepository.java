@@ -10,4 +10,6 @@ public interface ApartmentRepository {
 
     Optional<Apartment> findById(Long apartmentId);
 
+    void deleteById(Long id);
+
 }

@@ -1,17 +1,12 @@
 package com.mc.controller.http.main.team;
 
-import com.mc.application.model.team.AddApartmentMemberRequest;
-import com.mc.application.model.team.CreateApartmentRequest;
-import com.mc.application.model.team.CreateApartmentResponse;
+import com.mc.application.model.team.*;
 import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.team.TeamAppService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,5 +29,10 @@ public class TeamController {
         return ResponseEntity.ok(teamAppService.addApartmentMember(request));
     }
 
+    @DeleteMapping("/delete-team")
+    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:DELETE')")
+    public ResponseEntity<DeleteApartmentResponse> deleteApartment(@RequestBody DeleteApartmentRequest request){
+        return ResponseEntity.ok(teamAppService.deleteApartmentById(request.getApartmentId()));
+    }
 
 }

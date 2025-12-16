@@ -24,4 +24,9 @@ public class ApartmentInfrasRepositoryImpl implements ApartmentRepository {
         return apartmentJPAMapper.findById(apartmentId);
     }
 
+    @Override
+    public void deleteById(Long id) {
+        apartmentJPAMapper.deleteById(id);
+    }
+
 }

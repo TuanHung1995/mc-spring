@@ -19,4 +19,9 @@ public class ApartmentDomainServiceImpl implements ApartmentDomainService {
         return apartmentRepository.findById(apartmentId);
     }
 
+    @Override
+    public void deleteTeam(Long id) {
+        apartmentRepository.deleteById(id);
+    }
+
 }

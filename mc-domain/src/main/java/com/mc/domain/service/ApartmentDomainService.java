@@ -8,4 +8,6 @@ public interface ApartmentDomainService {
 
     Optional<Apartment> findApartmentById(Long apartmentId);
 
+    void deleteTeam(Long id);
+
 }
