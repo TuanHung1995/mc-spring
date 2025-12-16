@@ -6,6 +6,8 @@ import com.mc.application.model.user.UserProfileResponse;
 import com.mc.domain.model.entity.User;
 import org.mapstruct.Mapper;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
@@ -15,6 +17,7 @@ public interface UserMapper {
     RegisterResponse toRegisterResponse(User user);
     UpdateProfileResponse toUpdateProfileResponse(User user);
     UserProfileResponse toUserProfileResponse(User user);
+    List<UserProfileResponse> toUserProfileResponseList(List<User> users);
 
     // Ví dụ mapping khác
     // @Mapping(target = "password", ignore = true) // Bỏ qua password

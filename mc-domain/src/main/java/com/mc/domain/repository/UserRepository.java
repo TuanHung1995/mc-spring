@@ -27,4 +27,6 @@ public interface UserRepository {
     Optional<User> findById(Long userId);
 
     List<User> searchUsers(String keyword, Long currentUserId, int limit);
+
+    List<User> findAllByApartmentId(Long apartmentId);
 }

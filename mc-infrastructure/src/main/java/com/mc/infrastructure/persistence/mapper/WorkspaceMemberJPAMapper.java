@@ -12,4 +12,8 @@ public interface WorkspaceMemberJPAMapper extends JpaRepository<WorkspaceMember,
 
     @Query("SELECT wm.role FROM WorkspaceMember wm WHERE wm.workspace.id = :workspaceId AND wm.user.id = :userId")
     Optional<Role> findRoleByWorkspaceIdAndUserId(@Param("workspaceId") Long workspaceId, @Param("userId") Long userId);
+
+    @Query("SELECT CASE WHEN COUNT(wm) > 0 THEN true ELSE false END FROM WorkspaceMember wm WHERE wm.user.id = :userId")
+    boolean memberExist(@Param("userId") Long userId);
+
 }

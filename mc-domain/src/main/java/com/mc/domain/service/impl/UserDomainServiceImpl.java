@@ -64,6 +64,12 @@ public class UserDomainServiceImpl implements UserDomainService {
     }
 
     @Override
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+    }
+
+
+    @Override
     public String changePassword(Long userId, String oldPassword, String newPassword, String confirmNewPassword) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));

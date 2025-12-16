@@ -1,6 +1,5 @@
 package com.mc.domain.model.entity;
 
-import com.mc.domain.model.enums.BoardType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,36 +10,33 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "boards")
+@Table(name = "apartments")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Board {
+public class Apartment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
-    @Enumerated(EnumType.STRING)
-    private BoardType type;
+    private String backgroundUrl;
     private Date createdAt = new Date();
-    private Date updatedAt = new Date();
-    private Date deletedAt;
 
     @ManyToOne
-    @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private User createdBy;
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    private User owner;
 
     @ManyToOne
-    @JoinColumn(name = "workspace_id", referencedColumnName = "id")
-    Workspace workspace;
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
+    private Team team;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "board_members",
-            joinColumns = @JoinColumn(name = "board_id"),
+            name = "apartment_members",
+            joinColumns = @JoinColumn(name = "apartment_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> members;
