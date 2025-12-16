@@ -1,9 +1,6 @@
 package com.mc.application.service.team;
 
-import com.mc.application.model.team.AddApartmentMemberRequest;
-import com.mc.application.model.team.CreateApartmentRequest;
-import com.mc.application.model.team.CreateApartmentResponse;
-import com.mc.application.model.team.DeleteApartmentResponse;
+import com.mc.application.model.team.*;
 import com.mc.application.model.user.UserProfileResponse;
 
 import java.util.List;
@@ -16,5 +13,5 @@ public interface TeamAppService {
 
     DeleteApartmentResponse deleteApartmentById(Long id);
 
-
+    List<UserProfileResponse> deleteApartmentMember(DeleteApartmentMemberRequest request);
 }

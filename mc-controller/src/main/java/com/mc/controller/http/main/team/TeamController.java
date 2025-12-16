@@ -35,4 +35,10 @@ public class TeamController {
         return ResponseEntity.ok(teamAppService.deleteApartmentById(request.getApartmentId()));
     }
 
+    @DeleteMapping("/delete-member")
+    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:DELETE_MEMBER')")
+    public ResponseEntity<List<UserProfileResponse>> deleteApartmentMember(@RequestBody DeleteApartmentMemberRequest request) {
+        return ResponseEntity.ok(teamAppService.deleteApartmentMember(request));
+    }
+
 }

@@ -6,6 +6,8 @@ import com.mc.infrastructure.persistence.mapper.ApartmentMemberJPAMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ApartmentMemberInfrasRepositoryImpl implements ApartmentMemberRepository {
@@ -15,6 +17,21 @@ public class ApartmentMemberInfrasRepositoryImpl implements ApartmentMemberRepos
     @Override
     public void save(ApartmentMember apartmentMember) {
         apartmentMemberJPAMapper.save(apartmentMember);
+    }
+
+    @Override
+    public void deleteByUserIdAndApartmentId(Long userId, Long apartmentId) {
+        apartmentMemberJPAMapper.deleteByUserIdAndApartmentId(userId, apartmentId);
+    }
+
+    @Override
+    public void deleteApartmentMember(ApartmentMember apartmentMember) {
+        apartmentMemberJPAMapper.deleteById(apartmentMember.getId());
+    }
+
+    @Override
+    public Optional<ApartmentMember> findApartmentMemberByUserIdAndApartmentId(Long userId, Long apartmentId) {
+        return apartmentMemberJPAMapper.findByUserIdAndApartmentId(userId, apartmentId);
     }
 
 }

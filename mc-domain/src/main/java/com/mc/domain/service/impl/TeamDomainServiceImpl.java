@@ -62,4 +62,10 @@ public class TeamDomainServiceImpl implements TeamDomainService {
 
     }
 
+    @Override
+    public List<User> deletedApartmentMember(ApartmentMember apartmentMember) {
+        apartmentMemberRepository.deleteApartmentMember(apartmentMember);
+        return userRepository.findAllByApartmentId(apartmentMember.getApartment().getId());
+    }
+
 }
