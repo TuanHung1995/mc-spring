@@ -33,6 +33,8 @@ public class AuthDomainServiceImpl implements AuthDomainService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final TokenHelperPort tokenHelperPort;
     private final MailSender mailSender;
@@ -70,7 +72,6 @@ public class AuthDomainServiceImpl implements AuthDomainService {
 
         // Initialize User Data
         if (inviteToken == null && inviteToken.isEmpty()) {
-            // Nếu không có inviteToken, tạo data mặc định
             initUserData(user);
         }
 
@@ -129,6 +130,14 @@ public class AuthDomainServiceImpl implements AuthDomainService {
         // Create Default Workspace
         Workspace workspace = Workspace.create("DEFAULT_WORKSPACE", user, team);
         workspaceRepository.save(workspace);
+
+        WorkspaceMember workspaceMember = new WorkspaceMember();
+        workspaceMember.setUser(user);
+        workspaceMember.setWorkspace(workspace);
+        workspaceMember.setRole(role);
+        workspaceMember.setJoinedAt(new Date());
+
+        workspaceMemberRepository.save(workspaceMember);
 
     }
 

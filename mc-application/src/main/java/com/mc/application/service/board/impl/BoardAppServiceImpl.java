@@ -1,17 +1,15 @@
 package com.mc.application.service.board.impl;
 
+import com.mc.application.mapper.BoardMapper;
+import com.mc.application.model.board.CreateBoardRequest;
+import com.mc.application.model.board.CreateBoardResponse;
 import com.mc.application.model.board.ReorderRequest;
 import com.mc.application.service.board.BoardAppService;
-import com.mc.domain.model.entity.Board;
-import com.mc.domain.model.entity.Column;
-import com.mc.domain.model.entity.Item;
-import com.mc.domain.model.entity.TaskGroup;
+import com.mc.domain.exception.ResourceNotFoundException;
+import com.mc.domain.model.entity.*;
 import com.mc.domain.port.RealTimeUpdatePort;
 import com.mc.domain.port.UserContextPort;
-import com.mc.domain.service.BoardDomainService;
-import com.mc.domain.service.ColumnDomainService;
-import com.mc.domain.service.ItemDomainService;
-import com.mc.domain.service.TaskGroupDomainService;
+import com.mc.domain.service.*;
 import com.mc.infrastructure.config.security.CustomUserDetails;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +29,11 @@ public class BoardAppServiceImpl implements BoardAppService {
     private final ItemDomainService itemDomainService;
     private final TaskGroupDomainService taskGroupDomainService;
     private final ColumnDomainService columnDomainService;
+    private final UserDomainService userDomainService;
+    private final WorkspaceDomainService workspaceDomainService;
     private final UserContextPort userContextPort;
     private final RealTimeUpdatePort realTimeUpdatePort;
+    private final BoardMapper boardMapper;
 
     @Value("${constants.frontend}")
     private String frontendUrl;
@@ -41,6 +42,26 @@ public class BoardAppServiceImpl implements BoardAppService {
     public List<Board> getBoardsForUser() {
         /* Get current user ID from UserContextPort */
         return boardDomainService.getBoardsForUser(userContextPort.getCurrentUserId());
+    }
+
+    @Override
+    public CreateBoardResponse createBoard(CreateBoardRequest request) {
+
+        User user = userDomainService.findUserById(userContextPort.getCurrentUserId());
+
+        Workspace currentWorkspace = workspaceDomainService
+                .findById(request.getCurrentWorkspaceId())
+                .orElseThrow(() -> new ResourceNotFoundException("Workspace", "id", request.getCurrentWorkspaceId()));
+
+        return boardMapper.toCreateBoardResponse(
+                boardDomainService.createBoard(user,
+                        currentWorkspace,
+                        request.getName(),
+                        request.getPurpose(),
+                        request.getType()
+                )
+        );
+
     }
 
     public void reorderGroup(ReorderRequest request) {

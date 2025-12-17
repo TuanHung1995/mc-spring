@@ -5,6 +5,8 @@ import com.mc.domain.repository.WorkspaceRepository;
 import com.mc.infrastructure.persistence.mapper.WorkspaceJPAMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class WorkspaceInfrasRepositoryImpl implements WorkspaceRepository {
 
@@ -18,4 +20,10 @@ public class WorkspaceInfrasRepositoryImpl implements WorkspaceRepository {
     public void save(Workspace workspace) {
         workspaceJPAMapper.save(workspace);
     }
+
+    @Override
+    public Optional<Workspace> findById(Long id) {
+        return workspaceJPAMapper.findById(id);
+    }
+
 }

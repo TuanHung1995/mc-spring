@@ -1,9 +1,12 @@
 package com.mc.controller.http.main;
 
+import com.mc.application.model.board.CreateBoardRequest;
+import com.mc.application.model.board.CreateBoardResponse;
 import com.mc.application.model.board.InviteRequest;
 import com.mc.application.model.board.ReorderRequest;
 import com.mc.application.service.board.BoardAppService;
 import com.mc.application.service.invite.InviteAppService;
+import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.Board;
 import com.mc.domain.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +33,17 @@ public class BoardController {
     public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
 
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("Board not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
 
         return ResponseEntity.ok(board);
     }
+
+    @PostMapping("/create")
+    @PreAuthorize("hasPermission(#request.currentWorkspaceId, 'Workspace', 'BOARD:CREATE')")
+    public ResponseEntity<CreateBoardResponse> createBoard(@RequestBody CreateBoardRequest request) {
+        return ResponseEntity.ok(boardAppService.createBoard(request));
+    }
+
 
     @DeleteMapping("/{boardId}")
     @PreAuthorize("hasPermission(#boardId, 'BOARD:DELETE')")

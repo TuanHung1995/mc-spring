@@ -5,6 +5,7 @@ import com.mc.domain.model.enums.AccountStatus;
 import com.mc.domain.port.MailSender;
 import com.mc.domain.repository.UserRepository;
 import com.mc.infrastructure.persistence.mapper.UserJPAMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class UserInfrasRepositoryImpl implements UserRepository {
 
@@ -36,12 +38,6 @@ public class UserInfrasRepositoryImpl implements UserRepository {
     private final UserJPAMapper userJPAMapper;
     private final MailSender mailSender;
     private final PasswordEncoder passwordEncoder;
-
-    public UserInfrasRepositoryImpl(UserJPAMapper userJPAMapper, MailSender mailSender, PasswordEncoder passwordEncoder) {
-        this.userJPAMapper = userJPAMapper;
-        this.mailSender = mailSender;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public Optional<User> findByEmail(String email) {
@@ -146,6 +142,11 @@ public class UserInfrasRepositoryImpl implements UserRepository {
 
         Page<User> pageResult = userJPAMapper.searchUsers(keyword, currentUserId, pageable);
         return pageResult.getContent();
+    }
+
+    @Override
+    public List<User> findAllByApartmentId(Long apartmentId) {
+        return userJPAMapper.findAllByApartmentId(apartmentId);
     }
 
 }
