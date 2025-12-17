@@ -91,6 +91,7 @@ CREATE TABLE `apartment_members`
     `user_id`   BIGINT UNSIGNED NOT NULL,
     `role_id`   BIGINT UNSIGNED,
     `joined_at` DATETIME                DEFAULT CURRENT_TIMESTAMP,
+    `is_owner`  BOOLEAN NOT NULL ,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_apm_apartment` FOREIGN KEY (`apartment_id`) REFERENCES `apartments` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_apm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,

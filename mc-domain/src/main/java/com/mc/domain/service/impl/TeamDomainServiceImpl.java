@@ -68,4 +68,17 @@ public class TeamDomainServiceImpl implements TeamDomainService {
         return userRepository.findAllByApartmentId(apartmentMember.getApartment().getId());
     }
 
+    @Override
+    public boolean assignApartmentOwner(boolean isOwner, Long userId, Long apartmentId) {
+
+        ApartmentMember apartmentMember = apartmentMemberRepository.findApartmentMemberByUserIdAndApartmentId(userId, apartmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("ApartmentMember", "id", apartmentId.toString()));
+
+        apartmentMember.setOwner(isOwner);
+        apartmentMemberRepository.save(apartmentMember);
+
+        return isOwner;
+
+    }
+
 }

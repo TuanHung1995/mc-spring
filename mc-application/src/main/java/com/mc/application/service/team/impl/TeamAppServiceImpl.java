@@ -88,4 +88,20 @@ public class TeamAppServiceImpl implements TeamAppService {
 
     }
 
+    @Override
+    public AssignApartmentOwnerResponse assignApartmentOwner(AssignApartmentOwnerRequest request) {
+
+        User user = userDomainService.findUserById(request.getUserId());
+        Apartment apartment = apartmentDomainService.findApartmentById(request.getApartmentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Apartment", "id", request.getApartmentId()));
+
+        return new AssignApartmentOwnerResponse(
+                "Owner assigned",
+                        user.getEmail(),
+                        user.getJobTitle(),
+                teamDomainService.assignApartmentOwner(request.isOwner(), user.getId(), apartment.getId())
+        );
+
+    }
+
 }

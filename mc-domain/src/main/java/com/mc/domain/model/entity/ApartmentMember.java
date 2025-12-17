@@ -19,6 +19,7 @@ public class ApartmentMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private boolean isOwner;
     private Date joinedAt = new Date();
 
     @ManyToOne
