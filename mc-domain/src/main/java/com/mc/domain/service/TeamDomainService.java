@@ -17,4 +17,7 @@ public interface TeamDomainService {
     List<User> addApartmentMember(User user, Apartment apartment);
 
     List<User> deletedApartmentMember(ApartmentMember apartmentMember);
+
+    boolean assignApartmentOwner(boolean isOwner, Long userId, Long apartmentId);
+
 }

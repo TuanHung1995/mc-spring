@@ -23,7 +23,7 @@ public class TeamController {
         return ResponseEntity.ok(teamAppService.createApartment(request));
     }
 
-    @PostMapping("add-member")
+    @PostMapping("/add-member")
     @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:ADD_MEMBER')")
     public ResponseEntity<List<UserProfileResponse>> addApartmentMember(@RequestBody AddApartmentMemberRequest request){
         return ResponseEntity.ok(teamAppService.addApartmentMember(request));
@@ -39,6 +39,12 @@ public class TeamController {
     @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:DELETE_MEMBER')")
     public ResponseEntity<List<UserProfileResponse>> deleteApartmentMember(@RequestBody DeleteApartmentMemberRequest request) {
         return ResponseEntity.ok(teamAppService.deleteApartmentMember(request));
+    }
+
+    @PutMapping("/assign-owner")
+    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:ASSIGN_OWNER')")
+    public ResponseEntity<AssignApartmentOwnerResponse> assignApartmentOwner(@RequestBody AssignApartmentOwnerRequest request){
+        return ResponseEntity.ok(teamAppService.assignApartmentOwner(request));
     }
 
 }

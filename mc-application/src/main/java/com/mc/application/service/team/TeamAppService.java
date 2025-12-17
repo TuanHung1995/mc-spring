@@ -14,4 +14,7 @@ public interface TeamAppService {
     DeleteApartmentResponse deleteApartmentById(Long id);
 
     List<UserProfileResponse> deleteApartmentMember(DeleteApartmentMemberRequest request);
+
+    AssignApartmentOwnerResponse assignApartmentOwner(AssignApartmentOwnerRequest request);
+
 }
