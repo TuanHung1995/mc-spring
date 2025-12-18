@@ -16,4 +16,5 @@ public interface UserDomainService {
 
     List<User> search(String keyword, Long currentUserId);
 
+    List<User> findAllByEmailIn(List<String> emails);
 }

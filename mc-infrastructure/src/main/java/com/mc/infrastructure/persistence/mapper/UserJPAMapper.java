@@ -28,4 +28,6 @@ public interface UserJPAMapper extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u JOIN ApartmentMember am ON u.id = am.user.id WHERE am.apartment.id = :apartmentId")
     List<User> findAllByApartmentId(@Param("apartmentId") Long apartmentId);
 
+    List<User> findAllByEmailIsIn(List<String> emails);
+
 }

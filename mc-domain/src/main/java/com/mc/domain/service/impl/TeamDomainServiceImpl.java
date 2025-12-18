@@ -7,6 +7,7 @@ import com.mc.domain.repository.*;
 import com.mc.domain.service.TeamDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,13 +51,39 @@ public class TeamDomainServiceImpl implements TeamDomainService {
     }
 
     @Override
-    public List<User> addApartmentMember(User user, Apartment apartment) {
+    @Transactional
+    public List<User> addApartmentMember(List<User> users, Apartment apartment) {
 
-        ApartmentMember newMember = new ApartmentMember();
-        newMember.setApartment(apartment);
-        newMember.setUser(user);
+        List<Long> userIds = users.stream().map(User::getId).toList();
 
-        apartmentMemberRepository.save(newMember);
+        List<Long> existingMemberUserIds = apartmentMemberRepository.findAllUserIdsByApartmentIdAndUserIdsIn(apartment.getId(), userIds);
+
+        Role memberRole = roleRepository.findByName(RoleType.ROLE_MEMBER_APARTMENT.name())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", RoleType.ROLE_MEMBER_APARTMENT.name()));
+
+        Role ownerRole = roleRepository.findByName(RoleType.ROLE_OWNER_APARTMENT.name())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", RoleType.ROLE_OWNER_APARTMENT.name()));
+
+        long apartmentMembers = apartmentMemberRepository.countByApartmentId(apartment.getId());
+
+        List<ApartmentMember> newMembers = users.stream()
+                .filter(user -> !existingMemberUserIds.contains(user.getId()))
+                .map(user -> {
+                    ApartmentMember member = new ApartmentMember();
+                    member.setApartment(apartment);
+                    member.setUser(user);
+                    if (apartmentMembers == 0) {
+                        member.setRole(ownerRole);
+                    } else {
+                        member.setRole(memberRole);
+                    }
+                    return member;
+                })
+                .toList();
+
+        if (!newMembers.isEmpty()) {
+            apartmentMemberRepository.saveAllApartmentMembers(newMembers);
+        }
 
         return userRepository.findAllByApartmentId(apartment.getId());
 

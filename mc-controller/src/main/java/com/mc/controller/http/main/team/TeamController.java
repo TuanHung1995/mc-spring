@@ -3,6 +3,7 @@ package com.mc.controller.http.main.team;
 import com.mc.application.model.team.*;
 import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.team.TeamAppService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +26,7 @@ public class TeamController {
 
     @PostMapping("/add-member")
     @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:ADD_MEMBER')")
-    public ResponseEntity<List<UserProfileResponse>> addApartmentMember(@RequestBody AddApartmentMemberRequest request){
+    public ResponseEntity<List<UserProfileResponse>> addApartmentMember(@Valid @RequestBody AddApartmentMemberRequest request){
         return ResponseEntity.ok(teamAppService.addApartmentMember(request));
     }
 

@@ -29,4 +29,6 @@ public interface UserRepository {
     List<User> searchUsers(String keyword, Long currentUserId, int limit);
 
     List<User> findAllByApartmentId(Long apartmentId);
+
+    List<User> findAllByEmailIn(List<String> emails);
 }
