@@ -22,4 +22,6 @@ public interface TeamDomainService {
 
     void requestToJoinApartment(Long userId, Long apartmentId);
 
+    void approveRequestJoinApartment(boolean isApprove, Long apartmentId, Long requesterId, Long approverId);
+
 }

@@ -129,4 +129,18 @@ public class TeamAppServiceImpl implements TeamAppService {
 
     }
 
+    @Override
+    public void approveRequestJoinApartment(ApproveRequestJoinApartmentRequest request) {
+
+        Long currentUserId = userContextPort.getCurrentUserId();
+
+        teamDomainService.approveRequestJoinApartment(
+                request.isApprove(),
+                request.getApartmentId(),
+                request.getUserId(),
+                currentUserId
+        );
+
+    }
+
 }

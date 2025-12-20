@@ -19,4 +19,6 @@ public interface TeamAppService {
 
     RequestToJoinApartmentResponse requestToJoinApartment(RequestToJoinApartmentRequest request);
 
+    void approveRequestJoinApartment(ApproveRequestJoinApartmentRequest request);
+
 }

@@ -48,9 +48,17 @@ public class TeamController {
         return ResponseEntity.ok(teamAppService.assignApartmentOwner(request));
     }
 
-    @PostMapping("/request-join")
+    @PostMapping("/request-join-apartment")
     @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:REQUEST_JOIN')")
     public ResponseEntity<RequestToJoinApartmentResponse> requestJoinApartment(@Valid @RequestBody RequestToJoinApartmentRequest request) {
         return ResponseEntity.ok(teamAppService.requestToJoinApartment(request));
     }
+
+    @PostMapping("/accept-request/join-apartment")
+//    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:APPROVE_REQUEST')")
+    public ResponseEntity<?> acceptJoinApartmentRequest(@RequestBody ApproveRequestJoinApartmentRequest request) {
+        teamAppService.approveRequestJoinApartment(request);
+        return ResponseEntity.ok("Request processed successfully");
+    }
+
 }

@@ -25,7 +25,7 @@ public class ApartmentMember {
     private boolean isOwner;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+//    @Column(name = "status")
     private ApartmentMemberStatus status;
 
     private Date joinedAt = new Date();

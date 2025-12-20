@@ -193,4 +193,68 @@ public class TeamDomainServiceImpl implements TeamDomainService {
         mailSender.send(ownerEmails.toArray(new String[0]), subject, body);
     }
 
+    @Override
+    @Transactional
+    public void approveRequestJoinApartment(boolean isApprove, Long apartmentId, Long requesterId, Long approverId) {
+
+        // Check owner
+        ApartmentMember approver = apartmentMemberRepository.findApartmentMemberByUserIdAndApartmentId(approverId, apartmentId)
+                .orElseThrow(() -> new BusinessLogicException("You have no request to approve or reject."));
+
+        if (!RoleType.ROLE_OWNER_APARTMENT.name().equals(approver.getRole().getName())) {
+            throw new BusinessLogicException("You are not apartment owner.");
+        }
+
+        // Find requester
+        ApartmentMember requesterMember = apartmentMemberRepository.findApartmentMemberByUserIdAndApartmentId(requesterId, apartmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("ApartmentMember", "userId and apartmentId", requesterId + ", " + apartmentId));
+
+        if (requesterMember.getStatus() == ApartmentMemberStatus.ACTIVE) {
+            throw new BusinessLogicException("This user has active.");
+        }
+        if (requesterMember.getStatus() != ApartmentMemberStatus.PENDING) {
+            throw new BusinessLogicException("Not found validated request.");
+        }
+
+        if (!isApprove) {
+            requesterMember.setStatus(ApartmentMemberStatus.REJECTED);
+        } else {
+            requesterMember.setStatus(ApartmentMemberStatus.ACTIVE);
+        }
+
+        apartmentMemberRepository.save(requesterMember);
+
+        sendApprovalNotification(isApprove, requesterMember.getApartment(), requesterMember.getUser());
+
+    }
+
+    private void sendApprovalNotification(boolean isApprove, Apartment apartment, User user) {
+
+        if (!isApprove) {
+            mailSender.send(user.getEmail(),
+                    "[Monday Clone] Yêu cầu tham gia bị từ chối",
+                    "Yêu cầu tham gia vào " + apartment.getName() + " của bạn đã bị từ chối.");
+            return;
+        }
+
+        String subject = "[Monday Clone] Yêu cầu tham gia được chấp thuận";
+        String loginLink = "http://" + appUrl + "/login";
+
+        String body = String.format("""
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #00ca72;">Yêu cầu được chấp thuận!</h2>
+            <p>Xin chào <strong>%s</strong>,</p>
+            <p>Yêu cầu tham gia vào <strong>%s</strong> của bạn đã được chấp thuận.</p>
+            <p>Bây giờ bạn có thể truy cập và bắt đầu làm việc.</p>
+            <div style="margin: 20px 0;">
+                <a href="%s" style="background-color: #5960e6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Truy cập ngay</a>
+            </div>
+        </div>
+        """,
+                user.getFullName(), apartment.getName(), loginLink
+        );
+
+        mailSender.send(user.getEmail(), subject, body);
+    }
+
 }
