@@ -3,6 +3,7 @@ package com.mc.controller.http.main.team;
 import com.mc.application.model.team.*;
 import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.team.TeamAppService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +26,7 @@ public class TeamController {
 
     @PostMapping("/add-member")
     @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:ADD_MEMBER')")
-    public ResponseEntity<List<UserProfileResponse>> addApartmentMember(@RequestBody AddApartmentMemberRequest request){
+    public ResponseEntity<List<UserProfileResponse>> addApartmentMember(@Valid @RequestBody AddApartmentMemberRequest request){
         return ResponseEntity.ok(teamAppService.addApartmentMember(request));
     }
 
@@ -45,6 +46,19 @@ public class TeamController {
     @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:ASSIGN_OWNER')")
     public ResponseEntity<AssignApartmentOwnerResponse> assignApartmentOwner(@RequestBody AssignApartmentOwnerRequest request){
         return ResponseEntity.ok(teamAppService.assignApartmentOwner(request));
+    }
+
+    @PostMapping("/request-join-apartment")
+    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:REQUEST_JOIN')")
+    public ResponseEntity<RequestToJoinApartmentResponse> requestJoinApartment(@Valid @RequestBody RequestToJoinApartmentRequest request) {
+        return ResponseEntity.ok(teamAppService.requestToJoinApartment(request));
+    }
+
+    @PostMapping("/accept-request/join-apartment")
+//    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:APPROVE_REQUEST')")
+    public ResponseEntity<?> acceptJoinApartmentRequest(@RequestBody ApproveRequestJoinApartmentRequest request) {
+        teamAppService.approveRequestJoinApartment(request);
+        return ResponseEntity.ok("Request processed successfully");
     }
 
 }

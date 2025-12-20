@@ -41,4 +41,8 @@ public class Apartment {
     )
     private Set<User> members;
 
+    @ManyToOne
+    @JoinColumn(name = "workspace_id",referencedColumnName = "id")
+    private Workspace workspace;
+
 }

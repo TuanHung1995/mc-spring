@@ -149,4 +149,9 @@ public class UserInfrasRepositoryImpl implements UserRepository {
         return userJPAMapper.findAllByApartmentId(apartmentId);
     }
 
+    @Override
+    public List<User> findAllByEmailIn(List<String> emails) {
+        return userJPAMapper.findAllByEmailIsIn(emails);
+    }
+
 }

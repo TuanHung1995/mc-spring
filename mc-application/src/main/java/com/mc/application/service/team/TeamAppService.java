@@ -17,4 +17,8 @@ public interface TeamAppService {
 
     AssignApartmentOwnerResponse assignApartmentOwner(AssignApartmentOwnerRequest request);
 
+    RequestToJoinApartmentResponse requestToJoinApartment(RequestToJoinApartmentRequest request);
+
+    void approveRequestJoinApartment(ApproveRequestJoinApartmentRequest request);
+
 }
