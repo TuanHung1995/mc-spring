@@ -1,5 +1,7 @@
 package com.mc.domain.port;
 
+import java.util.List;
+
 public interface MailSender {
 
     /**
@@ -10,4 +12,6 @@ public interface MailSender {
      * @param body    the body content of the email
      */
     void send(String to, String subject, String body);
+
+    void send(String[] to, String subject, String body);
 }

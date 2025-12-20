@@ -20,4 +20,6 @@ public interface TeamDomainService {
 
     boolean assignApartmentOwner(boolean isOwner, Long userId, Long apartmentId);
 
+    void requestToJoinApartment(Long userId, Long apartmentId);
+
 }

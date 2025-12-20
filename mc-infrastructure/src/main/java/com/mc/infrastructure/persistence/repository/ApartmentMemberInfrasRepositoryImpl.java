@@ -1,20 +1,35 @@
 package com.mc.infrastructure.persistence.repository;
 
 import com.mc.domain.model.entity.ApartmentMember;
-import com.mc.domain.model.entity.User;
+import com.mc.domain.model.entity.Role;
+import com.mc.domain.port.MailSender;
 import com.mc.domain.repository.ApartmentMemberRepository;
 import com.mc.infrastructure.persistence.mapper.ApartmentMemberJPAMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ApartmentMemberInfrasRepositoryImpl implements ApartmentMemberRepository {
 
     private final ApartmentMemberJPAMapper apartmentMemberJPAMapper;
+    private final MailSender mailSender;
+
+    private String apartmentApiUrl = "/api/v1/teams/";
+
+    @Value("${server.port}")
+    private String serverPort;
+
+    @Value("${constants.development}")
+    private boolean isDevelopment;
+
+    @Value("${constants.frontend}")
+    private String appUrl;
 
     @Override
     public void save(ApartmentMember apartmentMember) {
@@ -47,10 +62,18 @@ public class ApartmentMemberInfrasRepositoryImpl implements ApartmentMemberRepos
     }
 
     @Override
-    public List<User> saveAllApartmentMembers(List<ApartmentMember> apartmentMembers) {
-        return apartmentMemberJPAMapper.saveAll(apartmentMembers).stream()
-                .map(ApartmentMember::getUser)
-                .toList();
+    public void saveAllApartmentMembers(List<ApartmentMember> apartmentMembers) {
+        apartmentMemberJPAMapper.saveAll(apartmentMembers);
+    }
+
+    @Override
+    public Optional<Role> findRoleByApartmentIdAndUserId(Long apartmentId, Long userId) {
+        return apartmentMemberJPAMapper.findRoleByApartmentIdAndUserId(apartmentId, userId);
+    }
+
+    @Override
+    public List<String> findOwnerEmailsByApartmentId(Long apartmentId) {
+        return apartmentMemberJPAMapper.findOwnerEmailsByApartmentId(apartmentId);
     }
 
 }

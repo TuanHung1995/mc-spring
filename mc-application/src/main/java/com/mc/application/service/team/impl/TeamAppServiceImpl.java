@@ -8,9 +8,11 @@ import com.mc.application.service.team.TeamAppService;
 import com.mc.domain.exception.BusinessLogicException;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
+import com.mc.domain.model.enums.RoleType;
 import com.mc.domain.port.UserContextPort;
 import com.mc.domain.repository.WorkspaceMemberRepository;
 import com.mc.domain.service.ApartmentDomainService;
+import com.mc.domain.service.RoleDomainService;
 import com.mc.domain.service.TeamDomainService;
 import com.mc.domain.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class TeamAppServiceImpl implements TeamAppService {
     private final TeamDomainService teamDomainService;
     private final UserDomainService userDomainService;
     private final ApartmentDomainService apartmentDomainService;
+    private final RoleDomainService roleDomainService;
     private final WorkspaceMemberRepository workspaceMemberRepository;
 
     private final UserContextPort userContextPort;
@@ -112,6 +115,17 @@ public class TeamAppServiceImpl implements TeamAppService {
                         user.getJobTitle(),
                 teamDomainService.assignApartmentOwner(request.isOwner(), user.getId(), apartment.getId())
         );
+
+    }
+
+    @Override
+    public RequestToJoinApartmentResponse requestToJoinApartment(RequestToJoinApartmentRequest request) {
+
+        Long currentUserId = userContextPort.getCurrentUserId();
+
+        teamDomainService.requestToJoinApartment(currentUserId, request.getApartmentId());
+
+        return new RequestToJoinApartmentResponse("Request sent");
 
     }
 

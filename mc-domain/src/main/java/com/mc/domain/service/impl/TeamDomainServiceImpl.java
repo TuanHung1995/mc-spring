@@ -1,11 +1,15 @@
 package com.mc.domain.service.impl;
 
+import com.mc.domain.exception.BusinessLogicException;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
+import com.mc.domain.model.enums.ApartmentMemberStatus;
 import com.mc.domain.model.enums.RoleType;
+import com.mc.domain.port.MailSender;
 import com.mc.domain.repository.*;
 import com.mc.domain.service.TeamDomainService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +25,20 @@ public class TeamDomainServiceImpl implements TeamDomainService {
     private final ApartmentMemberRepository apartmentMemberRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+
+    private final MailSender mailSender;
+
+    private String apartmentApiUrl = "/api/v1/teams/";
+
+    @Value("${server.port}")
+    private String serverPort;
+
+    @Value("${constants.development}")
+    private boolean isDevelopment;
+
+    @Value("${constants.frontend}")
+    private String appUrl;
+
 
     @Override
     public Optional<Team> findById(Long id) {
@@ -106,6 +124,73 @@ public class TeamDomainServiceImpl implements TeamDomainService {
 
         return isOwner;
 
+    }
+
+    @Override
+    @Transactional
+    public void requestToJoinApartment(Long userId, Long apartmentId) {
+
+        Apartment apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Apartment", "id", apartmentId.toString()));
+
+        // Check exist member
+        Optional<ApartmentMember> existingMember = apartmentMemberRepository.findApartmentMemberByUserIdAndApartmentId(userId, apartmentId);
+
+        if (existingMember.isPresent()) {
+            ApartmentMemberStatus status = existingMember.get().getStatus();
+            if (status == ApartmentMemberStatus.ACTIVE) {
+                throw new BusinessLogicException("You already joined this apartment.");
+            } else if (status == ApartmentMemberStatus.PENDING) {
+                throw new BusinessLogicException("Request is pending.");
+            }
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId.toString()));
+
+        Role apartmentMemberRole = roleRepository.findByName(RoleType.ROLE_MEMBER_APARTMENT.name())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", RoleType.ROLE_MEMBER_APARTMENT.name()));
+
+        ApartmentMember newMember = new ApartmentMember();
+        newMember.setUser(user);
+        newMember.setRole(apartmentMemberRole);
+        newMember.setApartment(apartment);
+        newMember.setStatus(ApartmentMemberStatus.PENDING);
+        newMember.setOwner(false);
+
+        apartmentMemberRepository.save(newMember);
+
+        sendNotificationToOwners(apartmentId, user, apartment);
+
+    }
+
+    private void sendNotificationToOwners(Long apartmentId, User requester, Apartment apartment) {
+
+        List<String> ownerEmails = apartmentMemberRepository.findOwnerEmailsByApartmentId(apartmentId);
+        if (ownerEmails.isEmpty()) return;
+
+        String subject = "[Monday Clone] New apartment join request: " + apartment.getName();
+
+        String approveLink = "http://localhost:" + serverPort + apartmentApiUrl + "accept-request?apartmentId=" + apartmentId + "/members?action=approve&userId=" + requester.getId();
+        String rejectLink = "http://localhost:" + serverPort + apartmentApiUrl + "reject-request?apartmentId=" + apartmentId + "/members?action=reject&userId=" + requester.getId();
+
+        String body = String.format("""
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>New apartment join request: %s</h2>
+                <p>Hi, </p>
+                <p><strong>%s</strong> (%s) has requested to join your apartment <strong>%s</strong>.</p>
+                <div style="margin: 20px 0;">
+                    <a href="%s" style="background-color: #00ca72; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">Approve</a>
+                    <a href="%s" style="background-color: #fb275d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reject</a>
+                </div>
+                <p>Or you can access to admin page to approve or reject.</p>
+            </div>
+            """,
+                apartment.getName(), requester.getFullName(), requester.getEmail(), apartment.getName(), approveLink, rejectLink
+        );
+
+        // 3. Gửi mail
+        mailSender.send(ownerEmails.toArray(new String[0]), subject, body);
     }
 
 }
