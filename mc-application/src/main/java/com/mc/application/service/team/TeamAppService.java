@@ -21,4 +21,13 @@ public interface TeamAppService {
 
     void approveRequestJoinApartment(ApproveRequestJoinApartmentRequest request);
 
+    /**
+     * Orchestrates the process of updating an apartment's details.
+     * Retrieves the current authenticated user context before delegating to the domain service.
+     *
+     * @param apartmentId the ID of the apartment
+     * @param request     the update data
+     */
+    void updateApartment(Long apartmentId, UpdateApartmentRequest request);
+
 }

@@ -61,4 +61,20 @@ public class TeamController {
         return ResponseEntity.ok("Request processed successfully");
     }
 
+    /**
+     * Updates an existing apartment's information.
+     *
+     * @param apartmentId the ID of the apartment to update
+     * @param request     the request body containing update fields
+     * @return a ResponseEntity containing a success message
+     */
+    @PutMapping("/apartments/{apartmentId}")
+    public ResponseEntity<String> updateApartment(
+            @PathVariable Long apartmentId,
+            @Valid @RequestBody UpdateApartmentRequest request) {
+
+        teamAppService.updateApartment(apartmentId, request);
+        return ResponseEntity.ok("Apartment updated successfully.");
+    }
+
 }

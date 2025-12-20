@@ -143,4 +143,19 @@ public class TeamAppServiceImpl implements TeamAppService {
 
     }
 
+    @Override
+    public void updateApartment(Long apartmentId, UpdateApartmentRequest request) {
+        Long currentUserId = userContextPort.getCurrentUserId();
+
+        apartmentDomainService.updateApartment(
+                apartmentId,
+                currentUserId,
+                request.getName(),
+                request.getDescription(),
+                request.getAvatarUrl(),
+                request.getBackgroundImageUrl(),
+                request.getIsPrivate()
+        );
+    }
+
 }
