@@ -1,26 +1,51 @@
 package com.mc.infrastructure.mail;
 
 import com.mc.domain.port.MailSender;
-import org.springframework.mail.SimpleMailMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class MailSenderImpl implements MailSender {
 
     private final JavaMailSender javaMailSender;
 
-    public MailSenderImpl(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
+    @Override
+    @Async
+    public void send(String to, String subject, String body) {
+        sendEmail(new String[]{to}, subject, body);
     }
 
     @Override
-    public void send(String to, String subject, String body) {
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(to);
-        mail.setSubject(subject);
-        mail.setText(body);
-        javaMailSender.send(mail);
+    @Async
+    public void send(String[] to, String subject, String body) {
+        sendEmail(to, subject, body);
+    }
+
+    private void sendEmail(String[] to, String subject, String body) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+//            helper.setFrom("noreply@mondayclone.com");
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body, true); // true = HTML
+
+            javaMailSender.send(message);
+            log.info("Email sent successfully to {} recipients", to.length);
+        } catch (MessagingException e) {
+            log.error("Failed to send email", e);
+        }
     }
 
 }

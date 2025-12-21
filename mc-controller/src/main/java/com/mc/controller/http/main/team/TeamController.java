@@ -3,6 +3,7 @@ package com.mc.controller.http.main.team;
 import com.mc.application.model.team.*;
 import com.mc.application.model.user.UserProfileResponse;
 import com.mc.application.service.team.TeamAppService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,9 +24,9 @@ public class TeamController {
         return ResponseEntity.ok(teamAppService.createApartment(request));
     }
 
-    @PostMapping("add-member")
+    @PostMapping("/add-member")
     @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:ADD_MEMBER')")
-    public ResponseEntity<List<UserProfileResponse>> addApartmentMember(@RequestBody AddApartmentMemberRequest request){
+    public ResponseEntity<List<UserProfileResponse>> addApartmentMember(@Valid @RequestBody AddApartmentMemberRequest request){
         return ResponseEntity.ok(teamAppService.addApartmentMember(request));
     }
 
@@ -40,5 +41,63 @@ public class TeamController {
     public ResponseEntity<List<UserProfileResponse>> deleteApartmentMember(@RequestBody DeleteApartmentMemberRequest request) {
         return ResponseEntity.ok(teamAppService.deleteApartmentMember(request));
     }
+
+    @PutMapping("/assign-owner")
+    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:ASSIGN_OWNER')")
+    public ResponseEntity<AssignApartmentOwnerResponse> assignApartmentOwner(@RequestBody AssignApartmentOwnerRequest request){
+        return ResponseEntity.ok(teamAppService.assignApartmentOwner(request));
+    }
+
+    @PostMapping("/request-join-apartment")
+    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:REQUEST_JOIN')")
+    public ResponseEntity<RequestToJoinApartmentResponse> requestJoinApartment(@Valid @RequestBody RequestToJoinApartmentRequest request) {
+        return ResponseEntity.ok(teamAppService.requestToJoinApartment(request));
+    }
+
+    @PostMapping("/accept-request/join-apartment")
+//    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'APARTMENT:APPROVE_REQUEST')")
+    public ResponseEntity<?> acceptJoinApartmentRequest(@RequestBody ApproveRequestJoinApartmentRequest request) {
+        teamAppService.approveRequestJoinApartment(request);
+        return ResponseEntity.ok("Request processed successfully");
+    }
+
+    /**
+     * Updates an existing apartment's information.
+     *
+     * @param apartmentId the ID of the apartment to update
+     * @param request     the request body containing update fields
+     * @return a ResponseEntity containing a success message
+     */
+    @PutMapping("/apartments/{apartmentId}")
+    public ResponseEntity<String> updateApartment(
+            @PathVariable Long apartmentId,
+            @Valid @RequestBody UpdateApartmentRequest request) {
+
+        teamAppService.updateApartment(apartmentId, request);
+        return ResponseEntity.ok("Apartment updated successfully.");
+    }
+
+    /**
+     * Get all apartment by current workspace ID.
+     *
+     * @param workspaceId the current workspace ID
+     * @return a ResponseEntity containing a list of apartments
+     */
+    @GetMapping("/workspace/{workspaceId}/all")
+    public ResponseEntity<List<CreateApartmentResponse>> getAllApartments(@PathVariable Long workspaceId) {
+        return ResponseEntity.ok(teamAppService.getAllApartmentsInWorkspace(workspaceId));
+    }
+
+    /**
+     * Get apartment by apartment ID.
+     *
+     * @param apartmentId the ID of the apartment
+     * @return a list of CreateApartmentResponse representing the apartments
+     */
+    @GetMapping("/apartments/{apartmentId}")
+    public ResponseEntity<GetApartmentResponse> getApartmentById(@PathVariable Long apartmentId) {
+        return ResponseEntity.ok(teamAppService.getApartmentById(apartmentId));
+    }
+
 
 }

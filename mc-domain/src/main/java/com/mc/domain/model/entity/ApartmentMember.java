@@ -1,6 +1,9 @@
 package com.mc.domain.model.entity;
 
+import com.mc.domain.model.enums.ApartmentMemberStatus;
+import com.mc.domain.model.enums.RoleType;
 import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +22,12 @@ public class ApartmentMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private boolean isOwner;
+
+    @Enumerated(EnumType.STRING)
+//    @Column(name = "status")
+    private ApartmentMemberStatus status;
+
     private Date joinedAt = new Date();
 
     @ManyToOne

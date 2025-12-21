@@ -19,9 +19,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private final BoardMemberRepository boardMemberRepo;
     private final TeamMemberRepository teamMemberRepo;
     private final WorkspaceMemberRepository workspaceMemberRepo;
+    private final ApartmentMemberRepository apartmentMemberRepo;
 
     private final BoardRepository boardRepo;
     private final WorkspaceRepository workspaceRepo;
+    private final ApartmentRepository apartmentRepo;
 
     private final TaskGroupRepository taskGroupRepo;
     private final ColumnRepository columnRepo;
@@ -33,6 +35,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String TYPE_GROUP = "Group";
     private static final String TYPE_COLUMN = "Column";
     private static final String TYPE_ITEM = "Item";
+    private static final String TYPE_APARTMENT = "Apartment";
 
     @Override
     public boolean hasPermission(Authentication auth, Object targetDomainObject, Object permission) {
@@ -59,6 +62,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (targetType) {
             case TYPE_TEAM -> checkTeamPermission(resourceId, userId, requiredPerm);
             case TYPE_WORKSPACE -> checkWorkspacePermission(resourceId, userId, requiredPerm);
+            case TYPE_APARTMENT -> checkApartmentPermission(resourceId, userId, requiredPerm);
             case TYPE_BOARD -> checkBoardPermission(resourceId, userId, requiredPerm);
             case TYPE_GROUP, TYPE_COLUMN, TYPE_ITEM -> checkSubBoardEntityPermission(resourceId, targetType, userId, requiredPerm);
             default -> {
@@ -78,7 +82,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private boolean checkWorkspacePermission(Long workspaceId, Long userId, String permission) {
         // 1. Check trực tiếp tại Workspace
         Optional<Role> roleOpt = workspaceMemberRepo.findRoleByWorkspaceIdAndUserId(workspaceId, userId);
-        System.out.println("RoleOpt WS: " + roleOpt);
         if (roleOpt.isPresent() && hasPrivilege(roleOpt.get(), permission)) {
             return true;
         }
@@ -87,6 +90,20 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return workspaceRepo.findById(workspaceId)
                 .map(Workspace::getTeam)
                 .map(team -> checkTeamPermission(team.getId(), userId, permission))
+                .orElse(false);
+    }
+
+    // --- LEVEL 2.1: APARTMENT (Inherits from Workspace)
+    private boolean checkApartmentPermission(Long apartmentId, Long userId, String permission) {
+        Optional<Role> roleOpt = teamMemberRepo.findRoleByTeamIdAndUserId(apartmentId, userId);
+
+        if (roleOpt.isPresent() && hasPrivilege(roleOpt.get(), permission)) {
+            return true;
+        }
+
+        return apartmentRepo.findById(apartmentId)
+                .map(Apartment::getWorkspace)
+                .map(ws -> checkWorkspacePermission(ws.getId(), userId, permission))
                 .orElse(false);
     }
 

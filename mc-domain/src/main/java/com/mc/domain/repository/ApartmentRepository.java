@@ -2,6 +2,7 @@ package com.mc.domain.repository;
 
 import com.mc.domain.model.entity.Apartment;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ApartmentRepository {
@@ -11,5 +12,7 @@ public interface ApartmentRepository {
     Optional<Apartment> findById(Long apartmentId);
 
     void deleteById(Long id);
+
+    List<Apartment> findAllByWorkspaceId(Long workspaceId);
 
 }

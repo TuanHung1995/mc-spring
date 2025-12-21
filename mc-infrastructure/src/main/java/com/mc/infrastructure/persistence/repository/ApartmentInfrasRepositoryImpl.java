@@ -1,12 +1,15 @@
 package com.mc.infrastructure.persistence.repository;
 
 import com.mc.domain.model.entity.Apartment;
+import com.mc.domain.model.entity.User;
 import com.mc.domain.repository.ApartmentRepository;
 import com.mc.infrastructure.persistence.mapper.ApartmentJPAMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,11 @@ public class ApartmentInfrasRepositoryImpl implements ApartmentRepository {
     @Override
     public void deleteById(Long id) {
         apartmentJPAMapper.deleteById(id);
+    }
+
+    @Override
+    public List<Apartment> findAllByWorkspaceId(Long workspaceId) {
+        return apartmentJPAMapper.findAllByWorkspaceId(workspaceId);
     }
 
 }

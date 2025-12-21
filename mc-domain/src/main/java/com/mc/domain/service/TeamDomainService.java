@@ -14,7 +14,14 @@ public interface TeamDomainService {
 
     Apartment saveApartment(User user, Team team, String name, String description, String backgroundUrl);
 
-    List<User> addApartmentMember(User user, Apartment apartment);
+    List<User> addApartmentMember(List<User> user, Apartment apartment);
 
     List<User> deletedApartmentMember(ApartmentMember apartmentMember);
+
+    boolean assignApartmentOwner(boolean isOwner, Long userId, Long apartmentId);
+
+    void requestToJoinApartment(Long userId, Long apartmentId);
+
+    void approveRequestJoinApartment(boolean isApprove, Long apartmentId, Long requesterId, Long approverId);
+
 }

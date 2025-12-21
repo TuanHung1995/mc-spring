@@ -90,4 +90,9 @@ public class UserDomainServiceImpl implements UserDomainService {
         return userRepository.searchUsers(keyword, currentUserId, 20);
     }
 
+    @Override
+    public List<User> findAllByEmailIn(List<String> emails) {
+        return userRepository.findAllByEmailIn(emails);
+    }
+
 }
