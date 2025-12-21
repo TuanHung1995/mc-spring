@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -72,6 +73,16 @@ public class ApartmentDomainServiceImpl implements ApartmentDomainService {
 
         // 4. Persist changes
         apartmentRepository.save(apartment);
+    }
+
+    @Override
+    public List<Apartment> getAllByWorkspaceId(Long workspaceId) {
+        return apartmentRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    public Apartment getApartmentById(Long apartmentId) {
+        return apartmentRepository.findById(apartmentId).orElseThrow(() -> new BusinessLogicException("Apartment not found with id: " + apartmentId));
     }
 
 }

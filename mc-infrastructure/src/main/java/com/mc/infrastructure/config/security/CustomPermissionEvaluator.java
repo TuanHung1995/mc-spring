@@ -35,6 +35,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String TYPE_GROUP = "Group";
     private static final String TYPE_COLUMN = "Column";
     private static final String TYPE_ITEM = "Item";
+    private static final String TYPE_APARTMENT = "Apartment";
 
     @Override
     public boolean hasPermission(Authentication auth, Object targetDomainObject, Object permission) {
@@ -61,6 +62,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (targetType) {
             case TYPE_TEAM -> checkTeamPermission(resourceId, userId, requiredPerm);
             case TYPE_WORKSPACE -> checkWorkspacePermission(resourceId, userId, requiredPerm);
+            case TYPE_APARTMENT -> checkApartmentPermission(resourceId, userId, requiredPerm);
             case TYPE_BOARD -> checkBoardPermission(resourceId, userId, requiredPerm);
             case TYPE_GROUP, TYPE_COLUMN, TYPE_ITEM -> checkSubBoardEntityPermission(resourceId, targetType, userId, requiredPerm);
             default -> {

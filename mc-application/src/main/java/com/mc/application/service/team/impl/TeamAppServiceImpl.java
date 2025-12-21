@@ -158,4 +158,16 @@ public class TeamAppServiceImpl implements TeamAppService {
         );
     }
 
+    @Override
+    public List<CreateApartmentResponse> getAllApartmentsInWorkspace(Long workspaceId) {
+        return apartmentMapper.toCreateApartmentResponseList(apartmentDomainService.getAllByWorkspaceId(workspaceId));
+    }
+
+    @Override
+    public GetApartmentResponse getApartmentById(Long apartmentId) {
+        Apartment apartment =  apartmentDomainService.getApartmentById(apartmentId);
+
+        return apartmentMapper.toGetApartmentResponse(apartment);
+    }
+
 }

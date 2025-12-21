@@ -7,6 +7,7 @@ import com.mc.infrastructure.persistence.mapper.ApartmentJPAMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +30,11 @@ public class ApartmentInfrasRepositoryImpl implements ApartmentRepository {
     @Override
     public void deleteById(Long id) {
         apartmentJPAMapper.deleteById(id);
+    }
+
+    @Override
+    public List<Apartment> findAllByWorkspaceId(Long workspaceId) {
+        return apartmentJPAMapper.findAllByWorkspaceId(workspaceId);
     }
 
 }

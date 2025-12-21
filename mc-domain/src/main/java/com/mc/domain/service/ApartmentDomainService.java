@@ -3,6 +3,7 @@ package com.mc.domain.service;
 import com.mc.domain.model.entity.Apartment;
 import com.mc.domain.model.entity.ApartmentMember;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ApartmentDomainService {
@@ -32,5 +33,15 @@ public interface ApartmentDomainService {
      * @throws com.mc.domain.exception.BusinessLogicException    if the user does not have the OWNER role
      */
     void updateApartment(Long apartmentId, Long requesterId, String apartmentName, String description, String avatarUrl, String backgroundImageUrl, Boolean isPrivate);
+
+    /**
+     * Retrieves all apartments associated with a specific workspace ID.
+     *
+     * @param workspaceId the unique identifier of the workspace
+     * @return a list of Apartment entities belonging to the specified workspace
+     */
+    List<Apartment> getAllByWorkspaceId(Long workspaceId);
+
+    Apartment getApartmentById(Long apartmentId);
 
 }
