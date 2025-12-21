@@ -5,6 +5,8 @@ import com.mc.domain.repository.TeamRepository;
 import com.mc.infrastructure.persistence.mapper.TeamJPAMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class TeamRepositoryInfrasImpl implements TeamRepository {
 
@@ -18,4 +20,10 @@ public class TeamRepositoryInfrasImpl implements TeamRepository {
     public Team save(Team team) {
         return teamJPAMapper.save(team);
     }
+
+    @Override
+    public Optional<Team> findById(Long id) {
+        return teamJPAMapper.findById(id);
+    }
+
 }

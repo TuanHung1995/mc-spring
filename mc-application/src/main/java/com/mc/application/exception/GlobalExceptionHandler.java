@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.TOO_MANY_REQUESTS.value());
         body.put("error", "Too Many Requests");
-        body.put("message", "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.");
+        body.put("message", "You have requested too many request. Try later in 1 minute.");
 
         return new ResponseEntity<>(body, HttpStatus.TOO_MANY_REQUESTS);
     }

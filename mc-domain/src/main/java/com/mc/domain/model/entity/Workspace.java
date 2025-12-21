@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.Set;
 
 @Accessors(chain = true)
 @Getter
@@ -37,6 +38,15 @@ public class Workspace {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Team team;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "workspace_members",
+            joinColumns = @JoinColumn(name = "workspace_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> members;
+
 
     public static Workspace create(String name, User createdBy, Team team) {
         Workspace workspace = new Workspace();

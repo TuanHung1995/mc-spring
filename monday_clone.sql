@@ -22,7 +22,6 @@ CREATE TABLE `users`
     `phone`       VARCHAR(255),
     `address`     VARCHAR(255),
     `birthday`    DATE,
-
     `status`      ENUM ('ACTIVE', 'PENDING', 'LOCKED') DEFAULT 'ACTIVE',
     `created_at`  DATETIME                             DEFAULT CURRENT_TIMESTAMP,
     `updated_at`  DATETIME                             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -32,17 +31,19 @@ CREATE TABLE `users`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- 2. Teams: Nhóm người dùng (VD: Dev Team, Marketing)
+-- 2. Teams: Team hệ thống (VD: User _ 's Team)
 DROP TABLE IF EXISTS `teams`;
 CREATE TABLE `teams`
 (
     `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`        VARCHAR(100)    NOT NULL,
+    `owner_id`    BIGINT UNSIGNED NOT NULL,
     `description` TEXT,
     `avatar_url`  TEXT,
     `created_at`  DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at`  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_t_owner` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -53,11 +54,48 @@ CREATE TABLE `team_members`
 (
     `team_id`   BIGINT UNSIGNED NOT NULL,
     `user_id`   BIGINT UNSIGNED NOT NULL,
-    `role`      ENUM ('LEAD', 'MEMBER') DEFAULT 'MEMBER',
+    `role_id`   BIGINT UNSIGNED,
     `joined_at` DATETIME                DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`team_id`, `user_id`),
     CONSTRAINT `fk_tm_team` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_tm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_tm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_tm_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+-- 4. Apartment: Nhóm người dùng trong team (VD: Marketing, Sales)
+DROP TABLE IF EXISTS `apartments`;
+CREATE TABLE `apartments`
+(
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`        VARCHAR(100)    NOT NULL,
+    `owner_id`    BIGINT UNSIGNED NOT NULL,
+    `team_id`     BIGINT UNSIGNED NOT NULL,
+    `description` TEXT,
+    `background_url`  TEXT,
+    `created_at`  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_ap_owner` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`),
+    CONSTRAINT `fk_ap_team` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `apartment_members`;
+CREATE TABLE `apartment_members`
+(
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `apartment_id`   BIGINT UNSIGNED NOT NULL,
+    `user_id`   BIGINT UNSIGNED NOT NULL,
+    `role_id`   BIGINT UNSIGNED,
+    `joined_at` DATETIME                DEFAULT CURRENT_TIMESTAMP,
+    `is_owner`  BOOLEAN NOT NULL ,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_apm_apartment` FOREIGN KEY (`apartment_id`) REFERENCES `apartments` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_apm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_apm_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -89,11 +127,12 @@ CREATE TABLE `workspace_members`
     `id`           BIGINT UNSIGNED AUTO_INCREMENT,
     `workspace_id` BIGINT  ,
     `user_id`      BIGINT  ,
-    `role`         ENUM ('ADMIN', 'MEMBER', 'VIEWER') DEFAULT 'MEMBER',
+    `role_id`      BIGINT  ,
     `joined_at`    DATETIME                           DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_wsm_workspace` FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_wsm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+    CONSTRAINT `fk_wsm_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_wsm_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

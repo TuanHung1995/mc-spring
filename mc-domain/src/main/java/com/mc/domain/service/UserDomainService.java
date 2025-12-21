@@ -10,8 +10,11 @@ public interface UserDomainService {
 
     User findUserById(Long userId);
 
+    User findUserByEmail(String email);
+
     String changePassword(Long userId, String oldPassword, String newPassword, String confirmNewPassword);
 
     List<User> search(String keyword, Long currentUserId);
 
+    List<User> findAllByEmailIn(List<String> emails);
 }

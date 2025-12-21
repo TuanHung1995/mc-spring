@@ -11,4 +11,6 @@ public interface BoardRepository {
 
     List<Board> findAllByUserId(Long userId);
 
+    Board save(Board board);
+
 }
