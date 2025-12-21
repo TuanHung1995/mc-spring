@@ -61,4 +61,43 @@ public class TeamController {
         return ResponseEntity.ok("Request processed successfully");
     }
 
+    /**
+     * Updates an existing apartment's information.
+     *
+     * @param apartmentId the ID of the apartment to update
+     * @param request     the request body containing update fields
+     * @return a ResponseEntity containing a success message
+     */
+    @PutMapping("/apartments/{apartmentId}")
+    public ResponseEntity<String> updateApartment(
+            @PathVariable Long apartmentId,
+            @Valid @RequestBody UpdateApartmentRequest request) {
+
+        teamAppService.updateApartment(apartmentId, request);
+        return ResponseEntity.ok("Apartment updated successfully.");
+    }
+
+    /**
+     * Get all apartment by current workspace ID.
+     *
+     * @param workspaceId the current workspace ID
+     * @return a ResponseEntity containing a list of apartments
+     */
+    @GetMapping("/workspace/{workspaceId}/all")
+    public ResponseEntity<List<CreateApartmentResponse>> getAllApartments(@PathVariable Long workspaceId) {
+        return ResponseEntity.ok(teamAppService.getAllApartmentsInWorkspace(workspaceId));
+    }
+
+    /**
+     * Get apartment by apartment ID.
+     *
+     * @param apartmentId the ID of the apartment
+     * @return a list of CreateApartmentResponse representing the apartments
+     */
+    @GetMapping("/apartments/{apartmentId}")
+    public ResponseEntity<GetApartmentResponse> getApartmentById(@PathVariable Long apartmentId) {
+        return ResponseEntity.ok(teamAppService.getApartmentById(apartmentId));
+    }
+
+
 }
