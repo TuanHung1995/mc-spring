@@ -12,4 +12,6 @@ public interface BoardMemberJPAMapper extends JpaRepository<BoardMember, Long> {
     @Query("SELECT bm.role FROM BoardMember bm WHERE bm.board.id = :boardId AND bm.user.id = :userId")
     Optional<Role> findRoleByBoardIdAndUserId(Long boardId, Long userId);
 
+    boolean existsByBoardIdAndUserId(Long boardId, Long userId);
+
 }
