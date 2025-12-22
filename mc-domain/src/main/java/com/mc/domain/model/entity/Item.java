@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "items")
@@ -40,5 +41,8 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "board_id", referencedColumnName = "id")
     private Board board;
+
+    @OneToMany(mappedBy = "item")
+    private Set<ColumnValue> columnValues;
 
 }

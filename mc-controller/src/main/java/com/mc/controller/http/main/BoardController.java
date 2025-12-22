@@ -1,9 +1,6 @@
 package com.mc.controller.http.main;
 
-import com.mc.application.model.board.CreateBoardRequest;
-import com.mc.application.model.board.CreateBoardResponse;
-import com.mc.application.model.board.InviteRequest;
-import com.mc.application.model.board.ReorderRequest;
+import com.mc.application.model.board.*;
 import com.mc.application.service.board.BoardAppService;
 import com.mc.application.service.invite.InviteAppService;
 import com.mc.domain.exception.ResourceNotFoundException;
@@ -91,4 +88,11 @@ public class BoardController {
     public ResponseEntity<List<Board>> getMyBoards() {
         return ResponseEntity.ok(boardAppService.getBoardsForUser());
     }
+
+    @PutMapping("/{boardId}/update-elements")
+    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:EDIT')")
+    public ResponseEntity<UpdateBoardResponse> updateBoardElements(@PathVariable Long boardId, @RequestBody UpdateBoardRequest request) {
+        return ResponseEntity.ok(boardAppService.updateBoard(request));
+    }
+
 }

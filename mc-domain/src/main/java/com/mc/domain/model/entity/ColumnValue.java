@@ -22,7 +22,10 @@ public class ColumnValue {
     private Long id;
     private Set<String> value;
     private String textValue;
-    private Date updatedAt = new Date();
+    private String color;
+    private String type;
+    private Date createdAt = new Date();
+    private Date updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "item_id", referencedColumnName = "id")
