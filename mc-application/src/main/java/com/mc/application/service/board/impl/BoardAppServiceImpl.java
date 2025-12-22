@@ -5,16 +5,14 @@ import com.mc.application.model.board.CreateBoardRequest;
 import com.mc.application.model.board.CreateBoardResponse;
 import com.mc.application.model.board.ReorderRequest;
 import com.mc.application.service.board.BoardAppService;
+import com.mc.domain.event.BoardChangedEvent;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
-import com.mc.domain.port.RealTimeUpdatePort;
 import com.mc.domain.port.UserContextPort;
 import com.mc.domain.service.*;
-import com.mc.infrastructure.config.security.CustomUserDetails;
-import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -32,7 +30,7 @@ public class BoardAppServiceImpl implements BoardAppService {
     private final UserDomainService userDomainService;
     private final WorkspaceDomainService workspaceDomainService;
     private final UserContextPort userContextPort;
-    private final RealTimeUpdatePort realTimeUpdatePort;
+    private final ApplicationEventPublisher eventPublisher;
     private final BoardMapper boardMapper;
 
     @Value("${constants.frontend}")
@@ -75,7 +73,7 @@ public class BoardAppServiceImpl implements BoardAppService {
         payload.put("newPosition", updatedGroup.getPosition());
         payload.put("boardId", updatedGroup.getBoard().getId());
 
-        realTimeUpdatePort.sendBoardUpdate(updatedGroup.getBoard().getId(), payload);
+        eventPublisher.publishEvent(new BoardChangedEvent(updatedGroup.getBoard().getId(), payload));
     }
 
     public void reorderColumn(ReorderRequest request) {
@@ -89,7 +87,7 @@ public class BoardAppServiceImpl implements BoardAppService {
         payload.put("newPosition", updatedColumn.getPosition());
         payload.put("boardId", updatedColumn.getBoard().getId());
         
-        realTimeUpdatePort.sendBoardUpdate(updatedColumn.getBoard().getId(), payload);
+        eventPublisher.publishEvent(new BoardChangedEvent(updatedColumn.getBoard().getId(), payload));
     }
 
     public void reorderItem(ReorderRequest request) {
@@ -104,8 +102,9 @@ public class BoardAppServiceImpl implements BoardAppService {
         payload.put("groupId", updatedItem.getGroup().getId());
         payload.put("boardId", updatedItem.getBoard().getId());
 
-        realTimeUpdatePort.sendBoardUpdate(updatedItem.getBoard().getId(), payload);
-
+        // Publish Event (Thay vì gọi port.send)
+        // Spring sẽ giữ event này lại và chỉ đưa cho Listener sau khi hàm này return & transaction commit thành công
+        eventPublisher.publishEvent(new BoardChangedEvent(updatedItem.getBoard().getId(), payload));
     }
 
 }
