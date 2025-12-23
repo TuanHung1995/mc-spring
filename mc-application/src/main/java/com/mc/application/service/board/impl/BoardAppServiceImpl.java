@@ -50,18 +50,13 @@ public class BoardAppServiceImpl implements BoardAppService {
     @Override
     public CreateBoardResponse createBoard(CreateBoardRequest request) {
 
-        User user = userDomainService.findUserById(userContextPort.getCurrentUserId());
-
-        Workspace currentWorkspace = workspaceDomainService
-                .findById(request.getCurrentWorkspaceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Workspace", "id", request.getCurrentWorkspaceId()));
-
         return boardMapper.toCreateBoardResponse(
-                boardDomainService.createBoard(user,
-                        currentWorkspace,
+                boardDomainService.createBoard(
+                        userContextPort.getCurrentUserId(),
+                        request.getCurrentWorkspaceId(),
                         request.getName(),
                         request.getPurpose(),
-                        request.getType()
+                        request.getPrivacy()
                 )
         );
 

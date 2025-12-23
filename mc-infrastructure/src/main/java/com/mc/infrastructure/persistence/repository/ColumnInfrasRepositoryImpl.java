@@ -6,6 +6,7 @@ import com.mc.infrastructure.persistence.mapper.ColumnJPAMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,6 +33,11 @@ public class ColumnInfrasRepositoryImpl implements ColumnRepository {
     @Override
     public Optional<Long> findBoardIdByColumnId(Long columnId) {
         return columnJPAMapper.findBoardIdByColumnId(columnId);
+    }
+
+    @Override
+    public List<Column> findAllByBoardId(Long boardId) {
+        return columnJPAMapper.findAllByBoardId(boardId);
     }
 
 }

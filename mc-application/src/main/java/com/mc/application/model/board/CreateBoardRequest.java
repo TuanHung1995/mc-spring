@@ -8,6 +8,6 @@ public class CreateBoardRequest {
     private Long currentWorkspaceId;
     private String name;
     private String purpose;
-    private String type;
+    private String privacy;
 
 }

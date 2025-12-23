@@ -20,7 +20,7 @@ public class ColumnValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Set<String> value;
+    private String value;
     private String textValue;
     private String color;
     private String type;

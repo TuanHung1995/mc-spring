@@ -41,7 +41,6 @@ public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
         group.setPosition(newPos);
         return taskGroupRepository.save(group);
 
-
         /*     Next: WebSocket     */
 
     }

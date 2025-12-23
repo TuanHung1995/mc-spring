@@ -25,6 +25,7 @@ public class Board {
     private String description;
     @Enumerated(EnumType.STRING)
     private BoardType type;
+    private String purpose;
     private Date createdAt = new Date();
     private Date updatedAt = new Date();
     private Date deletedAt;

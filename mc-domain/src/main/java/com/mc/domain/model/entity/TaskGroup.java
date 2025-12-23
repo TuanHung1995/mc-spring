@@ -29,4 +29,12 @@ public class TaskGroup {
     @JoinColumn(name = "board_id", referencedColumnName = "id")
     private Board board;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by", referencedColumnName = "id")
+    private User createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "deleted_by", referencedColumnName = "id")
+    private User deletedBy;
+
 }
