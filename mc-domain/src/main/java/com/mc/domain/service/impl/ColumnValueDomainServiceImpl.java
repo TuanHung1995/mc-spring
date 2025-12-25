@@ -22,7 +22,7 @@ public class ColumnValueDomainServiceImpl implements ColumnValueDomainService {
         ColumnValue columnValue = columnValueRepository.findById(columnValueId)
                 .orElseThrow(() -> new ResourceNotFoundException("ColumnValue", "id", columnValueId));
 
-        if (newValue != null) columnValue.setValue(Collections.singleton(newValue));
+        if (newValue != null) columnValue.setValue(newValue);
         if (newColor != null) columnValue.setColor(newColor);
         if (newText != null) columnValue.setTextValue(newText);
 

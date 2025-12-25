@@ -30,4 +30,14 @@ public class BoardInfrasRepository implements BoardRepository {
         return boardJPAMapper.save(board);
     }
 
+    @Override
+    public void delete(Board board) {
+        boardJPAMapper.delete(board);
+    }
+
+    @Override
+    public void deletePhysical(Long boardId) {
+        boardJPAMapper.deletePhysical(boardId);
+    }
+
 }

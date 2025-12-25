@@ -62,6 +62,20 @@ public class BoardAppServiceImpl implements BoardAppService {
 
     }
 
+    @Override
+    public void trashBoard(TrashBoardRequest request) {
+
+        Long currentUserId = userContextPort.getCurrentUserId();
+
+        boardDomainService.trashBoard(currentUserId, request.getBoardId());
+    }
+
+    @Override
+    public void deleteBoardPermanently(Long boardId) {
+        Long userId = userContextPort.getCurrentUserId();
+        boardDomainService.deleteBoardPermanently(boardId, userId);
+    }
+
     public void reorderGroup(ReorderRequest request) {
         TaskGroup updatedGroup = taskGroupDomainService.reorderGroup(
                 request.getTargetId(), request.getPreviousId(), request.getNextId());

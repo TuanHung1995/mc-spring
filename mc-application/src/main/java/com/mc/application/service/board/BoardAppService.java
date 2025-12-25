@@ -9,6 +9,10 @@ public interface BoardAppService {
 
     List<Board> getBoardsForUser();
 
+    void trashBoard(TrashBoardRequest request);
+
+    void deleteBoardPermanently(Long boardId);
+
     CreateBoardResponse createBoard(CreateBoardRequest board);
 
     void reorderGroup(ReorderRequest request);

@@ -6,7 +6,7 @@ import com.mc.domain.model.entity.Column;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ColumnMapper {
 
     @Mapping(source = "title", target = "name")

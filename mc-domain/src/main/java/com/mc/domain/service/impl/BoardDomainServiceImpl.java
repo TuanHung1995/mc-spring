@@ -1,5 +1,6 @@
 package com.mc.domain.service.impl;
 
+import com.mc.domain.exception.BusinessLogicException;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.model.enums.BoardColumnType;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -126,6 +128,26 @@ public class BoardDomainServiceImpl implements BoardDomainService {
         columnValue.setColor(color);
         columnValue.setType(type);
         columnValueRepository.save(columnValue);
+    }
+
+    @Transactional
+    public void trashBoard(Long currentUserId, Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", currentUserId));
+
+        board.setDeletedAt(new Date());
+        board.setDeletedBy(currentUser);
+        boardRepository.save(board);
+        boardRepository.delete(board);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBoardPermanently(Long boardId, Long userId) {
+        boardRepository.deletePhysical(boardId);
     }
 
 }

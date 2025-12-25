@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface TaskGroupMapper {
 
-    @Mapping(source = "title", target = "value")
+    @Mapping(source = "title", target = "name")
     UpdateBoardResponse toUpdateBoardResponse(TaskGroup taskGroup);
 
 }

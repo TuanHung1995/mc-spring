@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.type.NumericBooleanConverter;
 
 import java.util.Date;
 
@@ -14,6 +16,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SoftDelete(columnName = "is_deleted", converter = NumericBooleanConverter.class)
 public class TaskGroup {
 
     @Id
@@ -24,6 +27,9 @@ public class TaskGroup {
     private double position;
     private boolean isCollapsed;
     private Date createdAt = new Date();
+
+    @jakarta.persistence.Column(name = "is_deleted", insertable = false, updatable = false)
+    private Boolean isDeleted = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "board_id", referencedColumnName = "id")
