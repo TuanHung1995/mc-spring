@@ -48,7 +48,7 @@ public class BoardController {
      * @param request the trash board request containing the board ID
      * @return success message
      */
-    @DeleteMapping("/trash-board")
+    @PostMapping("/trash-board")
     @PreAuthorize("hasPermission(#request.boardId, 'Board', 'BOARD:TRASH')")
     public ResponseEntity<?> deleteBoard(@Valid @RequestBody TrashBoardRequest request) {
         boardAppService.trashBoard(request);
