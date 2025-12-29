@@ -44,4 +44,14 @@ public class BoardInfrasRepository implements BoardRepository {
         boardJPAMapper.deletePhysical(boardId);
     }
 
+    @Override
+    public List<Board> findAllDeletedBoards(Long userId) {
+        return boardJPAMapper.findAllDeletedBoards(userId);
+    }
+
+    @Override
+    public void restoreBoard(Long boardId) {
+        boardJPAMapper.restoreBoard(boardId);
+    }
+
 }

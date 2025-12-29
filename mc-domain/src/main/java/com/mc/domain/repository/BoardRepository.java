@@ -26,4 +26,18 @@ public interface BoardRepository {
      * @param boardId the ID of the board to delete
      */
     void deletePhysical(Long boardId);
+
+    /**
+     * Finds all boards that have been soft-deleted by a specific user.
+     * @param userId the ID of the user who deleted the board
+     * @return List of soft-deleted boards
+     */
+    List<Board> findAllDeletedBoards(Long userId);
+
+    /**
+     * Restores a soft-deleted board by setting is_deleted = false.
+     * @param boardId the ID of the board to restore
+     */
+    void restoreBoard(Long boardId);
+
 }
