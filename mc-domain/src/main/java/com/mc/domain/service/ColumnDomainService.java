@@ -8,4 +8,6 @@ public interface ColumnDomainService {
 
     Column reorderColumn(Long columnId, Long prevItemId, Long nextItemId);
 
+    Column updateColumnDetails(Long columnId, String newTitle);
+
 }

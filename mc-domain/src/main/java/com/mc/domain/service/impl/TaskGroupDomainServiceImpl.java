@@ -1,5 +1,6 @@
 package com.mc.domain.service.impl;
 
+import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.Item;
 import com.mc.domain.model.entity.TaskGroup;
 import com.mc.domain.repository.ItemRepository;
@@ -40,8 +41,23 @@ public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
         group.setPosition(newPos);
         return taskGroupRepository.save(group);
 
-
         /*     Next: WebSocket     */
+
+    }
+
+    @Transactional
+    public TaskGroup updateTaskGroup(Long groupId, String newTitle, String newColor) {
+
+        TaskGroup group = taskGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
+
+        if (newTitle == null && newColor == null) return group;
+
+        if (newTitle != null) group.setTitle(newTitle);
+        if (newColor != null) group.setColor(newColor);
+
+        return taskGroupRepository.save(group);
+
 
     }
 

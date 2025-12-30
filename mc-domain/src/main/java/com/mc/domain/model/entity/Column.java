@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.type.NumericBooleanConverter;
 
 import java.util.Date;
 import java.util.Set;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SoftDelete(columnName = "is_deleted", converter = NumericBooleanConverter.class)
 public class Column {
 
     @Id
@@ -31,6 +34,10 @@ public class Column {
     private int width;
     private boolean isHidden;
     private Date createdAt = new Date();
+    private Date deletedAt;
+
+    @jakarta.persistence.Column(name = "is_deleted", insertable = false, updatable = false)
+    private Boolean isDeleted = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "board_id", referencedColumnName = "id")
@@ -40,7 +47,7 @@ public class Column {
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
 
-    @OneToMany(mappedBy = "column")
+    @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ColumnValue> columnValues;
 
 }

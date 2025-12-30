@@ -1,6 +1,7 @@
 .env
 gg-oauth-web-client-1.json
 HELP.md
+GEMINI.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

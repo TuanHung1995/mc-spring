@@ -10,5 +10,9 @@ public interface BoardDomainService {
 
     List<Board> getBoardsForUser(Long userId);
 
-    Board createBoard(User user, Workspace workspace, String name, String purpose, String type);
+    Board createBoard(Long userId, Long workspaceId, String name, String purpose, String type);
+
+    void deleteBoardPermanently(Long userId, Long boardId);
+
+    void trashBoard(Long currentUserId, Long boardId);
 }

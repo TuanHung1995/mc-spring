@@ -27,7 +27,31 @@ public class BoardInfrasRepository implements BoardRepository {
 
     @Override
     public Board save(Board board) {
+        System.out.println("Saving board: " + board.getId());
         return boardJPAMapper.save(board);
+    }
+
+    @Override
+    public void delete(Board board) {
+        if (board.getDeletedAt() != null || board.getDeletedBy() != null) {
+            boardJPAMapper.saveAndFlush(board);
+        }
+        boardJPAMapper.delete(board);
+    }
+
+    @Override
+    public void deletePhysical(Long boardId) {
+        boardJPAMapper.deletePhysical(boardId);
+    }
+
+    @Override
+    public List<Board> findAllDeletedBoards(Long userId) {
+        return boardJPAMapper.findAllDeletedBoards(userId);
+    }
+
+    @Override
+    public void restoreBoard(Long boardId) {
+        boardJPAMapper.restoreBoard(boardId);
     }
 
 }
