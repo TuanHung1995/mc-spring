@@ -39,4 +39,15 @@ public class ColumnDomainServiceImpl implements ColumnDomainService {
 
     }
 
+    @Transactional
+    public Column updateColumnDetails(Long columnId, String newTitle) {
+
+        Column column = columnRepository.findById(columnId)
+                .orElseThrow(() -> new RuntimeException("Column not found"));
+
+        if (newTitle != null) column.setTitle(newTitle);
+
+        return columnRepository.save(column);
+    }
+
 }

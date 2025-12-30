@@ -1,14 +1,12 @@
 package com.mc.controller.http.main;
 
-import com.mc.application.model.board.CreateBoardRequest;
-import com.mc.application.model.board.CreateBoardResponse;
-import com.mc.application.model.board.InviteRequest;
-import com.mc.application.model.board.ReorderRequest;
+import com.mc.application.model.board.*;
 import com.mc.application.service.board.BoardAppService;
 import com.mc.application.service.invite.InviteAppService;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.Board;
 import com.mc.domain.repository.BoardRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,11 +42,31 @@ public class BoardController {
         return ResponseEntity.ok(boardAppService.createBoard(request));
     }
 
+    /**
+     * Moves a board to the trash.
+     *
+     * @param request the trash board request containing the board ID
+     * @return success message
+     */
+    @PostMapping("/trash-board")
+    @PreAuthorize("hasPermission(#request.boardId, 'Board', 'BOARD:TRASH')")
+    public ResponseEntity<?> deleteBoard(@Valid @RequestBody TrashBoardRequest request) {
+        boardAppService.trashBoard(request);
+        return ResponseEntity.ok("Board deleted successfully");
+    }
 
-    @DeleteMapping("/{boardId}")
-    @PreAuthorize("hasPermission(#boardId, 'BOARD:DELETE')")
-    public ResponseEntity<?> deleteBoard(@PathVariable Long boardId) {
-        return ResponseEntity.ok().build();
+    /**
+     * Permanently deletes a board and all its contents.
+     * This action is irreversible.
+     *
+     * @param id the ID of the board
+     * @return success message
+     */
+    @DeleteMapping("/{id}/permanent")
+    @PreAuthorize("hasPermission(#id, 'Board', 'BOARD:DELETE')")
+    public ResponseEntity<String> deleteBoardPermanently(@PathVariable Long id) {
+        boardAppService.deleteBoardPermanently(id);
+        return ResponseEntity.ok("Board has been permanently deleted.");
     }
 
     @PostMapping("/{boardId}/invite")
@@ -91,4 +109,11 @@ public class BoardController {
     public ResponseEntity<List<Board>> getMyBoards() {
         return ResponseEntity.ok(boardAppService.getBoardsForUser());
     }
+
+    @PutMapping("/{boardId}/update-elements")
+    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:EDIT')")
+    public ResponseEntity<UpdateBoardResponse> updateBoardElements(@PathVariable Long boardId, @RequestBody UpdateBoardRequest request) {
+        return ResponseEntity.ok(boardAppService.updateBoard(request));
+    }
+
 }

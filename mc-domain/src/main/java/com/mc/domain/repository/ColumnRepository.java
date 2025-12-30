@@ -2,6 +2,7 @@ package com.mc.domain.repository;
 
 import com.mc.domain.model.entity.Column;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ColumnRepository {
@@ -12,4 +13,5 @@ public interface ColumnRepository {
 
     Optional<Long> findBoardIdByColumnId(Long columnId);
 
+    List<Column> findAllByBoardId(Long boardId);
 }

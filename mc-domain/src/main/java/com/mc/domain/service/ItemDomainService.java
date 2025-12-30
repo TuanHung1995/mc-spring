@@ -6,4 +6,6 @@ public interface ItemDomainService {
 
     Item reorderItem(Long itemId, Long targetGroup, Long prevItemId, Long nextItemId);
 
+    Item updateItem(Long itemId, String newName);
+
 }

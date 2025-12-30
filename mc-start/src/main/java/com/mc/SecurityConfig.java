@@ -100,6 +100,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/**",
+                                "/api/v1/boards/accept-invite",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/",

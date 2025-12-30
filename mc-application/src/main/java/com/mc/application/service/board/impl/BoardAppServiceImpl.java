@@ -1,20 +1,17 @@
 package com.mc.application.service.board.impl;
 
-import com.mc.application.mapper.BoardMapper;
-import com.mc.application.model.board.CreateBoardRequest;
-import com.mc.application.model.board.CreateBoardResponse;
-import com.mc.application.model.board.ReorderRequest;
+import com.mc.application.mapper.*;
+import com.mc.application.model.board.*;
 import com.mc.application.service.board.BoardAppService;
+import com.mc.domain.event.BoardChangedEvent;
+import com.mc.domain.exception.BusinessLogicException;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
-import com.mc.domain.port.RealTimeUpdatePort;
 import com.mc.domain.port.UserContextPort;
 import com.mc.domain.service.*;
-import com.mc.infrastructure.config.security.CustomUserDetails;
-import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -29,11 +26,17 @@ public class BoardAppServiceImpl implements BoardAppService {
     private final ItemDomainService itemDomainService;
     private final TaskGroupDomainService taskGroupDomainService;
     private final ColumnDomainService columnDomainService;
+    private final ColumnValueDomainService columnValueDomainService;
     private final UserDomainService userDomainService;
     private final WorkspaceDomainService workspaceDomainService;
     private final UserContextPort userContextPort;
-    private final RealTimeUpdatePort realTimeUpdatePort;
+    private final ApplicationEventPublisher eventPublisher;
+
     private final BoardMapper boardMapper;
+    private final TaskGroupMapper taskGroupMapper;
+    private final ColumnMapper columnMapper;
+    private final ItemMapper itemMapper;
+    private final ColumnValueMapper columnValueMapper;
 
     @Value("${constants.frontend}")
     private String frontendUrl;
@@ -47,21 +50,30 @@ public class BoardAppServiceImpl implements BoardAppService {
     @Override
     public CreateBoardResponse createBoard(CreateBoardRequest request) {
 
-        User user = userDomainService.findUserById(userContextPort.getCurrentUserId());
-
-        Workspace currentWorkspace = workspaceDomainService
-                .findById(request.getCurrentWorkspaceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Workspace", "id", request.getCurrentWorkspaceId()));
-
         return boardMapper.toCreateBoardResponse(
-                boardDomainService.createBoard(user,
-                        currentWorkspace,
+                boardDomainService.createBoard(
+                        userContextPort.getCurrentUserId(),
+                        request.getCurrentWorkspaceId(),
                         request.getName(),
                         request.getPurpose(),
-                        request.getType()
+                        request.getPrivacy()
                 )
         );
 
+    }
+
+    @Override
+    public void trashBoard(TrashBoardRequest request) {
+
+        Long currentUserId = userContextPort.getCurrentUserId();
+
+        boardDomainService.trashBoard(currentUserId, request.getBoardId());
+    }
+
+    @Override
+    public void deleteBoardPermanently(Long boardId) {
+        Long userId = userContextPort.getCurrentUserId();
+        boardDomainService.deleteBoardPermanently(boardId, userId);
     }
 
     public void reorderGroup(ReorderRequest request) {
@@ -75,7 +87,7 @@ public class BoardAppServiceImpl implements BoardAppService {
         payload.put("newPosition", updatedGroup.getPosition());
         payload.put("boardId", updatedGroup.getBoard().getId());
 
-        realTimeUpdatePort.sendBoardUpdate(updatedGroup.getBoard().getId(), payload);
+        eventPublisher.publishEvent(new BoardChangedEvent(updatedGroup.getBoard().getId(), payload));
     }
 
     public void reorderColumn(ReorderRequest request) {
@@ -89,7 +101,7 @@ public class BoardAppServiceImpl implements BoardAppService {
         payload.put("newPosition", updatedColumn.getPosition());
         payload.put("boardId", updatedColumn.getBoard().getId());
         
-        realTimeUpdatePort.sendBoardUpdate(updatedColumn.getBoard().getId(), payload);
+        eventPublisher.publishEvent(new BoardChangedEvent(updatedColumn.getBoard().getId(), payload));
     }
 
     public void reorderItem(ReorderRequest request) {
@@ -104,7 +116,23 @@ public class BoardAppServiceImpl implements BoardAppService {
         payload.put("groupId", updatedItem.getGroup().getId());
         payload.put("boardId", updatedItem.getBoard().getId());
 
-        realTimeUpdatePort.sendBoardUpdate(updatedItem.getBoard().getId(), payload);
+        // Publish Event (Thay vì gọi port.send)
+        // Spring sẽ giữ event này lại và chỉ đưa cho Listener sau khi hàm này return & transaction commit thành công
+        eventPublisher.publishEvent(new BoardChangedEvent(updatedItem.getBoard().getId(), payload));
+    }
+
+    @Override
+    public UpdateBoardResponse updateBoard(UpdateBoardRequest request) {
+
+        return switch (request.getType()) {
+            case "TASK_GROUP" -> taskGroupMapper.toUpdateBoardResponse(
+                    taskGroupDomainService.updateTaskGroup(request.getTargetId(), request.getValue(), request.getColor()));
+            case "COLUMN" -> columnMapper.toUpdateBoardResponse(
+                    columnDomainService.updateColumnDetails(request.getTargetId(), request.getValue()));
+            case "ITEM" -> itemMapper.toUpdateBoardResponse(
+                    itemDomainService.updateItem(request.getTargetId(), request.getValue()));
+            default -> throw new BusinessLogicException("Unsupported type: " + request.getType());
+        };
 
     }
 
