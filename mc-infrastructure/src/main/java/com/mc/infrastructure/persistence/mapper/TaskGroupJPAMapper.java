@@ -18,6 +18,9 @@ public interface TaskGroupJPAMapper extends JpaRepository<TaskGroup, Long> {
     @Query("SELECT tg FROM TaskGroup tg WHERE tg.board.id = :boardId ORDER BY tg.position")
     List<TaskGroup> findByBoardId(Long boardId);
 
+    @Query("SELECT tg FROM TaskGroup tg WHERE tg.board.id = :boardId AND tg.isArchived = true ORDER BY tg.position")
+    List<TaskGroup> findArchivedGroupsByBoardId(Long boardId);
+
     @Query("SELECT i.board.id FROM TaskGroup i WHERE i.id = :groupId")
     Optional<Long> findBoardIdByGroupId(Long groupId);
 

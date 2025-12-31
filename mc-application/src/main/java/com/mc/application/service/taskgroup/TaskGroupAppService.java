@@ -16,4 +16,10 @@ public interface TaskGroupAppService {
 
     void deleteGroup(DeleteTaskGroupRequest request);
 
+    void archiveGroup(ArchiveTaskGroupRequest request);
+
+    void unarchiveGroup(UnarchiveTaskGroupRequest request);
+
+    List<GetTaskGroupResponse> getArchivedGroupsByBoard(Long boardId);
+
 }

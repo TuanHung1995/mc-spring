@@ -12,6 +12,7 @@ public interface TaskGroupRepository {
     void delete(TaskGroup group);
     
     List<TaskGroup> findByBoardId(Long boardId);
+    List<TaskGroup> findArchivedGroupsByBoardId(Long boardId);
     
     Double getPosition(Long groupId);
     Double getMaxPositionByBoardId(Long boardId);

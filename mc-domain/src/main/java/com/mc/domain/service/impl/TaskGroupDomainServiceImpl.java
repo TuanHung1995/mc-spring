@@ -120,4 +120,47 @@ public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
         taskGroupRepository.delete(group);
     }
 
+    @Override
+    @Transactional
+    public TaskGroup archiveGroup(Long groupId, Long userId) {
+        TaskGroup group = taskGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
+
+        User currentUser = userRepository.findById(userId)
+                .orElse(null);
+
+        group.setArchived(true);
+        group.setArchivedAt(new Date());
+        group.setArchivedBy(currentUser);
+
+        return taskGroupRepository.save(group);
+    }
+
+    @Override
+    @Transactional
+    public TaskGroup unarchiveGroup(Long groupId, Long userId) {
+        TaskGroup group = taskGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
+
+        User currentUser = userRepository.findById(userId)
+                .orElse(null);
+
+        // Remove archived flag
+        group.setArchived(false);
+        group.setArchivedAt(null);
+        group.setArchivedBy(null);
+        
+        return taskGroupRepository.save(group);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskGroup> getArchivedGroupsByBoardId(Long boardId) {
+        // Validate board exists
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+        
+        return taskGroupRepository.findArchivedGroupsByBoardId(boardId);
+    }
+
 }

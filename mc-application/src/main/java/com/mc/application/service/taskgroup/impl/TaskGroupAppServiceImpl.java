@@ -98,4 +98,42 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
         
         eventPublisher.publishEvent(new BoardChangedEvent(boardId, payload));
     }
+
+    @Override
+    public void archiveGroup(ArchiveTaskGroupRequest request) {
+        Long currentUserId = userContextPort.getCurrentUserId();
+        
+        TaskGroup group = taskGroupDomainService.archiveGroup(request.getGroupId(), currentUserId);
+
+        // Publish event for real-time updates
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "GROUP_ARCHIVED");
+        payload.put("entityId", group.getId());
+        payload.put("boardId", group.getBoard().getId());
+        
+        eventPublisher.publishEvent(new BoardChangedEvent(group.getBoard().getId(), payload));
+    }
+
+    @Override
+    public void unarchiveGroup(UnarchiveTaskGroupRequest request) {
+        Long currentUserId = userContextPort.getCurrentUserId();
+        
+        TaskGroup group = taskGroupDomainService.unarchiveGroup(request.getGroupId(), currentUserId);
+
+        // Publish event for real-time updates
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "GROUP_UNARCHIVED");
+        payload.put("entityId", group.getId());
+        payload.put("boardId", group.getBoard().getId());
+        
+        eventPublisher.publishEvent(new BoardChangedEvent(group.getBoard().getId(), payload));
+    }
+
+    @Override
+    public List<GetTaskGroupResponse> getArchivedGroupsByBoard(Long boardId) {
+        List<TaskGroup> groups = taskGroupDomainService.getArchivedGroupsByBoardId(boardId);
+        return groups.stream()
+                .map(taskGroupMapper::toGetTaskGroupResponse)
+                .collect(Collectors.toList());
+    }
 }

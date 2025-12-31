@@ -87,4 +87,46 @@ public class TaskGroupController {
         return ResponseEntity.ok(taskGroupAppService.getGroupsByBoard(boardId));
     }
 
+    /**
+     * Archive a task group
+     *
+     * @param id the ID of the group
+     * @return success message
+     */
+    @PutMapping("/{id}/archive")
+    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:ARCHIVE')")
+    public ResponseEntity<String> archiveGroup(@PathVariable Long id) {
+        ArchiveTaskGroupRequest request = new ArchiveTaskGroupRequest();
+        request.setGroupId(id);
+        taskGroupAppService.archiveGroup(request);
+        return ResponseEntity.ok("Task group archived successfully");
+    }
+
+    /**
+     * Unarchive a task group
+     *
+     * @param id the ID of the group
+     * @return success message
+     */
+    @PutMapping("/{id}/unarchive")
+    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:ARCHIVE')")
+    public ResponseEntity<String> unarchiveGroup(@PathVariable Long id) {
+        UnarchiveTaskGroupRequest request = new UnarchiveTaskGroupRequest();
+        request.setGroupId(id);
+        taskGroupAppService.unarchiveGroup(request);
+        return ResponseEntity.ok("Task group unarchived successfully");
+    }
+
+    /**
+     * Get all archived task groups in a board
+     *
+     * @param boardId the ID of the board
+     * @return list of archived groups
+     */
+    @GetMapping("/board/{boardId}/archived")
+    @PreAuthorize("hasPermission(#boardId, 'Board', 'GROUP:VIEW')")
+    public ResponseEntity<List<GetTaskGroupResponse>> getArchivedGroupsByBoard(@PathVariable Long boardId) {
+        return ResponseEntity.ok(taskGroupAppService.getArchivedGroupsByBoard(boardId));
+    }
+
 }

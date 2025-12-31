@@ -20,4 +20,9 @@ public interface TaskGroupDomainService {
     // Delete operations
     void deleteGroup(Long groupId, Long userId);
 
+    // Archive operations
+    TaskGroup archiveGroup(Long groupId, Long userId);
+    TaskGroup unarchiveGroup(Long groupId, Long userId);
+    List<TaskGroup> getArchivedGroupsByBoardId(Long boardId);
+
 }

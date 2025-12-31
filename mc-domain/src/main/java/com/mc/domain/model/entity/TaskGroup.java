@@ -26,9 +26,12 @@ public class TaskGroup {
     private String color;
     private double position;
     private boolean isCollapsed;
+    private boolean isArchived = false;
+    
     private Date createdAt = new Date();
     private Date updatedAt;
     private Date deletedAt;
+    private Date archivedAt;
 
     @jakarta.persistence.Column(name = "is_deleted", insertable = false, updatable = false)
     private Boolean isDeleted = Boolean.FALSE;
@@ -44,5 +47,9 @@ public class TaskGroup {
     @ManyToOne
     @JoinColumn(name = "deleted_by", referencedColumnName = "id")
     private User deletedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "archived_by", referencedColumnName = "id")
+    private User archivedBy;
 
 }

@@ -10,6 +10,7 @@ public class GetTaskGroupResponse {
     private String color;
     private double position;
     private boolean isCollapsed;
+    private boolean isArchived;
     private Long boardId;
     
 }

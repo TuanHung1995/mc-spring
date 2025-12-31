@@ -39,6 +39,11 @@ public class TaskGroupInfrasRepositoryImpl implements TaskGroupRepository {
     }
 
     @Override
+    public List<TaskGroup> findArchivedGroupsByBoardId(Long boardId) {
+        return taskGroupJPAMapper.findArchivedGroupsByBoardId(boardId);
+    }
+
+    @Override
     public Double getPosition(Long groupId) {
         return taskGroupJPAMapper.getPosition(groupId);
     }
