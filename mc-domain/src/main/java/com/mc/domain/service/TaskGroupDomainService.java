@@ -2,17 +2,22 @@ package com.mc.domain.service;
 
 import com.mc.domain.model.entity.TaskGroup;
 
+import java.util.List;
+
 public interface TaskGroupDomainService {
 
+    // Create operations
+    TaskGroup createGroup(Long boardId, String title, String color, Long userId);
+
+    // Read operations
+    TaskGroup getGroupById(Long groupId);
+    List<TaskGroup> getGroupsByBoardId(Long boardId);
+
+    // Update operations
+    TaskGroup updateTaskGroup(Long groupId, String newTitle, String newColor);
     TaskGroup reorderGroup(Long targetGroup, Long prevItemId, Long nextItemId);
 
-    /**
-     * Update task group details
-     * @param groupId: ID of the group to be updated
-     * @param newTitle: New title (optional)
-     * @param newColor: New color (optional)
-     * @return Updated TaskGroup entity
-     */
-    TaskGroup updateTaskGroup(Long groupId, String newTitle, String newColor);
+    // Delete operations
+    void deleteGroup(Long groupId, Long userId);
 
 }

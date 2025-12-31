@@ -27,6 +27,8 @@ public class TaskGroup {
     private double position;
     private boolean isCollapsed;
     private Date createdAt = new Date();
+    private Date updatedAt;
+    private Date deletedAt;
 
     @jakarta.persistence.Column(name = "is_deleted", insertable = false, updatable = false)
     private Boolean isDeleted = Boolean.FALSE;

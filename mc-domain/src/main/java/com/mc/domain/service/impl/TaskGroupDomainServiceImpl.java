@@ -1,23 +1,90 @@
 package com.mc.domain.service.impl;
 
 import com.mc.domain.exception.ResourceNotFoundException;
-import com.mc.domain.model.entity.Item;
+import com.mc.domain.model.entity.Board;
 import com.mc.domain.model.entity.TaskGroup;
-import com.mc.domain.repository.ItemRepository;
+import com.mc.domain.model.entity.User;
+import com.mc.domain.repository.BoardRepository;
 import com.mc.domain.repository.TaskGroupRepository;
+import com.mc.domain.repository.UserRepository;
 import com.mc.domain.service.TaskGroupDomainService;
 import com.mc.domain.service.util.PositionCalculationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
 
     private final TaskGroupRepository taskGroupRepository;
+    private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
     private final PositionCalculationService positionCalculationService;
 
+    @Override
+    @Transactional
+    public TaskGroup createGroup(Long boardId, String title, String color, Long userId) {
+        // Validate board exists
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+        
+        // Get creator
+        User creator = userRepository.findById(userId)
+                .orElse(null);
+        
+        // Calculate position (append to end)
+        Double maxPosition = taskGroupRepository.getMaxPositionByBoardId(boardId);
+        double newPosition = (maxPosition != null) ? maxPosition + 65536 : 65536;
+        
+        // Create group
+        TaskGroup group = new TaskGroup();
+        group.setTitle(title);
+        group.setColor(color != null ? color : "#579bfc"); // Default color
+        group.setBoard(board);
+        group.setCreatedBy(creator);
+        group.setPosition(newPosition);
+        group.setCollapsed(false);
+        group.setCreatedAt(new Date());
+        
+        return taskGroupRepository.save(group);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TaskGroup getGroupById(Long groupId) {
+        return taskGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskGroup> getGroupsByBoardId(Long boardId) {
+        // Validate board exists
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+        
+        return taskGroupRepository.findByBoardId(boardId);
+    }
+
+    @Override
+    @Transactional
+    public TaskGroup updateTaskGroup(Long groupId, String newTitle, String newColor) {
+        TaskGroup group = taskGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
+
+        if (newTitle == null && newColor == null) return group;
+
+        if (newTitle != null) group.setTitle(newTitle);
+        if (newColor != null) group.setColor(newColor);
+
+        return taskGroupRepository.save(group);
+    }
+
+    @Override
     @Transactional
     public TaskGroup reorderGroup(Long targetGroupId, Long prevItemId, Long nextItemId) {
         // 1. Tính vị trí mới
@@ -28,37 +95,29 @@ public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
 
         // 2. Lấy Group
         TaskGroup group = taskGroupRepository.findById(targetGroupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
-
-        // 3. Cập nhật Group nếu có thay đổi (Move task sang group khác)
-//        if (targetGroupId != null && !targetGroupId.equals(item.getGroup().getId())) {
-//            TaskGroup newGroup = taskGroupRepository.findById(targetGroupId)
-//                    .orElseThrow(() -> new RuntimeException("Target Group not found"));
-//            item.setGroup(newGroup);
-//        }
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", targetGroupId));
 
         // 4. Cập nhật vị trí
         group.setPosition(newPos);
         return taskGroupRepository.save(group);
-
-        /*     Next: WebSocket     */
-
     }
 
+    @Override
     @Transactional
-    public TaskGroup updateTaskGroup(Long groupId, String newTitle, String newColor) {
-
+    public void deleteGroup(Long groupId, Long userId) {
         TaskGroup group = taskGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
-
-        if (newTitle == null && newColor == null) return group;
-
-        if (newTitle != null) group.setTitle(newTitle);
-        if (newColor != null) group.setColor(newColor);
-
-        return taskGroupRepository.save(group);
-
-
+        
+        // Get user who is deleting
+        User deleter = userRepository.findById(userId)
+                .orElse(null);
+        
+        // Set soft delete fields (if entity has these fields, otherwise just delete)
+        group.setDeletedBy(deleter);
+        group.setDeletedAt(new Date());
+        
+        // Soft delete
+        taskGroupRepository.delete(group);
     }
 
 }

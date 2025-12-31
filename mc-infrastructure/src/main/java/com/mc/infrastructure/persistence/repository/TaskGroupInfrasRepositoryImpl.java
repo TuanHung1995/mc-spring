@@ -6,6 +6,7 @@ import com.mc.infrastructure.persistence.mapper.TaskGroupJPAMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,8 +26,26 @@ public class TaskGroupInfrasRepositoryImpl implements TaskGroupRepository {
     }
 
     @Override
+    public void delete(TaskGroup group) {
+        if (group.getDeletedAt() != null || group.getDeletedBy() != null) {
+            taskGroupJPAMapper.saveAndFlush(group);
+        }
+        taskGroupJPAMapper.delete(group);
+    }
+
+    @Override
+    public List<TaskGroup> findByBoardId(Long boardId) {
+        return taskGroupJPAMapper.findByBoardId(boardId);
+    }
+
+    @Override
     public Double getPosition(Long groupId) {
         return taskGroupJPAMapper.getPosition(groupId);
+    }
+
+    @Override
+    public Double getMaxPositionByBoardId(Long boardId) {
+        return taskGroupJPAMapper.getMaxPositionByBoardId(boardId);
     }
 
     @Override

@@ -9,7 +9,12 @@ public interface TaskGroupRepository {
 
     Optional<TaskGroup> findById(Long id);
     TaskGroup save(TaskGroup group);
+    void delete(TaskGroup group);
+    
+    List<TaskGroup> findByBoardId(Long boardId);
+    
     Double getPosition(Long groupId);
+    Double getMaxPositionByBoardId(Long boardId);
 
     Optional<Long> findBoardIdByGroupId(Long groupId);
 
