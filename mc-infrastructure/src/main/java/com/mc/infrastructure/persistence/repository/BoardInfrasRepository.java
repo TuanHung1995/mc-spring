@@ -27,7 +27,6 @@ public class BoardInfrasRepository implements BoardRepository {
 
     @Override
     public Board save(Board board) {
-        System.out.println("Saving board: " + board.getId());
         return boardJPAMapper.save(board);
     }
 

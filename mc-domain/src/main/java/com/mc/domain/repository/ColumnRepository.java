@@ -9,7 +9,10 @@ public interface ColumnRepository {
 
     Column save(Column column);
     Optional<Column> findById(Long columnId);
+    void delete(Column column);
+    
     Double getPosition(Long columnId);
+    Double getMaxPositionByBoardId(Long boardId);
 
     Optional<Long> findBoardIdByColumnId(Long columnId);
 

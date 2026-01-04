@@ -47,6 +47,10 @@ public class Column {
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
 
+    @ManyToOne
+    @JoinColumn(name = "deleted_by", referencedColumnName = "id")
+    private User deletedBy;
+
     @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ColumnValue> columnValues;
 
