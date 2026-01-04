@@ -31,6 +31,19 @@ public class ColumnInfrasRepositoryImpl implements ColumnRepository {
     }
 
     @Override
+    public void delete(Column column) {
+        if (column.getDeletedAt() != null || column.getDeletedBy() != null) {
+            columnJPAMapper.saveAndFlush(column);
+        }
+        columnJPAMapper.delete(column);
+    }
+
+    @Override
+    public Double getMaxPositionByBoardId(Long boardId) {
+        return columnJPAMapper.getMaxPositionByBoardId(boardId);
+    }
+
+    @Override
     public Optional<Long> findBoardIdByColumnId(Long columnId) {
         return columnJPAMapper.findBoardIdByColumnId(columnId);
     }

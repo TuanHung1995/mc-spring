@@ -12,6 +12,9 @@ public interface ColumnJPAMapper extends JpaRepository<Column, Long> {
     @Query("SELECT c.position FROM Column c WHERE c.id = :columnId")
     double getPosition(Long columnId);
 
+    @Query("SELECT MAX(c.position) FROM Column c WHERE c.board.id = :boardId")
+    Double getMaxPositionByBoardId(Long boardId);
+
     @Query("SELECT i.board.id FROM Column i WHERE i.id = :columnId")
     Optional<Long> findBoardIdByColumnId(Long columnId);
 

@@ -2,8 +2,11 @@ package com.mc.infrastructure.config.security;
 
 import com.mc.domain.model.entity.*;
 import com.mc.domain.repository.*;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -28,6 +31,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private final TaskGroupRepository taskGroupRepo;
     private final ColumnRepository columnRepo;
     private final ItemRepository itemRepo;
+
+    private final EntityManager entityManager;
 
     private static final String TYPE_TEAM = "Team";
     private static final String TYPE_WORKSPACE = "Workspace";
@@ -124,15 +129,21 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     // --- LEVEL 4: SUB-ENTITIES (Group, Column, Item -> Resolve to Board) ---
     private boolean checkSubBoardEntityPermission(Long entityId, String entityType, Long userId, String permission) {
-        Long parentBoardId = null;
+//        Long parentBoardId = null;
 
-        if (TYPE_GROUP.equalsIgnoreCase(entityType)) {
-            parentBoardId = taskGroupRepo.findBoardIdByGroupId(entityId).orElse(null);
-        } else if (TYPE_COLUMN.equalsIgnoreCase(entityType)) {
-            parentBoardId = columnRepo.findBoardIdByColumnId(entityId).orElse(null);
-        } else if (TYPE_ITEM.equalsIgnoreCase(entityType)) {
-            parentBoardId = itemRepo.findBoardIdByItemId(entityId).orElse(null);
-        }
+//        if (TYPE_GROUP.equalsIgnoreCase(entityType)) {
+//            parentBoardId = taskGroupRepo.findBoardIdByGroupId(entityId).orElse(null);
+//        } else if (TYPE_COLUMN.equalsIgnoreCase(entityType)) {
+//            parentBoardId = columnRepo.findBoardIdByColumnId(entityId).orElse(null);
+//        } else if (TYPE_ITEM.equalsIgnoreCase(entityType)) {
+//            parentBoardId = itemRepo.findBoardIdByItemId(entityId).orElse(null);
+//        }
+
+        Long parentBoardId = findBoardParentId(true,
+                "deleted",
+                "deletedFilter",
+                entityType,
+                entityId).orElse(null);
 
         if (parentBoardId != null) {
             // Tái sử dụng logic check Board (bao gồm cả việc thừa kế từ Workspace/Team)
@@ -154,5 +165,24 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             return userDetails.getUserId();
         }
         return null;
+    }
+
+    private Optional<Long> findBoardParentId(boolean isDeleted, String parameter, String deletedFilter, String type, Long entityId){
+
+        Session session = entityManager.unwrap(Session.class);
+        Filter filter = session.enableFilter(deletedFilter);
+        filter.setParameter(parameter, isDeleted);
+        Optional<Long> boardId = Optional.empty();
+
+        if (TYPE_GROUP.equalsIgnoreCase(type)) {
+            boardId = taskGroupRepo.findBoardIdByGroupId(entityId);
+        } else if (TYPE_COLUMN.equalsIgnoreCase(type)) {
+            boardId = columnRepo.findBoardIdByColumnId(entityId);
+        } else if (TYPE_ITEM.equalsIgnoreCase(type)) {
+            boardId = itemRepo.findBoardIdByItemId(entityId);
+        }
+
+        session.disableFilter(deletedFilter);
+        return boardId;
     }
 }
