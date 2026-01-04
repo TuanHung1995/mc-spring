@@ -25,4 +25,9 @@ public interface TaskGroupDomainService {
     TaskGroup unarchiveGroup(Long groupId, Long userId);
     List<TaskGroup> getArchivedGroupsByBoardId(Long boardId);
 
+    // Restore and Permanent Delete operations
+    TaskGroup restoreGroup(Long groupId, Long userId);
+    Long permanentDeleteGroup(Long groupId); // Returns boardId before deletion
+    List<TaskGroup> getTrashedGroupsByBoardId(Long boardId);
+
 }

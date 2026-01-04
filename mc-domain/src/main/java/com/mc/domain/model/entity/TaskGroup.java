@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.type.NumericBooleanConverter;
 
@@ -17,6 +20,11 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @SoftDelete(columnName = "is_deleted", converter = NumericBooleanConverter.class)
+@FilterDef(
+        name = "deletedFilter",
+        parameters = @ParamDef(name = "deleted", type = Boolean.class)
+)
+@Filter(name = "deletedFilter", condition = "is_deleted = :deleted")
 public class TaskGroup {
 
     @Id

@@ -163,4 +163,45 @@ public class TaskGroupDomainServiceImpl implements TaskGroupDomainService {
         return taskGroupRepository.findArchivedGroupsByBoardId(boardId);
     }
 
+    @Override
+    @Transactional
+    public TaskGroup restoreGroup(Long groupId, Long userId) {
+        // Find group including deleted ones
+        System.out.println("Restoring group with ID: " + groupId);
+        TaskGroup group = taskGroupRepository.findByIdIncludingDeleted(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
+        
+        // Clear soft delete fields
+        group.setDeletedAt(null);
+        group.setDeletedBy(null);
+        
+        return taskGroupRepository.save(group);
+    }
+
+    @Override
+    @Transactional
+    public Long permanentDeleteGroup(Long groupId) {
+        // Find group including deleted ones
+        TaskGroup group = taskGroupRepository.findByIdIncludingDeleted(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
+        
+        // Get boardId before deletion
+        Long boardId = group.getBoard() != null ? group.getBoard().getId() : null;
+        
+        // Permanently delete from database
+        taskGroupRepository.permanentDelete(group);
+        
+        return boardId;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskGroup> getTrashedGroupsByBoardId(Long boardId) {
+        // Validate board exists
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+        
+        return taskGroupRepository.findTrashedGroupsByBoardId(boardId);
+    }
+
 }

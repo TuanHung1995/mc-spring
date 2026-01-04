@@ -22,4 +22,10 @@ public interface TaskGroupAppService {
 
     List<GetTaskGroupResponse> getArchivedGroupsByBoard(Long boardId);
 
+    void restoreGroup(RestoreTaskGroupRequest request);
+
+    void permanentDeleteGroup(PermanentDeleteTaskGroupRequest request);
+
+    List<GetTaskGroupResponse> getTrashedGroupsByBoard(Long boardId);
+
 }

@@ -136,4 +136,43 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
                 .map(taskGroupMapper::toGetTaskGroupResponse)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void restoreGroup(RestoreTaskGroupRequest request) {
+        Long currentUserId = userContextPort.getCurrentUserId();
+        
+        TaskGroup group = taskGroupDomainService.restoreGroup(request.getGroupId(), currentUserId);
+
+        // Publish event for real-time updates
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "GROUP_RESTORED");
+        payload.put("entityId", group.getId());
+        payload.put("boardId", group.getBoard().getId());
+        
+        eventPublisher.publishEvent(new BoardChangedEvent(group.getBoard().getId(), payload));
+    }
+
+    @Override
+    public void permanentDeleteGroup(PermanentDeleteTaskGroupRequest request) {
+        // Domain service returns boardId before deletion
+        Long boardId = taskGroupDomainService.permanentDeleteGroup(request.getGroupId());
+
+        // Publish event for real-time updates
+        if (boardId != null) {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("type", "GROUP_PERMANENTLY_DELETED");
+            payload.put("entityId", request.getGroupId());
+            payload.put("boardId", boardId);
+            
+            eventPublisher.publishEvent(new BoardChangedEvent(boardId, payload));
+        }
+    }
+
+    @Override
+    public List<GetTaskGroupResponse> getTrashedGroupsByBoard(Long boardId) {
+        List<TaskGroup> groups = taskGroupDomainService.getTrashedGroupsByBoardId(boardId);
+        return groups.stream()
+                .map(taskGroupMapper::toGetTaskGroupResponse)
+                .collect(Collectors.toList());
+    }
 }

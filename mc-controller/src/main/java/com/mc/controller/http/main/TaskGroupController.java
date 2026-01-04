@@ -67,7 +67,7 @@ public class TaskGroupController {
      * @return success message
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:DELETE')")
+    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:TRASH')")
     public ResponseEntity<String> deleteGroup(@PathVariable Long id) {
         DeleteTaskGroupRequest request = new DeleteTaskGroupRequest();
         request.setGroupId(id);
@@ -127,6 +127,48 @@ public class TaskGroupController {
     @PreAuthorize("hasPermission(#boardId, 'Board', 'GROUP:VIEW')")
     public ResponseEntity<List<GetTaskGroupResponse>> getArchivedGroupsByBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(taskGroupAppService.getArchivedGroupsByBoard(boardId));
+    }
+
+    /**
+     * Restore a trashed task group
+     *
+     * @param id the ID of the group
+     * @return success message
+     */
+    @PutMapping("/{id}/restore")
+    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:RESTORE')")
+    public ResponseEntity<String> restoreGroup(@PathVariable Long id) {
+        RestoreTaskGroupRequest request = new RestoreTaskGroupRequest();
+        request.setGroupId(id);
+        taskGroupAppService.restoreGroup(request);
+        return ResponseEntity.ok("Task group restored successfully");
+    }
+
+    /**
+     * Permanently delete a task group
+     *
+     * @param id the ID of the group
+     * @return success message
+     */
+    @DeleteMapping("/{id}/permanent")
+    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:DELETE')")
+    public ResponseEntity<String> permanentDeleteGroup(@PathVariable Long id) {
+        PermanentDeleteTaskGroupRequest request = new PermanentDeleteTaskGroupRequest();
+        request.setGroupId(id);
+        taskGroupAppService.permanentDeleteGroup(request);
+        return ResponseEntity.ok("Task group permanently deleted");
+    }
+
+    /**
+     * Get all trashed (soft-deleted) task groups in a board
+     *
+     * @param boardId the ID of the board
+     * @return list of trashed groups
+     */
+    @GetMapping("/board/{boardId}/trashed")
+    @PreAuthorize("hasPermission(#boardId, 'Board', 'GROUP:VIEW')")
+    public ResponseEntity<List<GetTaskGroupResponse>> getTrashedGroupsByBoard(@PathVariable Long boardId) {
+        return ResponseEntity.ok(taskGroupAppService.getTrashedGroupsByBoard(boardId));
     }
 
 }

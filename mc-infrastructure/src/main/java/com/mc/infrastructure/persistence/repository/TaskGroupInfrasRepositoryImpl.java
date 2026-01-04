@@ -44,6 +44,21 @@ public class TaskGroupInfrasRepositoryImpl implements TaskGroupRepository {
     }
 
     @Override
+    public List<TaskGroup> findTrashedGroupsByBoardId(Long boardId) {
+        return taskGroupJPAMapper.findTrashedGroupsByBoardId(boardId);
+    }
+
+    @Override
+    public Optional<TaskGroup> findByIdIncludingDeleted(Long id) {
+        return taskGroupJPAMapper.findByIdIncludingDeleted(id);
+    }
+
+    @Override
+    public void permanentDelete(TaskGroup group) {
+        taskGroupJPAMapper.delete(group);
+    }
+
+    @Override
     public Double getPosition(Long groupId) {
         return taskGroupJPAMapper.getPosition(groupId);
     }

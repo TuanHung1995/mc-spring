@@ -13,6 +13,10 @@ public interface TaskGroupRepository {
     
     List<TaskGroup> findByBoardId(Long boardId);
     List<TaskGroup> findArchivedGroupsByBoardId(Long boardId);
+    List<TaskGroup> findTrashedGroupsByBoardId(Long boardId);
+    
+    Optional<TaskGroup> findByIdIncludingDeleted(Long id);
+    void permanentDelete(TaskGroup group);
     
     Double getPosition(Long groupId);
     Double getMaxPositionByBoardId(Long boardId);
