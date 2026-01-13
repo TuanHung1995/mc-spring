@@ -12,6 +12,7 @@ import com.mc.domain.service.InviteDomainService;
 import com.mc.domain.service.RoleDomainService;
 import com.mc.infrastructure.config.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -28,6 +29,7 @@ import java.util.UUID;
 public class AuthAppServiceImpl implements AuthAppService {
 
     private final AuthenticationManager authenticationManager;
+    @Qualifier("appJwtTokenProvider")
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final MailSender mailSender;
