@@ -17,6 +17,7 @@ public class UserPersistenceMapper {
         entity.setId(domain.getId());
         entity.setEmail(domain.getEmail().getValue()); // Extract value
         entity.setPassword(domain.getPassword());
+        entity.setFailedLoginAttempts(domain.getFailedLoginAttempts());
 
         // Flatten UserProfile VO
         if (domain.getProfile() != null) {
@@ -27,6 +28,7 @@ public class UserPersistenceMapper {
         entity.setProvider(domain.getProvider());
         entity.setStatus(domain.getStatus());
         entity.setEmailVerified(domain.isEmailVerified());
+        entity.setUnlockToken(domain.getUnlockToken());
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());
 
@@ -41,10 +43,12 @@ public class UserPersistenceMapper {
                 entity.getId(),
                 new Email(entity.getEmail()), // Reconstruct VO
                 entity.getPassword(),
+                entity.getFailedLoginAttempts(),
                 new UserProfile(entity.getFullName(), entity.getAvatarUrl()), // Reconstruct VO
                 entity.getProvider(),
                 entity.getStatus(),
                 entity.isEmailVerified(),
+                entity.getUnlockToken(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.isDeleted()

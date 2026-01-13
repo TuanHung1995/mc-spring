@@ -95,7 +95,8 @@ public class AuthAppServiceImpl implements AuthAppService {
             );
 
         } catch (BadCredentialsException e) {
-            authenticationService.handleFailedLogin(request.getEmail());
+            String token = jwtTokenProvider.generateTokenFromEmail(request.getEmail());
+            authenticationService.handleFailedLogin(request.getEmail(), token);
             throw new InvalidCredentialsException();
         } catch (LockedException e) {
             throw new AccountLockedException("Account is not active");
@@ -227,12 +228,8 @@ public class AuthAppServiceImpl implements AuthAppService {
         }
 
         String email = jwtTokenProvider.getUsernameFromToken(token);
-        User user = userRepository.findByEmail(new Email(email))
-                .orElseThrow(() -> UserNotFoundException.withEmail(email));
 
-        // Activate account
-        user.activate();
-        userRepository.save(user);
+        authenticationService.unlockAccount(email, token);
 
         log.info("Account unlocked for user: {}", email);
 

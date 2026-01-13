@@ -15,6 +15,7 @@ import com.mc.domain.iam.repository.RefreshTokenRepository;
 import com.mc.domain.iam.repository.TokenBlacklistRepository;
 import com.mc.domain.iam.repository.UserRepository;
 import com.mc.domain.iam.service.AuthenticationService;
+import com.mc.domain.model.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -43,6 +45,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final TokenBlacklistRepository tokenBlacklistRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${constants.max-failed-login-attempts}")
+    private int MAX_FAILED_ATTEMPTS;
 
     @Qualifier("iamMailSender")
     private final MailSender mailSender;
@@ -130,16 +135,53 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void handleFailedLogin(String email) {
-        // TODO: Implement failed login tracking
-        // Could add failedLoginAttempts field to User entity
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void handleFailedLogin(String email, String token) {
+
         log.warn("Failed login attempt for email: {}", email);
+        User user = userRepository.findByEmail(new Email(email))
+                .orElseThrow(() -> UserNotFoundException.withEmail(email));
+
+        log.info("Attempt for user: {}", user.getFailedLoginAttempts());
+        if (AccountStatus.LOCKED.equals(user.getStatus())) {
+            return;
+        }
+
+        user.incrementFailedLoginAttempts();
+
+        if (user.getFailedLoginAttempts() >= MAX_FAILED_ATTEMPTS) {
+            user.deactivate();
+            user.generateUnlockToken(token);
+
+            sendMail(email, "Account Locked - Action Required", isDevelopment,
+                    authApiUrl, "/unlock-account?token=", serverPort,
+                    devUrl, appUrl + "/",
+                    user.getUnlockToken(),
+                    """
+                            Your account has been locked due to multiple failed login attempts.
+                            Please click the link below to unlock your account:
+                            """);
+
+            log.info("Account locked due to too many failed attempts for email: {}", email);
+            log.debug("Unlock token (dev): {}", user.getUnlockToken());
+        }
+
+        log.info("Check failed attempt: {}", user.getFailedLoginAttempts());
+        User updatedUser = userRepository.save(user);
+
+        log.info("Check hibernate: {}", updatedUser.getFailedLoginAttempts());
     }
 
     @Override
     public void resetFailedLogin(String email) {
-        // TODO: Reset failed login counter
+
         log.info("Failed login counter reset for email: {}", email);
+        User user = userRepository.findByEmail(new Email(email))
+                .orElseThrow();
+
+        user.resetFailedLoginAttempts();
+        userRepository.save(user);
+
     }
 
     @Override
@@ -187,9 +229,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void unlockAccount(String unlockToken) {
-        // TODO: Implement account unlock logic
-        // Could validate JWT token and activate account
+    public void unlockAccount(String email, String unlockToken) {
+        User user = userRepository.findByEmail(new Email(email))
+                .orElseThrow(() -> UserNotFoundException.withEmail(email));
+
+        user.activate();
+        user.generateUnlockToken(null);
+        user.resetFailedLoginAttempts();
+        userRepository.save(user);
+
         log.info("Account unlock requested with token");
     }
 

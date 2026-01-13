@@ -26,7 +26,7 @@ import java.io.IOException;
  * Intercepts requests and authenticates users based on JWT tokens.
  */
 @Component("iamJwtAuthenticationFilter")
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -36,13 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     private final TokenBlacklistRepository tokenBlacklistRepository;
     private final CookieUtils cookieUtils;
-
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, IamUserDetailsService iamUserDetailsService, TokenBlacklistRepository tokenBlacklistRepository, CookieUtils cookieUtils) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.iamUserDetailsService = iamUserDetailsService;
-        this.tokenBlacklistRepository = tokenBlacklistRepository;
-        this.cookieUtils = cookieUtils;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

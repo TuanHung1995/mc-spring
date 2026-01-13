@@ -21,24 +21,28 @@ public class User extends BaseDomainEntity {
 
     private Email email;
     private String password;
+    private int failedLoginAttempts = 0;
     private UserProfile profile;
     private AuthProvider provider;
     private AccountStatus status;
     private boolean emailVerified;
+    private String unlockToken;
 
     // =================================================================
     // CONSTRUCTOR (For Persistence/Reconstitution)
     // =================================================================
-    public User(UUID id, Email email, String password, UserProfile profile,
-                AuthProvider provider, AccountStatus status, boolean emailVerified,
+    public User(UUID id, Email email, String password, int failedLoginAttempts, UserProfile profile,
+                AuthProvider provider, AccountStatus status, boolean emailVerified, String unlockToken,
                 LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.email = email;
         this.password = password;
+        this.failedLoginAttempts = failedLoginAttempts;
         this.profile = profile;
         this.provider = provider;
         this.status = status;
         this.emailVerified = emailVerified;
+        this.unlockToken = unlockToken;
     }
 
     private User() {
@@ -97,6 +101,21 @@ public class User extends BaseDomainEntity {
             throw new DomainException("Cannot change password for social account");
         }
         this.password = newPasswordHash;
+        markAsModified();
+    }
+
+    public void incrementFailedLoginAttempts() {
+        this.failedLoginAttempts += 1;
+        markAsModified();
+    }
+
+    public void resetFailedLoginAttempts() {
+        this.failedLoginAttempts = 0;
+        markAsModified();
+    }
+
+    public void generateUnlockToken(String token) {
+        this.unlockToken = token;
         markAsModified();
     }
 

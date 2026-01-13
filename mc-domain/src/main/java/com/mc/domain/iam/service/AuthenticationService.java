@@ -44,7 +44,7 @@ public interface AuthenticationService {
     /**
      * Handle failed login attempt.
      */
-    void handleFailedLogin(String email);
+    void handleFailedLogin(String email, String token);
 
     /**
      * Reset failed login counter.
@@ -64,5 +64,5 @@ public interface AuthenticationService {
     /**
      * Unlock a locked account.
      */
-    void unlockAccount(String unlockToken);
+    void unlockAccount(String email, String unlockToken);
 }

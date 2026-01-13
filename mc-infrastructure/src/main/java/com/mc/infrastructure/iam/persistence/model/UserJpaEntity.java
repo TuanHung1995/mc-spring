@@ -28,6 +28,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "failed_login_attempts")
+    private int failedLoginAttempts;
+
     @Column(name = "full_name")
     private String fullName;
     
@@ -42,5 +45,8 @@ public class UserJpaEntity extends BaseJpaEntity {
 
     @Column(name = "email_verified")
     private boolean emailVerified;
+
+    @Column(name = "unlock_token")
+    private String unlockToken;
 
 }
