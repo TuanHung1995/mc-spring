@@ -1,8 +1,10 @@
 constants:
   auth-api-url: "/api/v1/auth"
+  auth-api-url-v2: "/api/v2/auth"
   development: true
   frontend: "localhost:5173"
   max-failed-login-attempts: 5
+  dev-url: "http://localhost:"
 
 app:
   oauth2:

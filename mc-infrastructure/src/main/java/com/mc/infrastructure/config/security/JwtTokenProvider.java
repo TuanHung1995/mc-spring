@@ -17,7 +17,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
-@Component
+@Component("appJwtTokenProvider")
 @RequiredArgsConstructor
 public class JwtTokenProvider implements TokenHelperPort {
 
