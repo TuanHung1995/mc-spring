@@ -77,16 +77,7 @@ public class UserAppServiceImpl implements UserAppService {
             return MessageResponse.error("New password and confirmation do not match");
         }
         
-        // Validate current password
-        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            return MessageResponse.error("Current password is incorrect");
-        }
-        
-        // Change password using domain logic
-        String newPasswordHash = passwordEncoder.encode(request.getNewPassword());
-        user.changePassword(newPasswordHash);
-        
-        userRepository.save(user);
+        userDomainService.changePassword(user, user.getPassword(), request.getNewPassword());
         
         return MessageResponse.success("Password changed successfully");
     }

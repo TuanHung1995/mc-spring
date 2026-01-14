@@ -31,7 +31,7 @@ public interface UserDomainService {
     /**
      * Change user password.
      */
-    void changePassword(UUID userId, String oldPassword, String newPassword);
+    void changePassword(User user, String oldPassword, String newPassword);
 
     /**
      * Search users by keyword.

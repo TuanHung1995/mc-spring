@@ -49,10 +49,8 @@ public class UserDomainServiceImpl implements UserDomainService {
     }
 
     @Override
-    public void changePassword(UUID userId, String oldPassword, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> UserNotFoundException.withId(userId));
-        
+    public void changePassword(User user, String oldPassword, String newPassword) {
+
         // Verify old password
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new InvalidCredentialsException("Current password is incorrect");
