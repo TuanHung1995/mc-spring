@@ -110,20 +110,9 @@ public class AuthAppServiceImpl implements AuthAppService {
             throw new InvalidCredentialsException("Passwords do not match");
         }
 
-        Email email = new Email(request.getEmail());
+        User savedUser = authenticationService.registerWithEmail(request.getEmail(), request.getPassword(), request.getFullName());
 
-        // Check if user exists
-        if (userRepository.existsByEmail(email)) {
-            throw UserAlreadyExistsException.withEmail(request.getEmail());
-        }
-
-        // Create user using domain factory method
-        String passwordHash = passwordEncoder.encode(request.getPassword());
-        User user = User.registerWithEmail(email, passwordHash, request.getFullName());
-
-        User savedUser = userRepository.save(user);
-
-        log.info("New user registered: {}", email.getValue());
+        log.info("New user registered: {}", savedUser.getEmail().getValue());
 
         return RegisterResponse.success(
                 savedUser.getId(),

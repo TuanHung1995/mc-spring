@@ -12,6 +12,11 @@ import java.util.UUID;
 public interface AuthenticationService {
 
     /**
+     * Register a new user with email and password.
+     */
+    User registerWithEmail(String email, String rawPassword, String fullName);
+
+    /**
      * Validate user credentials and return the user if valid.
      */
     User authenticate(String email, String rawPassword);

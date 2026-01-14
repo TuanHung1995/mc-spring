@@ -37,6 +37,15 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "job_title")
+    private String jobTitle;
+
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 

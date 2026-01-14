@@ -1,10 +1,7 @@
 package com.mc.domain.iam.service.impl;
 
 import com.mc.domain.core.port.out.MailSender;
-import com.mc.domain.iam.exception.AccountLockedException;
-import com.mc.domain.iam.exception.InvalidCredentialsException;
-import com.mc.domain.iam.exception.InvalidTokenException;
-import com.mc.domain.iam.exception.UserNotFoundException;
+import com.mc.domain.iam.exception.*;
 import com.mc.domain.iam.model.PasswordResetToken;
 import com.mc.domain.iam.model.RefreshToken;
 import com.mc.domain.iam.model.TokenBlacklist;
@@ -75,6 +72,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Value("${constants.frontend}")
     private String appUrl;
+
+    @Override
+    public User registerWithEmail(String email, String rawPassword, String fullName) {
+        Email emailVO = new Email(email);
+
+        // Check if user already exists
+        if (userRepository.existsByEmail(emailVO)) {
+            throw UserAlreadyExistsException.withEmail(email);
+        }
+
+        // Create and save user
+        String passwordHash = passwordEncoder.encode(rawPassword);
+        User user = User.registerWithEmail(emailVO, passwordHash, fullName);
+
+        return userRepository.save(user);
+    }
 
     @Override
     public User authenticate(String email, String rawPassword) {

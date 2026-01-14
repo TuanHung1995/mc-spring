@@ -14,7 +14,6 @@ public class UpdateProfileRequest {
 
     private String fullName;
     private String avatarUrl;
-    private String bio;
     private String phone;
     private String address;
     private String jobTitle;
