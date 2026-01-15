@@ -77,28 +77,23 @@ public class UserAppServiceImpl implements UserAppService {
             return MessageResponse.error("New password and confirmation do not match");
         }
         
-        userDomainService.changePassword(user, user.getPassword(), request.getNewPassword());
-        
+        userDomainService.changePassword(user, request.getCurrentPassword(), request.getNewPassword());
+
         return MessageResponse.success("Password changed successfully");
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> searchUsers(String keyword) {
-        UUID currentUserId = getCurrentUserId();
-        // Note: This would need a search method in the repository
-        // For now, return empty list as placeholder
-        return List.of();
+        return userDomainService.searchUsers(keyword, getCurrentUser().getId()).stream()
+                .map(userDtoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     private User getCurrentUser() {
         String email = getCurrentUserEmail();
         return userRepository.findByEmail(new Email(email))
                 .orElseThrow(() -> UserNotFoundException.withEmail(email));
-    }
-
-    private UUID getCurrentUserId() {
-        return getCurrentUser().getId();
     }
 
     private String getCurrentUserEmail() {

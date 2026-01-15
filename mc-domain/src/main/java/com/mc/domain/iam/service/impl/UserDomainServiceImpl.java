@@ -66,8 +66,10 @@ public class UserDomainServiceImpl implements UserDomainService {
     @Override
     @Transactional(readOnly = true)
     public List<User> searchUsers(String keyword, UUID excludeUserId) {
-        // TODO: Implement search in repository
-        return List.of();
+        return userRepository.searchUsers(keyword).stream()
+                .filter(user -> !user.getId().equals(excludeUserId))
+                .filter(User::isActive)
+                .toList();
     }
 
     @Override
