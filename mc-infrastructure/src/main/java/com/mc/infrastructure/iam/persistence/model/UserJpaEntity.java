@@ -55,6 +55,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "email_verified")
     private boolean emailVerified;
 
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
     @Column(name = "unlock_token")
     private String unlockToken;
 

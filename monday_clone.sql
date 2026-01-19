@@ -70,6 +70,47 @@ create table iam_users
             on delete set null
 );
 
+create table verification_codes
+(
+    id         binary(16)                                            not null
+        primary key,
+    user_id    binary(16)                                            not null,
+    code       varchar(20)                                           not null,
+    status     enum ('USED', 'EXPIRED', 'PENDING') default 'PENDING' not null,
+    is_deleted tinyint(1)                          default 0         null,
+    created_at datetime                                              null,
+    updated_at datetime                                              null on update CURRENT_TIMESTAMP,
+    expired_at datetime                                              null
+);
+
+create index verification_codes_code_index
+    on verification_codes (code);
+
+create index verification_codes_user_index
+    on verification_codes (user_id);
+
+create table password_reset_tokens
+(
+    id          binary(16)           not null,
+    token       varchar(255)         not null,
+    user_id     binary(16)           not null,
+    created_by  binary(16)           null,
+    updated_by  binary(16)           null,
+    expiry_Date datetime             not null,
+    used        tinyint(1)           null,
+    created_at  datetime             not null,
+    updated_at  datetime             null on update CURRENT_TIMESTAMP,
+    is_deleted  tinyint(1) default 0 not null,
+    constraint idx_password_reset_token
+        unique (token),
+    constraint prt_token_uq
+        unique (token)
+);
+
+create index idx_password_reset_user
+    on password_reset_tokens (user_id);
+
+
 create table iam_refresh_tokens
 (
     id          bigint auto_increment

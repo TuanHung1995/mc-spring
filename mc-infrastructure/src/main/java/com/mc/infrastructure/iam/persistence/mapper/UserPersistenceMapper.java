@@ -31,6 +31,7 @@ public class UserPersistenceMapper {
         entity.setProvider(domain.getProvider());
         entity.setStatus(domain.getStatus());
         entity.setEmailVerified(domain.isEmailVerified());
+        entity.setEmailVerifiedAt(domain.getEmailVerifiedAt());
         entity.setUnlockToken(domain.getUnlockToken());
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());
@@ -57,6 +58,7 @@ public class UserPersistenceMapper {
                 entity.getProvider(),
                 entity.getStatus(),
                 entity.isEmailVerified(),
+                entity.getEmailVerifiedAt(),
                 entity.getUnlockToken(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),

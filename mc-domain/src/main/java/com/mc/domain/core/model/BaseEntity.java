@@ -28,7 +28,7 @@ public abstract class BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "BINARY(16)")
     @JdbcTypeCode(SqlTypes.BINARY)
     private UUID id;
 
@@ -45,16 +45,16 @@ public abstract class BaseEntity implements Serializable {
      * We use UUID instead of Entity reference to decouple modules.
      */
     @CreatedBy
-    @Column(name = "created_by", updatable = false, columnDefinition = "VARCHAR(36)")
-    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "created_by", updatable = false, columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
     private UUID createdBy;
 
     /**
      * Stores the User UUID who last modified this entity.
      */
     @LastModifiedBy
-    @Column(name = "updated_by", columnDefinition = "VARCHAR(36)")
-    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "updated_by", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
     private UUID updatedBy;
 
     // Cờ xóa mềm (Soft Delete) dùng chung cho toàn hệ thống

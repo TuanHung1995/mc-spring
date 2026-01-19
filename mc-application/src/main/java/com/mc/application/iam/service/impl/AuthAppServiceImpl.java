@@ -225,6 +225,26 @@ public class AuthAppServiceImpl implements AuthAppService {
         return MessageResponse.success("Account has been unlocked successfully. You can now login.");
     }
 
+    @Override
+    public MessageResponse sendVerifyEmailCode() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        authenticationService.sendEmailVerificationCode(email);
+
+        return MessageResponse.success("Verification email sent successfully");
+    }
+
+    @Override
+    public MessageResponse verifyEmail(VerifyEmailRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        authenticationService.verifyEmail(email, request.getVerificationCode());
+
+        log.info("Email verified for user: {}", email);
+
+        return MessageResponse.success("Email has been verified successfully");
+    }
+
     // =================================================================
     // PRIVATE HELPERS
     // =================================================================

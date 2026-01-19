@@ -70,4 +70,14 @@ public interface AuthenticationService {
      * Unlock a locked account.
      */
     void unlockAccount(String email, String unlockToken);
+
+    /**
+     * Send verification email code to user.
+     */
+    void sendEmailVerificationCode(String email);
+
+    /**
+     * Verify user's email with code.
+     */
+    void verifyEmail(String email, String verificationCode);
 }

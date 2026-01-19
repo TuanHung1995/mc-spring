@@ -28,6 +28,8 @@ public class IamAuthController {
     private final CookieUtils cookieUtils;
 
     private static final String AUTH_RATE_LIMITER = "authRateLimiter";
+    private static final String SEND_VERIFY_CODE = "sendVerificationCodeRateLimiter";
+    private static final String VERIFY_EMAIL = "verifyEmailRateLimiter";
 
     @PostMapping("/login")
     @RateLimiter(name = AUTH_RATE_LIMITER)
@@ -106,6 +108,20 @@ public class IamAuthController {
     @RateLimiter(name = AUTH_RATE_LIMITER)
     public ResponseEntity<MessageResponse> unlockAccount(@RequestParam String token) {
         MessageResponse response = authAppService.unlockAccount(token);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/send-verify-email-code")
+    @RateLimiter(name = SEND_VERIFY_CODE)
+    public ResponseEntity<MessageResponse> sendVerifyEmailCode() {
+        MessageResponse response = authAppService.sendVerifyEmailCode();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/verify-email")
+    @RateLimiter(name = VERIFY_EMAIL)
+    public ResponseEntity<MessageResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        MessageResponse response = authAppService.verifyEmail(request);
         return ResponseEntity.ok(response);
     }
 }

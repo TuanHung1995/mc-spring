@@ -2,28 +2,23 @@ package com.mc.domain.iam.service.impl;
 
 import com.mc.domain.core.port.out.MailSender;
 import com.mc.domain.iam.exception.*;
-import com.mc.domain.iam.model.PasswordResetToken;
-import com.mc.domain.iam.model.RefreshToken;
-import com.mc.domain.iam.model.TokenBlacklist;
-import com.mc.domain.iam.model.User;
+import com.mc.domain.iam.model.*;
 import com.mc.domain.iam.model.vo.Email;
-import com.mc.domain.iam.repository.PasswordResetTokenRepository;
-import com.mc.domain.iam.repository.RefreshTokenRepository;
-import com.mc.domain.iam.repository.TokenBlacklistRepository;
-import com.mc.domain.iam.repository.UserRepository;
+import com.mc.domain.iam.repository.*;
 import com.mc.domain.iam.service.AuthenticationService;
 import com.mc.domain.model.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -41,6 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenBlacklistRepository tokenBlacklistRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final VerificationCodeRepository verificationCodeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${constants.max-failed-login-attempts}")
@@ -173,7 +169,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     """
                             Your account has been locked due to multiple failed login attempts.
                             Please click the link below to unlock your account:
-                            """);
+                            """, true);
 
             log.info("Account locked due to too many failed attempts for email: {}", email);
             log.debug("Unlock token (dev): {}", user.getUnlockToken());
@@ -214,7 +210,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     authApiUrl, "/reset-password?token=", serverPort,
                     devUrl, appUrl + "/",
                     resetToken.getToken(),
-                    "Click the link below to reset your password:\n");
+                    "Click the link below to reset your password:\n", true);
 
             log.info("Password reset initiated for user: {}", email);
             log.debug("Reset token (dev): {}", resetToken.getToken());
@@ -254,10 +250,80 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("Account unlock requested with token");
     }
 
+    @Override
+    public void sendEmailVerificationCode(String email) {
+
+        String verificationCode = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
+
+        User user = userRepository.findByEmail(new Email(email))
+                .orElseThrow(() -> UserNotFoundException.withEmail(email));
+
+        verificationCodeRepository.save(
+                VerificationCode.create(
+                        user.getId(),
+                        verificationCode,
+                        Instant.now().plusSeconds(5 * 60).atZone(ZoneId.systemDefault()).toLocalDateTime()
+                )
+        );
+
+        sendMail(email, "Email Verification Code", isDevelopment,
+                null, null, null,
+                null, null,
+                null,
+                "Use the following code to verify your email address: " + verificationCode, false);
+
+        log.info("Verification code sent to email: {}", email);
+        log.debug("Verification code (dev): {}", verificationCode);
+
+    }
+
+    @Override
+    public void verifyEmail(String email, String verificationCode) {
+        User cuurentUser = userRepository.findByEmail(new Email(email))
+                .orElseThrow(() -> UserNotFoundException.withEmail(email));
+
+        List<VerificationCode> listCode = verificationCodeRepository.findAllByUserId(cuurentUser.getId())
+                .stream()
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .toList();
+
+        VerificationCode code = getVerificationCode(verificationCode, listCode);
+        verificationCodeRepository.save(code);
+
+        cuurentUser.verifyEmail();
+
+        userRepository.save(cuurentUser);
+
+        log.info("Email verified for: {}", email);
+    }
+
+    private static VerificationCode getVerificationCode(String verificationCode, List<VerificationCode> listCode) {
+        VerificationCode code = listCode.isEmpty() ? null : listCode.get(0);
+
+        if (code == null) {
+            throw new InvalidTokenException("No verification code found");
+        }
+
+        if (!code.getCode().equals(verificationCode)) {
+            throw new InvalidTokenException("Invalid verification code");
+        }
+
+        if (code.isExpired()) {
+            throw new TokenExpiredException("Verification code");
+        }
+
+        if (code.isUsed()) {
+            throw new InvalidTokenException("Verification code has already been used");
+        }
+
+        code.markAsUsed();
+        return code;
+    }
+
     private void sendMail(
             String email, String subject, boolean isDev,
             String rootApiUrl, String apiUrl, String port,
-            String devUrl, String appUrl, String token, String content
+            String devUrl, String appUrl, String token, String content, boolean useLink
     ) {
 
         String rootUrl;
@@ -270,6 +336,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String link = rootUrl + rootApiUrl + apiUrl + token;
         String body = content + link;
+
+        if (!useLink) {
+            body = content;
+        }
 
         mailSender.send(email, subject, body);
 

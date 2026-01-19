@@ -26,13 +26,14 @@ public class User extends BaseDomainEntity {
     private AuthProvider provider;
     private AccountStatus status;
     private boolean emailVerified;
+    private LocalDateTime emailVerifiedAt;
     private String unlockToken;
 
     // =================================================================
     // CONSTRUCTOR (For Persistence/Reconstitution)
     // =================================================================
     public User(UUID id, Email email, String password, int failedLoginAttempts, UserProfile profile,
-                AuthProvider provider, AccountStatus status, boolean emailVerified, String unlockToken,
+                AuthProvider provider, AccountStatus status, boolean emailVerified, LocalDateTime emailVerifiedAt, String unlockToken,
                 LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.email = email;
@@ -42,6 +43,7 @@ public class User extends BaseDomainEntity {
         this.provider = provider;
         this.status = status;
         this.emailVerified = emailVerified;
+        this.emailVerifiedAt = emailVerifiedAt;
         this.unlockToken = unlockToken;
     }
 
@@ -121,6 +123,7 @@ public class User extends BaseDomainEntity {
 
     public void verifyEmail() {
         this.emailVerified = true;
+        this.emailVerifiedAt = LocalDateTime.now();
         markAsModified();
     }
 
