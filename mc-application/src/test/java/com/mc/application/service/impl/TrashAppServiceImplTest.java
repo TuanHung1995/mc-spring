@@ -1,6 +1,5 @@
 package com.mc.application.service.impl;
 
-import com.mc.application.service.impl.TrashAppServiceImpl;
 import com.mc.domain.exception.BusinessLogicException;
 import com.mc.domain.model.dto.TrashItem;
 import com.mc.domain.service.BoardDomainService;

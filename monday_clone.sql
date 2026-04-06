@@ -239,6 +239,95 @@ create table teams
             on delete cascade
 );
 
+create table org_teams
+(
+    id          binary(16)                           not null
+        primary key,
+    created_by  binary(16)                           null,
+    updated_by  binary(16)                           null,
+    deleted_by  binary(16)                           null,
+    name        varchar(255)                         null,
+    slug        varchar(255)                         null,
+    description varchar(255)                         null,
+    created_at  datetime   default CURRENT_TIMESTAMP null,
+    updated_at  datetime                             null on update CURRENT_TIMESTAMP,
+    deleted_at  datetime                             null,
+    is_deleted  tinyint(1) default 0                 not null,
+    constraint slug
+        unique (slug)
+);
+
+
+create table org_team_members
+(
+    id        binary(16)
+        primary key,
+    team_id   binary(16)                         not null,
+    user_id   binary(16)                         not null,
+    role_id   bigint                         not null,
+    joined_at datetime default CURRENT_TIMESTAMP null,
+    constraint uq_org_team_user
+        unique (team_id, user_id),
+    constraint fk_org_tm_team
+        foreign key (team_id) references org_teams (id)
+            on delete cascade
+);
+
+create table org_workspaces
+(
+    id         binary(16) primary key,
+    created_by binary(16)                             not null,
+    deleted_by binary(16)                             null,
+    updated_by binary(16)                             null,
+    team_id    binary(16)                             not null,
+    name       varchar(255)                       null,
+    status     varchar(255)                       null,
+    created_at datetime default CURRENT_TIMESTAMP null,
+    updated_at datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    deleted_at datetime                           null,
+    is_deleted  tinyint(1) default 0                 not null,
+    constraint fk_org_workspace_team
+        foreign key (team_id) references org_teams (id)
+            on delete cascade
+);
+
+create table org_apartments
+(
+    id             binary(16) primary key,
+    name           varchar(255)                       null,
+    created_by     binary(16)                             not null,
+    updated_by     binary(16)                             null,
+    deleted_by     binary(16)                             null,
+    workspace_id   binary(16)                             not null,
+    owner_id       binary(16)                             not null,
+    team_id        binary(16)                             not null,
+    description    varchar(255)                       null,
+    background_url varchar(255)                       null,
+    created_at     datetime default CURRENT_TIMESTAMP null,
+    updated_at     datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    deleted_at     datetime                           null,
+    is_deleted  tinyint(1) default 0                 not null,
+    constraint fk_org_ap_team
+        foreign key (team_id) references org_teams (id)
+            on delete cascade,
+    constraint fk_org_ap_workspace
+        foreign key (workspace_id) references org_workspaces (id)
+);
+
+create table org_apartment_members
+(
+    id           binary(16) primary key,
+    apartment_id binary(16)                        not null,
+    user_id      binary(16)                                 not null,
+    role_id      bigint                                 null,
+    is_owner     tinyint(1)                             null,
+    status       enum ('ACTIVE', 'PENDING', 'REJECTED') null,
+    joined_at    datetime default CURRENT_TIMESTAMP     null,
+    constraint fk_org_apm_apartment
+        foreign key (apartment_id) references org_apartments (id)
+            on delete cascade
+);
+
 create table team_members
 (
     id        bigint auto_increment

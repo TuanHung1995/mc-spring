@@ -57,8 +57,8 @@ public abstract class BaseJpaEntity implements Serializable {
     @JdbcTypeCode(SqlTypes.BINARY)
     private UUID updatedBy;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean deleted = Boolean.FALSE;
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean deleted;
 
     // =================================================================
     // LIFECYCLE CALLBACKS
