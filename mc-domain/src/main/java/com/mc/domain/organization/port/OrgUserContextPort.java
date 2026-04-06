@@ -4,7 +4,6 @@ package com.mc.domain.organization.port;
  * OrgUserContextPort — Outbound Port (Organization Bounded Context)
  *
  * <p><strong>WHY THIS PORT EXISTS (and why it's separate from the legacy {@code UserContextPort}):</strong>
- *
  * The existing {@code UserContextPort.getCurrentUserId()} returns {@code Long} — it is
  * tied to the legacy {@code users} table (auto-increment Long PK). The Organization
  * context was refactored to use {@code iam_users} (UUID PK).</p>

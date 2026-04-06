@@ -1,7 +1,6 @@
 package com.mc.application.organization.service;
 
 import com.mc.application.organization.dto.response.TeamResponse;
-import com.mc.domain.organization.model.entity.Team;
 
 import java.util.Optional;
 import java.util.UUID;

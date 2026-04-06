@@ -5,7 +5,6 @@ import com.mc.application.organization.dto.response.WorkspaceResponse;
 import com.mc.application.organization.service.WorkspaceAppService;
 import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.organization.model.entity.Workspace;
-import com.mc.domain.organization.model.enums.WorkspaceStatus;
 import com.mc.domain.organization.port.OrgUserContextPort;
 import com.mc.domain.organization.port.OrgUserView;
 import com.mc.domain.organization.repository.WorkspaceRepository;

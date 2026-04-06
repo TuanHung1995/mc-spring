@@ -2,11 +2,7 @@ package com.mc.domain.organization.model.entity;
 
 import com.mc.domain.core.model.BaseDomainEntity;
 import com.mc.domain.core.util.IdUtils;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
