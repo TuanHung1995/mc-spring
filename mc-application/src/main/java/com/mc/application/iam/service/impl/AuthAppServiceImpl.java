@@ -4,7 +4,6 @@ import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
 import com.mc.application.iam.mapper.UserDtoMapper;
 import com.mc.application.iam.service.AuthAppService;
-import com.mc.application.model.auth.JwtAuthResponse;
 import com.mc.domain.iam.exception.*;
 import com.mc.domain.iam.model.PasswordResetToken;
 import com.mc.domain.iam.model.RefreshToken;
@@ -14,7 +13,6 @@ import com.mc.domain.iam.repository.PasswordResetTokenRepository;
 import com.mc.domain.iam.repository.RefreshTokenRepository;
 import com.mc.domain.iam.repository.TokenBlacklistRepository;
 import com.mc.domain.iam.repository.UserRepository;
-import com.mc.domain.iam.model.TokenBlacklist;
 import com.mc.domain.iam.service.AuthenticationService;
 import com.mc.infrastructure.iam.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +28,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
 
 /**
  * Auth Application Service Implementation - IAM Bounded Context
@@ -78,7 +74,9 @@ public class AuthAppServiceImpl implements AuthAppService {
 
             User user = authenticationService.authenticate(request.getEmail(), request.getPassword());
 
-            authenticationService.resetFailedLogin(request.getEmail());
+            if (user.getFailedLoginAttempts() > 0) {
+                authenticationService.resetFailedLogin(request.getEmail());
+            }
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
