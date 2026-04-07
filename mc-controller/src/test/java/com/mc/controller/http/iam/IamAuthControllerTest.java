@@ -3,6 +3,7 @@ package com.mc.controller.http.iam;
 import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
 import com.mc.application.iam.service.AuthAppService;
+import com.mc.controller.iam.http.IamAuthController;
 import com.mc.infrastructure.utils.CookieUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

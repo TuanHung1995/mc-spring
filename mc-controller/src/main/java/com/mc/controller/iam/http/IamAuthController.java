@@ -1,4 +1,4 @@
-package com.mc.controller.http.iam;
+package com.mc.controller.iam.http;
 
 import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
