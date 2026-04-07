@@ -1,7 +1,7 @@
 package com.mc.controller.organization.http;
 
-import com.mc.application.organization.dto.request.CreateApartmentRequest;
-import com.mc.application.organization.dto.request.UpdateApartmentRequest;
+import com.mc.application.organization.dto.request.*;
+import com.mc.application.organization.dto.response.ApartmentMemberResponse;
 import com.mc.application.organization.dto.response.ApartmentResponse;
 import com.mc.application.organization.service.ApartmentAppService;
 import jakarta.validation.Valid;
@@ -15,10 +15,13 @@ import java.util.UUID;
 /**
  * ApartmentController — HTTP Adapter (Organization Context)
  *
- * <p><strong>SECURITY FIX:</strong>
- * The previous version accepted {@code @RequestParam Long currentUserId} —
- * a client could supply any user's ID and create/delete apartments as that user.
- * The owner is now resolved from the JWT security context inside the application service.</p>
+ * <p>Exposes Apartment CRUD and the full ApartmentMember lifecycle as REST endpoints.
+ * All acting-user resolution is done internally via the JWT security context —
+ * no userId parameters are accepted from HTTP clients.</p>
+ *
+ * <p><strong>ENDPOINT DESIGN:</strong>
+ * Member management endpoints are nested under {@code /api/v1/apartments/members/}
+ * to keep them semantically grouped under their parent resource.</p>
  */
 @RestController
 @RequestMapping("/api/v1/apartments")
@@ -27,10 +30,13 @@ public class ApartmentController {
 
     private final ApartmentAppService apartmentAppService;
 
+    // =================================================================
+    // APARTMENT CRUD
+    // =================================================================
+
     @PostMapping
     public ResponseEntity<ApartmentResponse> createApartment(
             @Valid @RequestBody CreateApartmentRequest request) {
-        // Owner resolved from JWT security context — not from request params
         return ResponseEntity.ok(apartmentAppService.createApartment(request));
     }
 
@@ -55,6 +61,71 @@ public class ApartmentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteApartment(@PathVariable UUID id) {
         apartmentAppService.deleteApartment(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // =================================================================
+    // MEMBER MANAGEMENT
+    // =================================================================
+
+    /**
+     * POST /api/v1/apartments/members/add
+     *
+     * <p>Owner invites a user by userId UUID into the apartment.
+     * Requires: caller is apartment owner.</p>
+     */
+    @PostMapping("/members/add")
+    public ResponseEntity<ApartmentMemberResponse> addMember(
+            @Valid @RequestBody AddMemberRequest request) {
+        return ResponseEntity.ok(apartmentAppService.addMember(request));
+    }
+
+    /**
+     * POST /api/v1/apartments/members/request-join
+     *
+     * <p>Any authenticated user self-requests to join an apartment.
+     * Creates a PENDING membership that the owner must approve.</p>
+     */
+    @PostMapping("/members/request-join")
+    public ResponseEntity<ApartmentMemberResponse> requestToJoin(
+            @Valid @RequestBody RequestToJoinRequest request) {
+        return ResponseEntity.ok(apartmentAppService.requestToJoin(request));
+    }
+
+    /**
+     * POST /api/v1/apartments/members/approve
+     *
+     * <p>Owner approves or rejects a PENDING membership.
+     * {@code approve=true} → ACTIVE. {@code approve=false} → REJECTED.</p>
+     */
+    @PostMapping("/members/approve")
+    public ResponseEntity<ApartmentMemberResponse> approveOrRejectRequest(
+            @Valid @RequestBody ApproveRequestRequest request) {
+        return ResponseEntity.ok(apartmentAppService.approveOrRejectRequest(request));
+    }
+
+    /**
+     * POST /api/v1/apartments/members/assign-owner
+     *
+     * <p>Current owner transfers ownership to another ACTIVE member.
+     * The caller loses owner status; the target gains it atomically.</p>
+     */
+    @PostMapping("/members/assign-owner")
+    public ResponseEntity<ApartmentMemberResponse> assignOwner(
+            @Valid @RequestBody AssignOwnerRequest request) {
+        return ResponseEntity.ok(apartmentAppService.assignOwner(request));
+    }
+
+    /**
+     * DELETE /api/v1/apartments/members/remove
+     *
+     * <p>Owner removes a member from the apartment.
+     * The owner cannot remove themselves.</p>
+     */
+    @DeleteMapping("/members/remove")
+    public ResponseEntity<Void> removeMember(
+            @Valid @RequestBody RemoveMemberRequest request) {
+        apartmentAppService.removeMember(request);
         return ResponseEntity.noContent().build();
     }
 }

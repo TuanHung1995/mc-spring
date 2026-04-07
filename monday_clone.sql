@@ -316,13 +316,17 @@ create table org_apartments
 
 create table org_apartment_members
 (
-    id           binary(16) primary key,
-    apartment_id binary(16)                        not null,
-    user_id      binary(16)                                 not null,
+    id           binary(16)                             not null
+        primary key,
+    apartment_id binary(16)                             not null,
+    user_id      binary(16)                             not null,
     role_id      bigint                                 null,
     is_owner     tinyint(1)                             null,
     status       enum ('ACTIVE', 'PENDING', 'REJECTED') null,
-    joined_at    datetime default CURRENT_TIMESTAMP     null,
+    joined_at    datetime   default CURRENT_TIMESTAMP   null,
+    created_at   datetime   default (now())             null,
+    updated_at   datetime                               null,
+    is_deleted   tinyint(1) default 0                   not null,
     constraint fk_org_apm_apartment
         foreign key (apartment_id) references org_apartments (id)
             on delete cascade

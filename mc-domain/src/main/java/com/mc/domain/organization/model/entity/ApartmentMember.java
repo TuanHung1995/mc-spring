@@ -172,4 +172,74 @@ public class ApartmentMember extends BaseDomainEntity {
         this.status = MemberStatus.REJECTED;
         markAsModified();
     }
+
+    /**
+     * Promotes this member to apartment owner.
+     *
+     * <p><strong>INVARIANT:</strong> Only an ACTIVE member can become an owner.
+     * A PENDING invitation holder has not yet committed to the apartment,
+     * so granting ownership before acceptance has no product meaning.
+     * A REJECTED member has left — they cannot be owner.</p>
+     *
+     * <p>Called during the AssignOwner use case, AFTER the current owner is
+     * demoted. Ownership is always singular: one apartment, one owner.
+     * This is enforced at the application service layer by the ordering of calls.</p>
+     */
+    public void promoteToOwner() {
+        if (this.status != MemberStatus.ACTIVE) {
+            throw new DomainException(
+                    "Only an ACTIVE member can be promoted to owner, current status: " + this.status);
+        }
+        if (this.owner) {
+            throw new DomainException("This member is already the owner");
+        }
+        this.owner = true;
+        this.roleId = 6L;
+        markAsModified();
+    }
+
+    /**
+     * Demotes this member from owner status (removes the owner flag).
+     *
+     * <p>Called during the AssignOwner use case BEFORE promoting the new owner.
+     * Atomically clears the owner flag so there is a brief moment with NO owner
+     * (within the same transaction), rather than TWO owners simultaneously.</p>
+     *
+     * <p><strong>INVARIANT:</strong> You can only demote someone who IS the current owner.
+     * Calling this on a non-owner is a logic error that we surface loudly.</p>
+     */
+    public void demoteFromOwner() {
+        if (!this.owner) {
+            throw new DomainException("This member is not the current owner");
+        }
+        this.owner = false;
+        this.roleId = 7L;
+        markAsModified();
+    }
+
+    /**
+     * Creates a self-join request (Request to Join flow).
+     *
+     * <p>Unlike an invitation (created by an owner), a self-join request is
+     * initiated by the user themselves. The membership starts as PENDING
+     * until an owner approves or rejects it.</p>
+     *
+     * @param apartmentId The apartment the user wants to join.
+     * @param userId      The requesting user's UUID.
+     * @param roleId      Default member role ID applied after approval.
+     */
+    public static ApartmentMember createJoinRequest(UUID apartmentId, UUID userId, Long roleId) {
+        if (apartmentId == null || userId == null) {
+            throw new DomainException("ApartmentMember requires both apartmentId and userId");
+        }
+        ApartmentMember member = new ApartmentMember();
+        member.initializeNewEntity(IdUtils.newId());
+        member.apartmentId = apartmentId;
+        member.userId = userId;
+        member.roleId = roleId;
+        member.owner = false;
+        member.status = MemberStatus.PENDING;
+        member.joinedAt = null;
+        return member;
+    }
 }
