@@ -41,6 +41,7 @@ public class BoardMember extends BaseWorkEntity {
         member.boardId = boardId;
         member.userId = userId;
         member.roleId = roleId;
+        member.createdBy = userId;
         member.joinedAt = LocalDateTime.now();
         return member;
     }

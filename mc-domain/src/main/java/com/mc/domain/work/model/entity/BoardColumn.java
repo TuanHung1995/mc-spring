@@ -39,6 +39,7 @@ public class BoardColumn extends BaseWorkEntity {
     private boolean hidden;
 
     private UUID createdById;
+    private UUID updatedById;
     private UUID deletedById;
     private LocalDateTime deletedAt;
 
@@ -51,7 +52,7 @@ public class BoardColumn extends BaseWorkEntity {
     /** Full-arg reconstitution constructor — persistence mapper only. */
     public BoardColumn(Long id, Long boardId, String title, BoardColumnType type, String description,
                        double position, int width, boolean hidden,
-                       UUID createdById, UUID deletedById, LocalDateTime deletedAt,
+                       UUID createdById, UUID updatedById, UUID deletedById, LocalDateTime deletedAt,
                        LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.boardId = boardId;
@@ -62,6 +63,7 @@ public class BoardColumn extends BaseWorkEntity {
         this.width = width;
         this.hidden = hidden;
         this.createdById = createdById;
+        this.updatedById = updatedById;
         this.deletedById = deletedById;
         this.deletedAt = deletedAt;
     }
@@ -108,17 +110,19 @@ public class BoardColumn extends BaseWorkEntity {
     // =================================================================
 
     /** Renames the column. */
-    public void rename(String newTitle) {
+    public void rename(String newTitle, UUID updatedById) {
         if (newTitle == null || newTitle.isBlank()) {
             throw new DomainException("Column title cannot be blank");
         }
         this.title = newTitle.trim();
+        this.updatedById = updatedById;
         touch();
     }
 
     /** Moves this column to a new drag-and-drop position. */
-    public void moveTo(double newPosition) {
+    public void moveTo(double newPosition, UUID updatedById) {
         this.position = newPosition;
+        this.updatedById = updatedById;
         touch();
     }
 

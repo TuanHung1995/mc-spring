@@ -20,6 +20,7 @@ public class ItemPersistenceMapper {
         entity.setName(domain.getName());
         entity.setPosition(domain.getPosition());
         entity.setCreatedById(domain.getCreatedById());
+        entity.setUpdatedById(domain.getUpdatedById());
         entity.setDeletedById(domain.getDeletedById());
         entity.setDeletedAt(domain.getDeletedAt());
         entity.setCreatedAt(domain.getCreatedAt());
@@ -37,6 +38,7 @@ public class ItemPersistenceMapper {
                 entity.getName(),
                 entity.getPosition(),
                 entity.getCreatedById(),
+                entity.getUpdatedById(),
                 entity.getDeletedById(),
                 entity.getDeletedAt(),
                 entity.getCreatedAt(),

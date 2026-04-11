@@ -44,6 +44,7 @@ public class TaskGroup extends BaseWorkEntity {
     private LocalDateTime archivedAt;
     private UUID archivedBy;
     private UUID createdBy;
+    private UUID updatedBy;
     private UUID deletedBy;
     private LocalDateTime deletedAt;
 
@@ -56,7 +57,7 @@ public class TaskGroup extends BaseWorkEntity {
     /** Full-arg reconstitution constructor — persistence mapper only. */
     public TaskGroup(Long id, Long boardId, String title, String color, double position,
                      boolean collapsed, boolean archived, LocalDateTime archivedAt, UUID archivedBy,
-                     UUID createdBy, UUID deletedBy, LocalDateTime deletedAt,
+                     UUID createdBy, UUID updatedBy, UUID deletedBy, LocalDateTime deletedAt,
                      LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.boardId = boardId;
@@ -68,6 +69,7 @@ public class TaskGroup extends BaseWorkEntity {
         this.archivedAt = archivedAt;
         this.archivedBy = archivedBy;
         this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
         this.deletedBy = deletedBy;
         this.deletedAt = deletedAt;
     }
@@ -111,19 +113,22 @@ public class TaskGroup extends BaseWorkEntity {
     // =================================================================
 
     /** Updates the group's header label and/or accent color. */
-    public void update(String newTitle, String newColor) {
+    public void update(String newTitle, String newColor, UUID updatedBy) {
         if (newTitle != null && !newTitle.isBlank()) {
             this.title = newTitle.trim();
         }
         if (newColor != null && !newColor.isBlank()) {
             this.color = newColor;
         }
+
+        this.updatedBy = updatedBy;
         touch();
     }
 
     /** Moves this group to a new drag-and-drop position. */
-    public void moveTo(double newPosition) {
+    public void moveTo(double newPosition, UUID updatedBy) {
         this.position = newPosition;
+        this.updatedBy = updatedBy;
         touch();
     }
 

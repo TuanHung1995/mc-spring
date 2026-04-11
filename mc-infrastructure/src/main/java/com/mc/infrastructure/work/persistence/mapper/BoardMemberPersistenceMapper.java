@@ -1,9 +1,6 @@
 package com.mc.infrastructure.work.persistence.mapper;
 
-import com.mc.domain.work.model.entity.Board;
 import com.mc.domain.work.model.entity.BoardMember;
-import com.mc.domain.work.model.enums.BoardType;
-import com.mc.infrastructure.work.persistence.model.BoardJpaEntity;
 import com.mc.infrastructure.work.persistence.model.BoardMemberJpaEntity;
 import org.springframework.stereotype.Component;
 

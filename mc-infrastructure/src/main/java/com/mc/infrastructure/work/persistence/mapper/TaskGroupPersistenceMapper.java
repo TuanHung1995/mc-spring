@@ -21,13 +21,14 @@ public class TaskGroupPersistenceMapper {
         entity.setPosition(domain.getPosition());
         entity.setCollapsed(domain.isCollapsed());
         entity.setArchived(domain.isArchived());
-        entity.setArchivedAt(domain.getArchivedAt());
         entity.setArchivedById(domain.getArchivedBy());
         entity.setCreatedById(domain.getCreatedBy());
+        entity.setUpdatedById(domain.getUpdatedBy());
         entity.setDeletedById(domain.getDeletedBy());
         entity.setDeletedAt(domain.getDeletedAt());
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());
+        entity.setArchivedAt(domain.getArchivedAt());
         return entity;
     }
 
@@ -45,6 +46,7 @@ public class TaskGroupPersistenceMapper {
                 entity.getArchivedAt(),
                 entity.getArchivedById(),
                 entity.getCreatedById(),
+                entity.getUpdatedById(),
                 entity.getDeletedById(),
                 entity.getDeletedAt(),
                 entity.getCreatedAt(),

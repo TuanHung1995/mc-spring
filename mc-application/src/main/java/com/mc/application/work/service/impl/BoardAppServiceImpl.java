@@ -41,6 +41,8 @@ public class BoardAppServiceImpl implements BoardAppService {
 
     @Qualifier("workBoardRepository")
     private final BoardRepository boardRepository;
+    @Qualifier("workBoardMemberRepository")
+    private final BoardMemberRepository boardMemberRepository;
     @Qualifier("workTaskGroupRepository")
     private final TaskGroupRepository taskGroupRepository;
     @Qualifier("workBoardColumnRepository")
@@ -65,6 +67,8 @@ public class BoardAppServiceImpl implements BoardAppService {
         Board board = Board.create(request.getName(), type, request.getPurpose(),
                 userId, request.getWorkspaceId());
         Board saved = boardRepository.save(board);
+
+        addBoardMember(saved.getId(), userId, 1L); // Add creator as member with default role (e.g., Owner)
 
         // Initialize default structure (columns + groups + items) — same as legacy behavior
         initializeDefaultBoardStructure(saved, userId);
@@ -112,26 +116,29 @@ public class BoardAppServiceImpl implements BoardAppService {
     @Override
     @Transactional
     public void updateBoardElement(UpdateBoardElementRequest request) {
+
+        UUID userId = workUserContextPort.getCurrentUser().id();
+
         Long boardId;
         switch (request.getType()) {
             case "TASK_GROUP" -> {
                 TaskGroup group = taskGroupRepository.findById(request.getTargetId())
                         .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", request.getTargetId()));
-                group.update(request.getValue(), request.getColor());
+                group.update(request.getValue(), request.getColor(), userId);
                 taskGroupRepository.save(group);
                 boardId = group.getBoardId();
             }
             case "COLUMN" -> {
                 BoardColumn column = columnRepository.findById(request.getTargetId())
                         .orElseThrow(() -> new ResourceNotFoundException("BoardColumn", "id", request.getTargetId()));
-                column.rename(request.getValue());
+                column.rename(request.getValue(), userId);
                 columnRepository.save(column);
                 boardId = column.getBoardId();
             }
             case "ITEM" -> {
                 Item item = itemRepository.findById(request.getTargetId())
                         .orElseThrow(() -> new ResourceNotFoundException("Item", "id", request.getTargetId()));
-                item.rename(request.getValue());
+                item.rename(request.getValue(), userId);
                 itemRepository.save(item);
                 boardId = item.getBoardId();
             }
@@ -147,13 +154,16 @@ public class BoardAppServiceImpl implements BoardAppService {
     @Override
     @Transactional
     public void reorderGroup(ReorderRequest request) {
+
+        UUID userId = workUserContextPort.getCurrentUser().id();
+
         double newPos = calculatePosition(
                 taskGroupRepository.getPositionById(request.getPreviousId()),
                 taskGroupRepository.getPositionById(request.getNextId())
         );
         TaskGroup group = taskGroupRepository.findById(request.getTargetId())
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", request.getTargetId()));
-        group.moveTo(newPos);
+        group.moveTo(newPos, userId);
         taskGroupRepository.save(group);
         publishBoardEvent("GROUP_REORDER", group.getId(), group.getBoardId());
     }
@@ -161,13 +171,16 @@ public class BoardAppServiceImpl implements BoardAppService {
     @Override
     @Transactional
     public void reorderColumn(ReorderRequest request) {
+
+        UUID userId = workUserContextPort.getCurrentUser().id();
+
         double newPos = calculatePosition(
                 columnRepository.getPositionById(request.getPreviousId()),
                 columnRepository.getPositionById(request.getNextId())
         );
         BoardColumn column = columnRepository.findById(request.getTargetId())
                 .orElseThrow(() -> new ResourceNotFoundException("BoardColumn", "id", request.getTargetId()));
-        column.moveTo(newPos);
+        column.moveTo(newPos, userId);
         columnRepository.save(column);
         publishBoardEvent("COLUMN_REORDER", column.getId(), column.getBoardId());
     }
@@ -175,13 +188,16 @@ public class BoardAppServiceImpl implements BoardAppService {
     @Override
     @Transactional
     public void reorderItem(ReorderRequest request) {
+
+        UUID userId = workUserContextPort.getCurrentUser().id();
+
         double newPos = calculatePosition(
                 itemRepository.getPositionById(request.getPreviousId()),
                 itemRepository.getPositionById(request.getNextId())
         );
         Item item = itemRepository.findById(request.getTargetId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", request.getTargetId()));
-        item.moveTo(newPos, request.getTargetGroupId());
+        item.moveTo(newPos, request.getTargetGroupId(), userId);
         itemRepository.save(item);
         publishBoardEvent("ITEM_REORDER", item.getId(), item.getBoardId());
     }
@@ -270,5 +286,9 @@ public class BoardAppServiceImpl implements BoardAppService {
                 board.getPurpose(), board.getWorkspaceId(), board.getCreatedById(),
                 board.getCreatedAt(), board.getUpdatedAt()
         );
+    }
+
+    private void addBoardMember(Long boardId, UUID userId, Long roleId) {
+        boardMemberRepository.save(BoardMember.addMember(boardId, userId, roleId));
     }
 }

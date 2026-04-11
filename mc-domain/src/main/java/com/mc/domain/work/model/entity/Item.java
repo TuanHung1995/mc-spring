@@ -40,6 +40,7 @@ public class Item extends BaseWorkEntity {
     private double position;
 
     private UUID createdById;
+    private UUID updatedById;
     private UUID deletedById;
     private LocalDateTime deletedAt;
 
@@ -51,7 +52,7 @@ public class Item extends BaseWorkEntity {
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
     public Item(Long id, Long boardId, Long groupId, String name, double position,
-                UUID createdById, UUID deletedById, LocalDateTime deletedAt,
+                UUID createdById, UUID updatedById, UUID deletedById, LocalDateTime deletedAt,
                 LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.boardId = boardId;
@@ -59,6 +60,7 @@ public class Item extends BaseWorkEntity {
         this.name = name;
         this.position = position;
         this.createdById = createdById;
+        this.updatedById = updatedById;
         this.deletedById = deletedById;
         this.deletedAt = deletedAt;
     }
@@ -100,11 +102,12 @@ public class Item extends BaseWorkEntity {
     // =================================================================
 
     /** Renames the item. */
-    public void rename(String newName) {
+    public void rename(String newName, UUID updatedById) {
         if (newName == null || newName.isBlank()) {
             throw new DomainException("Item name cannot be blank");
         }
         this.name = newName.trim();
+        this.updatedById = updatedById;
         touch();
     }
 
@@ -117,11 +120,13 @@ public class Item extends BaseWorkEntity {
      * @param newPosition The new fractional position.
      * @param newGroupId  The target group's ID (maybe same group for in-group reorder).
      */
-    public void moveTo(double newPosition, Long newGroupId) {
+    public void moveTo(double newPosition, Long newGroupId, UUID updatedById) {
         this.position = newPosition;
         if (newGroupId != null) {
             this.groupId = newGroupId;
         }
+
+        this.updatedById = updatedById;
         touch();
     }
 

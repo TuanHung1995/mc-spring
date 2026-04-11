@@ -27,6 +27,7 @@ public class BoardColumnPersistenceMapper {
         entity.setWidth(domain.getWidth());
         entity.setHidden(domain.isHidden());
         entity.setCreatedById(domain.getCreatedById());
+        entity.setUpdatedById(domain.getUpdatedById());
         entity.setDeletedById(domain.getDeletedById());
         entity.setDeletedAt(domain.getDeletedAt());
         entity.setCreatedAt(domain.getCreatedAt());
@@ -53,9 +54,10 @@ public class BoardColumnPersistenceMapper {
                 entity.getWidth(),
                 entity.isHidden(),
                 entity.getCreatedById(),
+                entity.getUpdatedById(),
                 entity.getDeletedById(),
-                entity.getDeletedAt(),
                 entity.getCreatedAt(),
+                entity.getUpdatedAt(),
                 entity.getUpdatedAt(),
                 entity.getDeleted()
         );
