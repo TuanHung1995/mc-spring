@@ -387,7 +387,13 @@ create table work_board_members
     board_id  bigint unsigned                    not null,
     user_id   binary(16)                              not null,
     role_id   bigint                             not null,
+    created_by   binary(16)                              not null,
+    updated_by   binary(16)                              not null,
+    deleted_by   binary(16)                              not null,
     joined_at datetime default CURRENT_TIMESTAMP null,
+    created_at   datetime default CURRENT_TIMESTAMP null,
+    updated_at   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    deleted_at   datetime default CURRENT_TIMESTAMP null,
     constraint fk_work_bm_board
         foreign key (board_id) references work_boards (id)
             on delete cascade

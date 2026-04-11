@@ -1,7 +1,6 @@
 package com.mc.domain.work.repository;
 
 import com.mc.domain.work.model.entity.BoardColumn;
-import com.mc.domain.work.model.enums.BoardColumnType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
