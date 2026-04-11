@@ -332,6 +332,194 @@ create table org_apartment_members
             on delete cascade
 );
 
+create table work_boards
+(
+    id           bigint unsigned auto_increment
+        primary key,
+    workspace_id binary(16)                                                            not null,
+    created_by   binary(16)                                                            null,
+    deleted_by   binary(16)                                                            null,
+    name         varchar(255)                                                      not null,
+    type         enum ('PUBLIC', 'PRIVATE', 'SHAREABLE') default 'PUBLIC'          null,
+    purpose      varchar(255)                                                      null,
+    description  varchar(255)                                                      null,
+    is_deleted   tinyint(1)                              default 0                 not null,
+    created_at   datetime                                default CURRENT_TIMESTAMP null,
+    updated_at   datetime                                default (now())           null on update CURRENT_TIMESTAMP,
+    deleted_at   datetime                                                          null
+)
+    collate = utf8mb4_unicode_ci;
+
+create table work_board_columns
+(
+    id          bigint unsigned auto_increment
+        primary key,
+    board_id    bigint unsigned                                                                                 not null,
+    created_by  binary(16)                                                                                           null,
+    deleted_by  binary(16)                                                                                           null,
+    archived_by binary(16)                                                                                           null,
+    title       varchar(255)                                                                                    not null,
+    type        enum ('TEXT', 'STATUS', 'DATE', 'PERSON', 'NUMBER', 'TIMELINE', 'CHECKBOX', 'LINK', 'DROPDOWN') not null,
+    settings    varbinary(255)                                                                                  null,
+    description varchar(255)                                                                                    null,
+    position    double                                                                                          not null,
+    width       int        default 150                                                                          null,
+    is_hidden   tinyint(1) default 0                                                                            null,
+    is_deleted  tinyint(1) default 0                                                                            not null,
+    is_archived tinyint(1) default 0                                                                            not null,
+    created_at  datetime   default CURRENT_TIMESTAMP                                                            null,
+    deleted_at  datetime                                                                                        null,
+    updated_at  datetime   default (now())                                                                      null on update CURRENT_TIMESTAMP,
+    archived_at datetime                                                                                        null,
+    constraint fk_work_bc_board
+        foreign key (board_id) references work_boards (id)
+            on delete cascade
+)
+    collate = utf8mb4_unicode_ci;
+
+create index idx_board_columns
+    on work_board_columns (board_id);
+
+create table work_board_members
+(
+    id        bigint auto_increment
+        primary key,
+    board_id  bigint unsigned                    not null,
+    user_id   binary(16)                              not null,
+    role_id   bigint                             not null,
+    joined_at datetime default CURRENT_TIMESTAMP null,
+    constraint fk_work_bm_board
+        foreign key (board_id) references work_boards (id)
+            on delete cascade
+);
+
+create index idx_workspace
+    on work_boards (workspace_id);
+
+create table folders
+(
+    id           bigint auto_increment
+        primary key,
+    created_by   bigint                             not null,
+    deleted_by   bigint                             not null,
+    archived_by  bigint                             not null,
+    workspace_id bigint                             not null,
+    name         varchar(255)                       null,
+    slug         varchar(255)                       null,
+    created_at   datetime default CURRENT_TIMESTAMP null,
+    updated_at   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    deleted_at   datetime default CURRENT_TIMESTAMP null,
+    archived_at  datetime default CURRENT_TIMESTAMP null,
+    constraint slug
+        unique (slug),
+    constraint fk_folder_archived_by
+        foreign key (archived_by) references users (id),
+    constraint fk_folder_created_by
+        foreign key (created_by) references users (id),
+    constraint fk_folder_deleted_by
+        foreign key (deleted_by) references users (id),
+    constraint fk_folder_workspace
+        foreign key (workspace_id) references workspaces (id)
+            on delete cascade
+);
+
+create table work_task_groups
+(
+    id           bigint unsigned auto_increment
+        primary key,
+    created_by   binary(16)                                  null,
+    board_id     bigint unsigned                        not null,
+    deleted_by   binary(16)                                  null,
+    archived_by  binary(16)                                  null,
+    title        varchar(255) default 'New Group'       not null,
+    color        varchar(255)                           null,
+    position     double       default 65535             not null,
+    is_collapsed tinyint(1)   default 0                 null,
+    is_deleted   tinyint(1)   default 0                 not null,
+    is_archived  tinyint(1)   default 0                 not null,
+    created_at   datetime     default CURRENT_TIMESTAMP null,
+    updated_at   datetime     default (now())           null on update CURRENT_TIMESTAMP,
+    archived_at  datetime                               null,
+    deleted_at   datetime                               null,
+    constraint fk_work_bg_board
+        foreign key (board_id) references work_boards (id)
+            on delete cascade
+)
+    collate = utf8mb4_unicode_ci;
+
+create table work_items
+(
+    id          bigint unsigned auto_increment
+        primary key,
+    created_by  binary(16)                                null,
+    group_id    bigint unsigned                      not null,
+    board_id    bigint unsigned                      not null,
+    deleted_by  binary(16)                                null,
+    archived_by binary(16)                                null,
+    name        varchar(255)                         not null,
+    position    double                               not null,
+    is_deleted  tinyint(1) default 0                 not null,
+    is_archived tinyint(1) default 0                 not null,
+    created_at  datetime   default CURRENT_TIMESTAMP null,
+    updated_at  datetime   default (now())           null on update CURRENT_TIMESTAMP,
+    deleted_at  datetime                             null,
+    archived_at datetime                             null,
+    constraint fk_work_item_board
+        foreign key (board_id) references work_boards (id)
+            on delete cascade,
+    constraint fk_work_item_group
+        foreign key (group_id) references work_task_groups (id)
+            on delete cascade
+)
+    collate = utf8mb4_unicode_ci;
+
+create table work_column_values
+(
+    id         bigint unsigned auto_increment
+        primary key,
+    item_id    bigint unsigned                      not null,
+    column_id  bigint unsigned                      not null,
+    board_id   bigint unsigned                      not null,
+    value      varchar(255)                         null,
+    text_value varchar(255)                         null,
+    color      varchar(255)                         null,
+    type       varchar(255)                         null,
+    is_deleted tinyint(1) default 0                 not null,
+    created_at datetime   default CURRENT_TIMESTAMP null,
+    updated_at datetime   default (now())           null on update CURRENT_TIMESTAMP,
+    deleted_at datetime                             null,
+    constraint unique_cell_work
+        unique (item_id, column_id),
+    constraint fk_work_cv_board
+        foreign key (board_id) references work_boards (id)
+            on delete cascade,
+    constraint fk_work_cv_column
+        foreign key (column_id) references work_board_columns (id)
+            on delete cascade,
+    constraint fk_work_cv_item
+        foreign key (item_id) references work_items (id)
+            on delete cascade
+)
+    collate = utf8mb4_unicode_ci;
+
+create index idx_cv_column
+    on column_values (column_id);
+
+create index idx_items_board
+    on items (board_id);
+
+create index idx_items_created_by
+    on items (created_by);
+
+create index idx_items_deleted_by
+    on items (deleted_by);
+
+create index idx_items_group
+    on items (group_id);
+
+create index idx_board_groups
+    on task_groups (board_id);
+
 create table team_members
 (
     id        bigint auto_increment

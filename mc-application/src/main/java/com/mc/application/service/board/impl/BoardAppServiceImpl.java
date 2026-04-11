@@ -5,7 +5,6 @@ import com.mc.application.model.board.*;
 import com.mc.application.service.board.BoardAppService;
 import com.mc.domain.event.BoardChangedEvent;
 import com.mc.domain.exception.BusinessLogicException;
-import com.mc.domain.exception.ResourceNotFoundException;
 import com.mc.domain.model.entity.*;
 import com.mc.domain.port.UserContextPort;
 import com.mc.domain.service.*;
@@ -26,9 +25,6 @@ public class BoardAppServiceImpl implements BoardAppService {
     private final ItemDomainService itemDomainService;
     private final TaskGroupDomainService taskGroupDomainService;
     private final ColumnDomainService columnDomainService;
-    private final ColumnValueDomainService columnValueDomainService;
-    private final UserDomainService userDomainService;
-    private final WorkspaceDomainService workspaceDomainService;
     private final UserContextPort userContextPort;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -36,7 +32,6 @@ public class BoardAppServiceImpl implements BoardAppService {
     private final TaskGroupMapper taskGroupMapper;
     private final ColumnMapper columnMapper;
     private final ItemMapper itemMapper;
-    private final ColumnValueMapper columnValueMapper;
 
     @Value("${constants.frontend}")
     private String frontendUrl;

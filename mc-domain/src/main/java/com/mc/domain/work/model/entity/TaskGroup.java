@@ -1,0 +1,169 @@
+package com.mc.domain.work.model.entity;
+
+import com.mc.domain.exception.DomainException;
+import com.mc.domain.work.model.BaseWorkEntity;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+/**
+ * TaskGroup — Rich Domain Entity (Work Bounded Context)
+ *
+ * <p><strong>WHAT IS A TASK GROUP:</strong>
+ * A TaskGroup is a row-group (section) within a Board. Each group has a colored header
+ * and contains Items (rows/tasks). Groups can be reordered (position), archived, or trashed.</p>
+ *
+ * <p><strong>LIFECYCLE:</strong>
+ * normal → archived (hidden from main view, recoverable)
+ * normal → trashed/soft-deleted (in trash, recoverable)
+ * trashed → permanently deleted (irreversible)</p>
+ */
+@Getter
+public class TaskGroup extends BaseWorkEntity {
+
+    // =================================================================
+    // STATE
+    // =================================================================
+
+    /** The parent Board's Long ID. */
+    private Long boardId;
+
+    private String title;
+    private String color;
+
+    /**
+     * Fractional position for drag-and-drop ordering.
+     * Uses a gap strategy (e.g., 65536 base) to allow insertion between items
+     * without renumbering all positions.
+     */
+    private double position;
+
+    private boolean collapsed;
+    private boolean archived;
+    private LocalDateTime archivedAt;
+    private UUID archivedBy;
+    private UUID createdBy;
+    private UUID deletedBy;
+    private LocalDateTime deletedAt;
+
+    // =================================================================
+    // CONSTRUCTORS
+    // =================================================================
+
+    private TaskGroup() {}
+
+    /** Full-arg reconstitution constructor — persistence mapper only. */
+    public TaskGroup(Long id, Long boardId, String title, String color, double position,
+                     boolean collapsed, boolean archived, LocalDateTime archivedAt, UUID archivedBy,
+                     UUID createdBy, UUID deletedBy, LocalDateTime deletedAt,
+                     LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
+        super(id, createdAt, updatedAt, deleted);
+        this.boardId = boardId;
+        this.title = title;
+        this.color = color;
+        this.position = position;
+        this.collapsed = collapsed;
+        this.archived = archived;
+        this.archivedAt = archivedAt;
+        this.archivedBy = archivedBy;
+        this.createdBy = createdBy;
+        this.deletedBy = deletedBy;
+        this.deletedAt = deletedAt;
+    }
+
+    // =================================================================
+    // FACTORY METHOD
+    // =================================================================
+
+    /**
+     * Creates a new TaskGroup appended to a Board.
+     *
+     * @param boardId   The parent board's ID.
+     * @param title     The group header label.
+     * @param color     Hex color code (e.g., "#579bfc"). Defaults to blue if null.
+     * @param position  The fractional position (calculated by the service).
+     * @param createdBy The user creating this group.
+     */
+    public static TaskGroup create(Long boardId, String title, String color,
+                                   double position, UUID createdBy) {
+        if (boardId == null) {
+            throw new DomainException("TaskGroup must belong to a Board");
+        }
+        if (title == null || title.isBlank()) {
+            throw new DomainException("TaskGroup title cannot be blank");
+        }
+
+        TaskGroup group = new TaskGroup();
+        group.initNew(null);
+        group.boardId = boardId;
+        group.title = title.trim();
+        group.color = (color != null && !color.isBlank()) ? color : "#579bfc";
+        group.position = position;
+        group.collapsed = false;
+        group.archived = false;
+        group.createdBy = createdBy;
+        return group;
+    }
+
+    // =================================================================
+    // BEHAVIOR METHODS
+    // =================================================================
+
+    /** Updates the group's header label and/or accent color. */
+    public void update(String newTitle, String newColor) {
+        if (newTitle != null && !newTitle.isBlank()) {
+            this.title = newTitle.trim();
+        }
+        if (newColor != null && !newColor.isBlank()) {
+            this.color = newColor;
+        }
+        touch();
+    }
+
+    /** Moves this group to a new drag-and-drop position. */
+    public void moveTo(double newPosition) {
+        this.position = newPosition;
+        touch();
+    }
+
+    /** Archives this group (hides it from the main board view). */
+    public void archive(UUID archivedBy) {
+        if (this.archived) {
+            throw new DomainException("TaskGroup is already archived");
+        }
+        this.archived = true;
+        this.archivedAt = LocalDateTime.now();
+        this.archivedBy = archivedBy;
+        touch();
+    }
+
+    /** Unarchives this group, making it visible again. */
+    public void unarchive() {
+        if (!this.archived) {
+            throw new DomainException("TaskGroup is not archived");
+        }
+        this.archived = false;
+        this.archivedAt = null;
+        this.archivedBy = null;
+        touch();
+    }
+
+    /** Soft-deletes (trashes) this group. */
+    public void trash(UUID deletedBy) {
+        if (this.isDeleted()) {
+            throw new DomainException("TaskGroup is already in trash");
+        }
+        this.deletedBy = deletedBy;
+        this.deletedAt = LocalDateTime.now();
+        markDeleted();
+    }
+
+    /** Restores a trashed group back to active state. */
+    @Override
+    public void restore() {
+        this.deletedBy = null;
+        this.deletedAt = null;
+        super.restore();
+    }
+}

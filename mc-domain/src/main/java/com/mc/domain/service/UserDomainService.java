@@ -1,9 +1,11 @@
 package com.mc.domain.service;
 
 import com.mc.domain.model.entity.User;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component("userDomainService")
 public interface UserDomainService {
 
     User updateProfile(Long userId, String fullName, String phone, String address, String jobTitle, String birthday);

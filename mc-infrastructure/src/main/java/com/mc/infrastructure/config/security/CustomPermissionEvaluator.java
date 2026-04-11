@@ -2,6 +2,10 @@ package com.mc.infrastructure.config.security;
 
 import com.mc.domain.model.entity.*;
 import com.mc.domain.repository.*;
+import com.mc.infrastructure.persistence.mapper.BoardJPAMapper;
+import com.mc.infrastructure.persistence.mapper.BoardMemberJPAMapper;
+import com.mc.infrastructure.persistence.mapper.TeamMemberJPAMapper;
+import com.mc.infrastructure.persistence.mapper.WorkspaceMemberJPAMapper;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +23,12 @@ import java.util.Optional;
 @Slf4j
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
-    private final BoardMemberRepository boardMemberRepo;
-    private final TeamMemberRepository teamMemberRepo;
-    private final WorkspaceMemberRepository workspaceMemberRepo;
+    private final BoardMemberJPAMapper boardMemberRepo;
+    private final TeamMemberJPAMapper teamMemberRepo;
+    private final WorkspaceMemberJPAMapper workspaceMemberRepo;
     private final ApartmentMemberRepository apartmentMemberRepo;
 
-    private final BoardRepository boardRepo;
+    private final BoardJPAMapper boardRepo;
     private final WorkspaceRepository workspaceRepo;
     private final ApartmentRepository apartmentRepo;
 
