@@ -69,8 +69,11 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
     @Override
     @Transactional
     public TaskGroupResponse updateGroup(Long groupId, UpdateTaskGroupRequest request) {
+
+        UUID userId = workUserContextPort.getCurrentUser().id();
+
         TaskGroup group = requireGroup(groupId);
-        group.update(request.getTitle(), request.getColor());
+        group.update(request.getTitle(), request.getColor(), userId);
         TaskGroup saved = taskGroupRepository.save(group);
         publishEvent("GROUP_UPDATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);

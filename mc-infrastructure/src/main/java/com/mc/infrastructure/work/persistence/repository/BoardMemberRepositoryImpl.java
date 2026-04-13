@@ -1,7 +1,6 @@
 package com.mc.infrastructure.work.persistence.repository;
 
 import com.mc.domain.iam.model.Role;
-import com.mc.domain.work.model.entity.Board;
 import com.mc.domain.work.model.entity.BoardMember;
 import com.mc.domain.work.repository.BoardMemberRepository;
 import com.mc.infrastructure.work.persistence.jpa.BoardMemberJpaRepository;

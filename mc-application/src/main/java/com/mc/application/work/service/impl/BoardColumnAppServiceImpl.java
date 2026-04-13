@@ -67,8 +67,11 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
     @Override
     @Transactional
     public ColumnResponse updateColumnTitle(Long columnId, String newTitle) {
+
+        UUID userId = workUserContextPort.getCurrentUser().id();
+
         BoardColumn col = requireColumn(columnId);
-        col.rename(newTitle);
+        col.rename(newTitle, userId);
         BoardColumn saved = columnRepository.save(col);
         publishEvent("COLUMN_UPDATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);

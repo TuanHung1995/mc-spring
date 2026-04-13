@@ -86,8 +86,11 @@ public class ItemAppServiceImpl implements ItemAppService {
     @Override
     @Transactional
     public ItemResponse updateItemName(Long itemId, String newName) {
+
+        UUID userId = workUserContextPort.getCurrentUser().id();
+
         Item item = requireItem(itemId);
-        item.rename(newName);
+        item.rename(newName, userId);
         Item saved = itemRepository.save(item);
         publishEvent("ITEM_UPDATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
         return toResponse(saved);

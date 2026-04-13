@@ -8,7 +8,6 @@ import org.hibernate.annotations.SoftDelete;
 import org.hibernate.type.NumericBooleanConverter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * ColumnValueJpaEntity — Infrastructure JPA Entity (Work Context)

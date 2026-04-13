@@ -32,14 +32,14 @@ public interface TaskGroupJpaRepository extends JpaRepository<TaskGroupJpaEntity
      * Trashed (soft-deleted) groups — bypasses Hibernate @SoftDelete filter
      * to find rows that are normally invisible.
      */
-    @Query(value = "SELECT * FROM work_task_group WHERE board_id = :boardId AND is_deleted = 1 ORDER BY position",
+    @Query(value = "SELECT * FROM work_task_groups WHERE board_id = :boardId AND is_deleted = 1 ORDER BY position",
            nativeQuery = true)
     List<TaskGroupJpaEntity> findTrashedByBoardId(@Param("boardId") Long boardId);
 
     /**
      * Finds a group even if soft-deleted (for restore/permanent-delete flows).
      */
-    @Query(value = "SELECT * FROM work_task_group WHERE id = :id AND is_deleted = 1",
+    @Query(value = "SELECT * FROM work_task_groups WHERE id = :id AND is_deleted = 1",
            nativeQuery = true)
     Optional<TaskGroupJpaEntity> findByIdIncludingDeleted(@Param("id") Long id);
 
@@ -53,6 +53,6 @@ public interface TaskGroupJpaRepository extends JpaRepository<TaskGroupJpaEntity
 
     /** Permanently deletes a task group row, bypassing @SoftDelete. */
     @Modifying
-    @Query(value = "DELETE FROM work_task_group WHERE id = :id", nativeQuery = true)
+    @Query(value = "DELETE FROM work_task_groups WHERE id = :id", nativeQuery = true)
     void permanentDeleteById(@Param("id") Long id);
 }

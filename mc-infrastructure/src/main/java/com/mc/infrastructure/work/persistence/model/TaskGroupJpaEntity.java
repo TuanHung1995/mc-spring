@@ -11,7 +11,6 @@ import org.hibernate.annotations.SoftDelete;
 import org.hibernate.type.NumericBooleanConverter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
