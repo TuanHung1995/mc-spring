@@ -31,7 +31,7 @@ public class BoardColumnController {
     private final BoardColumnAppService boardColumnAppService;
 
     @PostMapping
-    @PreAuthorize("hasPermission(#request.boardId, 'Board', 'COLUMN:CREATE')")
+//    @PreAuthorize("hasPermission(#request.boardId, 'Board', 'COLUMN:CREATE')")
     public ResponseEntity<ColumnResponse> createColumn(
             @Valid @RequestBody CreateColumnRequest request) {
         log.info("Creating column in board {}", request.getBoardId());
@@ -39,19 +39,19 @@ public class BoardColumnController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:VIEW')")
+//    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:VIEW')")
     public ResponseEntity<ColumnResponse> getColumn(@PathVariable Long id) {
         return ResponseEntity.ok(boardColumnAppService.getColumnById(id));
     }
 
     @GetMapping("/board/{boardId}")
-    @PreAuthorize("hasPermission(#boardId, 'Board', 'COLUMN:VIEW')")
+//    @PreAuthorize("hasPermission(#boardId, 'Board', 'COLUMN:VIEW')")
     public ResponseEntity<List<ColumnResponse>> getColumnsByBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardColumnAppService.getColumnsByBoard(boardId));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:EDIT')")
+//    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:EDIT')")
     public ResponseEntity<ColumnResponse> updateColumn(
             @PathVariable Long id,
             @RequestParam String title) {
@@ -59,7 +59,7 @@ public class BoardColumnController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:DELETE')")
+//    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:DELETE')")
     public ResponseEntity<Void> deleteColumn(@PathVariable Long id) {
         boardColumnAppService.deleteColumn(id);
         return ResponseEntity.noContent().build();
