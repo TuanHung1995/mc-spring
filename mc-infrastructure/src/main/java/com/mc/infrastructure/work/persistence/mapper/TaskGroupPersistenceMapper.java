@@ -21,6 +21,7 @@ public class TaskGroupPersistenceMapper {
         entity.setPosition(domain.getPosition());
         entity.setCollapsed(domain.isCollapsed());
         entity.setArchived(domain.isArchived());
+        entity.setDeleted(domain.isDeleted());
         entity.setArchivedById(domain.getArchivedBy());
         entity.setCreatedById(domain.getCreatedBy());
         entity.setUpdatedById(domain.getUpdatedBy());
