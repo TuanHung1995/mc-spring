@@ -4,7 +4,7 @@ import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
 import com.mc.application.iam.service.AuthAppService;
 import com.mc.controller.iam.http.IamAuthController;
-import com.mc.infrastructure.utils.CookieUtils;
+import com.mc.infrastructure.core.utils.CookieUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -80,4 +80,7 @@ public interface AuthenticationService {
      * Verify user's email with code.
      */
     void verifyEmail(String email, String verificationCode);
+
+    User processOAuthPostLogin(String email, String name, String imageUrl);
+
 }

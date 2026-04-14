@@ -2,11 +2,11 @@ package com.mc.domain.iam.model;
 
 import com.mc.domain.core.model.BaseDomainEntity;
 import com.mc.domain.core.util.IdUtils;
-import com.mc.domain.exception.DomainException;
+import com.mc.domain.core.exception.DomainException;
 import com.mc.domain.iam.model.vo.Email;
 import com.mc.domain.iam.model.vo.UserProfile;
-import com.mc.domain.model.enums.AccountStatus;
-import com.mc.domain.model.enums.AuthProvider;
+import com.mc.domain.iam.model.enums.AccountStatus;
+import com.mc.domain.iam.model.enums.AuthProvider;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

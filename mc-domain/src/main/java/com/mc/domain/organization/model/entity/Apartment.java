@@ -2,7 +2,7 @@ package com.mc.domain.organization.model.entity;
 
 import com.mc.domain.core.model.BaseDomainEntity;
 import com.mc.domain.core.util.IdUtils;
-import com.mc.domain.exception.DomainException;
+import com.mc.domain.core.exception.DomainException;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

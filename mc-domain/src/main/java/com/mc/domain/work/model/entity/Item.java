@@ -1,6 +1,6 @@
 package com.mc.domain.work.model.entity;
 
-import com.mc.domain.exception.DomainException;
+import com.mc.domain.core.exception.DomainException;
 import com.mc.domain.work.model.BaseWorkEntity;
 import lombok.Getter;
 

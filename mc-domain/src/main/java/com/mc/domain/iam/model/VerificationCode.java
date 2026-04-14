@@ -2,7 +2,7 @@ package com.mc.domain.iam.model;
 
 import com.mc.domain.core.model.BaseDomainEntity;
 import com.mc.domain.core.util.IdUtils;
-import com.mc.domain.model.enums.VerificationCodeStatus;
+import com.mc.domain.iam.model.enums.VerificationCodeStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

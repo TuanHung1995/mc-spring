@@ -3,7 +3,7 @@ package com.mc.controller.iam.http;
 import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
 import com.mc.application.iam.service.AuthAppService;
-import com.mc.infrastructure.utils.CookieUtils;
+import com.mc.infrastructure.core.utils.CookieUtils;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

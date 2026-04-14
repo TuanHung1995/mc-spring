@@ -3,7 +3,7 @@ package com.mc.application.organization.service.impl;
 import com.mc.application.organization.dto.request.CreateWorkspaceRequest;
 import com.mc.application.organization.dto.response.WorkspaceResponse;
 import com.mc.application.organization.service.WorkspaceAppService;
-import com.mc.domain.exception.ResourceNotFoundException;
+import com.mc.domain.core.exception.ResourceNotFoundException;
 import com.mc.domain.organization.model.entity.Workspace;
 import com.mc.domain.organization.port.OrgUserContextPort;
 import com.mc.domain.organization.port.OrgUserView;

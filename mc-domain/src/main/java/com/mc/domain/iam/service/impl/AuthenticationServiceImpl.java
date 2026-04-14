@@ -3,10 +3,11 @@ package com.mc.domain.iam.service.impl;
 import com.mc.domain.core.port.out.MailSender;
 import com.mc.domain.iam.exception.*;
 import com.mc.domain.iam.model.*;
+import com.mc.domain.iam.model.enums.AuthProvider;
 import com.mc.domain.iam.model.vo.Email;
 import com.mc.domain.iam.repository.*;
 import com.mc.domain.iam.service.AuthenticationService;
-import com.mc.domain.model.enums.AccountStatus;
+import com.mc.domain.iam.model.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -99,6 +100,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         return user;
+    }
+
+    @Override
+    public User processOAuthPostLogin(String email, String name, String imageUrl) {
+        Email emailVO = new Email(email);
+
+        if (!userRepository.existsByEmail(emailVO)) {
+            // Case 1: Register new user from Google
+            User  user = User.registerWithOAuth(emailVO, name, imageUrl, AuthProvider.GOOGLE);
+            log.info("Registered new user via Google OAuth: {}", email);
+
+            return userRepository.save(user);
+
+            // Tái sử dụng logic tạo data mặc định
+//            initUserData(user);
+        } else {
+            // Case 2: Update existing user (optional)
+            User user = userRepository.findByEmail(emailVO).orElseThrow();
+            user.updateProfile(name, imageUrl, user.getProfile().getPhone(), user.getProfile().getAddress(), user.getProfile().getJobTitle());
+            // Nếu user cũ là LOCAL, có thể update thành GOOGLE hoặc giữ nguyên tùy nghiệp vụ
+            return userRepository.save(user);
+        }
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.mc.infrastructure.iam.persistence.model;
 
-import com.mc.domain.model.enums.VerificationCodeStatus;
-import com.mc.infrastructure.persistence.model.BaseSimpleJpaEntity;
+import com.mc.domain.iam.model.enums.VerificationCodeStatus;
+import com.mc.infrastructure.core.persistence.model.BaseSimpleJpaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

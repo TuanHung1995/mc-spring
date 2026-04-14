@@ -1,6 +1,6 @@
 package com.mc.infrastructure.organization.persistence.model;
 
-import com.mc.infrastructure.persistence.model.BaseJpaEntity;
+import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

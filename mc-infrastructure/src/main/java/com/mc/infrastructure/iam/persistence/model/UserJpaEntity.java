@@ -1,8 +1,8 @@
 package com.mc.infrastructure.iam.persistence.model;
 
-import com.mc.domain.model.enums.AccountStatus;
-import com.mc.domain.model.enums.AuthProvider;
-import com.mc.infrastructure.persistence.model.BaseJpaEntity;
+import com.mc.domain.iam.model.enums.AccountStatus;
+import com.mc.domain.iam.model.enums.AuthProvider;
+import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

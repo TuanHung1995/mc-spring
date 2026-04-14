@@ -3,6 +3,7 @@ package com.mc.controller.work.http;
 import com.mc.application.work.dto.request.*;
 import com.mc.application.work.dto.response.BoardResponse;
 import com.mc.application.work.service.BoardAppService;
+import com.mc.domain.core.port.in.UserContextPort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,7 @@ import java.util.List;
  *
  * <p>Exposes Board CRUD, inline-edit, drag-and-drop reorder, and invite endpoints.
  * All {@code @PreAuthorize} checks are kept at the controller boundary (Spring Security best practice).
- * User identity is resolved internally via {@link com.mc.domain.port.UserContextPort}.</p>
+ * User identity is resolved internally via {@link UserContextPort}.</p>
  */
 @RestController
 @RequestMapping("/api/v2/boards")
