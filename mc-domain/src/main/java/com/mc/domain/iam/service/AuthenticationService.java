@@ -12,6 +12,11 @@ import java.util.UUID;
 public interface AuthenticationService {
 
     /**
+     * Register a new user with email and password.
+     */
+    User registerWithEmail(String email, String rawPassword, String fullName);
+
+    /**
      * Validate user credentials and return the user if valid.
      */
     User authenticate(String email, String rawPassword);
@@ -65,4 +70,17 @@ public interface AuthenticationService {
      * Unlock a locked account.
      */
     void unlockAccount(String email, String unlockToken);
+
+    /**
+     * Send verification email code to user.
+     */
+    void sendEmailVerificationCode(String email);
+
+    /**
+     * Verify user's email with code.
+     */
+    void verifyEmail(String email, String verificationCode);
+
+    User processOAuthPostLogin(String email, String name, String imageUrl);
+
 }

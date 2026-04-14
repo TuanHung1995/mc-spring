@@ -14,11 +14,6 @@ import java.util.UUID;
 public interface UserDomainService {
 
     /**
-     * Register a new user with email and password.
-     */
-    User registerWithEmail(String email, String rawPassword, String fullName);
-
-    /**
      * Find a user by their ID.
      */
     Optional<User> findById(UUID userId);
@@ -31,15 +26,20 @@ public interface UserDomainService {
     /**
      * Update user profile.
      */
-    User updateProfile(UUID userId, String fullName, String avatarUrl, String bio);
+    User updateProfile(User currentUser, String fullName, String avatarUrl, String address, String phone, String jobTitle);
 
     /**
      * Change user password.
      */
-    void changePassword(UUID userId, String oldPassword, String newPassword);
+    void changePassword(User user, String oldPassword, String newPassword);
 
     /**
      * Search users by keyword.
      */
     List<User> searchUsers(String keyword, UUID excludeUserId);
+
+    /**
+     * Get the currently authenticated user.
+     */
+    User getCurrentUser(String email);
 }

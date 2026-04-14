@@ -10,6 +10,7 @@ import com.mc.domain.iam.exception.UserNotFoundException;
 import com.mc.domain.iam.model.User;
 import com.mc.domain.iam.model.vo.Email;
 import com.mc.domain.iam.repository.UserRepository;
+import com.mc.domain.iam.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,20 +26,16 @@ import java.util.stream.Collectors;
  * User Application Service Implementation - IAM Bounded Context
  */
 @Service("iamUserAppService")
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @Transactional
 public class UserAppServiceImpl implements UserAppService {
 
     @Qualifier("iamUserRepository")
     private final UserRepository userRepository;
+    @Qualifier("iamUserDomainService")
+    private final UserDomainService userDomainService;
     private final UserDtoMapper userDtoMapper;
     private final PasswordEncoder passwordEncoder;
-
-    public UserAppServiceImpl(UserRepository userRepository, UserDtoMapper userDtoMapper, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.userDtoMapper = userDtoMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -57,15 +54,17 @@ public class UserAppServiceImpl implements UserAppService {
 
     @Override
     public UserResponse updateProfile(UpdateProfileRequest request) {
-        User user = getCurrentUser();
+        User currentUser = userDomainService.getCurrentUser(getCurrentUserEmail());
         
-        user.updateProfile(
+        User savedUser = userDomainService.updateProfile(
+                currentUser,
                 request.getFullName(),
                 request.getAvatarUrl(),
-                request.getBio()
+                request.getAddress(),
+                request.getPhone(),
+                request.getJobTitle()
         );
-        
-        User savedUser = userRepository.save(user);
+
         return userDtoMapper.toResponse(savedUser);
     }
 
@@ -78,37 +77,23 @@ public class UserAppServiceImpl implements UserAppService {
             return MessageResponse.error("New password and confirmation do not match");
         }
         
-        // Validate current password
-        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            return MessageResponse.error("Current password is incorrect");
-        }
-        
-        // Change password using domain logic
-        String newPasswordHash = passwordEncoder.encode(request.getNewPassword());
-        user.changePassword(newPasswordHash);
-        
-        userRepository.save(user);
-        
+        userDomainService.changePassword(user, request.getCurrentPassword(), request.getNewPassword());
+
         return MessageResponse.success("Password changed successfully");
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> searchUsers(String keyword) {
-        UUID currentUserId = getCurrentUserId();
-        // Note: This would need a search method in the repository
-        // For now, return empty list as placeholder
-        return List.of();
+        return userDomainService.searchUsers(keyword, getCurrentUser().getId()).stream()
+                .map(userDtoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     private User getCurrentUser() {
         String email = getCurrentUserEmail();
         return userRepository.findByEmail(new Email(email))
                 .orElseThrow(() -> UserNotFoundException.withEmail(email));
-    }
-
-    private UUID getCurrentUserId() {
-        return getCurrentUser().getId();
     }
 
     private String getCurrentUserEmail() {

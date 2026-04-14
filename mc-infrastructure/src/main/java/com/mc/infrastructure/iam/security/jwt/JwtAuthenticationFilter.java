@@ -1,9 +1,9 @@
 package com.mc.infrastructure.iam.security.jwt;
 
 import com.mc.domain.iam.repository.TokenBlacklistRepository;
-import com.mc.infrastructure.constant.SecurityConstants;
+import com.mc.infrastructure.core.constant.SecurityConstants;
 import com.mc.infrastructure.iam.security.userdetails.IamUserDetailsService;
-import com.mc.infrastructure.utils.CookieUtils;
+import com.mc.infrastructure.core.utils.CookieUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

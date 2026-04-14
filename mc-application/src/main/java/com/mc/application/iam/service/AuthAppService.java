@@ -43,4 +43,14 @@ public interface AuthAppService {
      * Unlock a locked user account.
      */
     MessageResponse unlockAccount(String token);
+
+    /**
+     * Send verification email code to user.
+     */
+    MessageResponse sendVerifyEmailCode();
+
+    /**
+     * Verify user's email using verification code.
+     */
+    MessageResponse verifyEmail(VerifyEmailRequest request);
 }

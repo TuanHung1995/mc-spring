@@ -1,6 +1,6 @@
 package com.mc.domain.iam.model;
 
-import com.mc.domain.exception.DomainException;
+import com.mc.domain.core.exception.DomainException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

@@ -2,11 +2,11 @@ package com.mc.domain.iam.model;
 
 import com.mc.domain.core.model.BaseDomainEntity;
 import com.mc.domain.core.util.IdUtils;
-import com.mc.domain.exception.DomainException;
+import com.mc.domain.core.exception.DomainException;
 import com.mc.domain.iam.model.vo.Email;
 import com.mc.domain.iam.model.vo.UserProfile;
-import com.mc.domain.model.enums.AccountStatus;
-import com.mc.domain.model.enums.AuthProvider;
+import com.mc.domain.iam.model.enums.AccountStatus;
+import com.mc.domain.iam.model.enums.AuthProvider;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -26,13 +26,14 @@ public class User extends BaseDomainEntity {
     private AuthProvider provider;
     private AccountStatus status;
     private boolean emailVerified;
+    private LocalDateTime emailVerifiedAt;
     private String unlockToken;
 
     // =================================================================
     // CONSTRUCTOR (For Persistence/Reconstitution)
     // =================================================================
     public User(UUID id, Email email, String password, int failedLoginAttempts, UserProfile profile,
-                AuthProvider provider, AccountStatus status, boolean emailVerified, String unlockToken,
+                AuthProvider provider, AccountStatus status, boolean emailVerified, LocalDateTime emailVerifiedAt, String unlockToken,
                 LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.email = email;
@@ -42,6 +43,7 @@ public class User extends BaseDomainEntity {
         this.provider = provider;
         this.status = status;
         this.emailVerified = emailVerified;
+        this.emailVerifiedAt = emailVerifiedAt;
         this.unlockToken = unlockToken;
     }
 
@@ -62,7 +64,7 @@ public class User extends BaseDomainEntity {
         user.initializeNewEntity(IdUtils.newId());
         user.email = email;
         user.password = passwordHash;
-        user.profile = new UserProfile(fullName, null);
+        user.profile = new UserProfile(fullName, null, null, null, null);
         user.provider = AuthProvider.LOCAL;
         user.status = AccountStatus.ACTIVE;
         user.emailVerified = false;
@@ -77,7 +79,7 @@ public class User extends BaseDomainEntity {
         user.initializeNewEntity(IdUtils.newId());
         user.email = email;
         user.password = null; // OAuth users don't have password
-        user.profile = new UserProfile(fullName, avatarUrl);
+        user.profile = new UserProfile(fullName, avatarUrl, null, null, null);
         user.provider = provider;
         user.status = AccountStatus.ACTIVE;
         user.emailVerified = true; // OAuth emails are pre-verified
@@ -88,11 +90,11 @@ public class User extends BaseDomainEntity {
     // BUSINESS LOGIC (Behavior)
     // =================================================================
     
-    public void updateProfile(String fullName, String avatarUrl, String bio) {
+    public void updateProfile(String fullName, String avatarUrl, String phone, String address, String jobTitle) {
         if (this.status != AccountStatus.ACTIVE) {
             throw new DomainException("Inactive user cannot update profile");
         }
-        this.profile = this.profile.update(fullName, avatarUrl);
+        this.profile = this.profile.update(fullName, avatarUrl, address, phone, jobTitle);
         markAsModified();
     }
 
@@ -121,6 +123,7 @@ public class User extends BaseDomainEntity {
 
     public void verifyEmail() {
         this.emailVerified = true;
+        this.emailVerifiedAt = LocalDateTime.now();
         markAsModified();
     }
 

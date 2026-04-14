@@ -3,6 +3,7 @@ package com.mc.domain.iam.repository;
 import com.mc.domain.iam.model.User;
 import com.mc.domain.iam.model.vo.Email;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,5 +14,7 @@ public interface UserRepository {
     // Tìm kiếm dựa trên Value Object Email
     Optional<User> findByEmail(Email email);
     boolean existsByEmail(Email email);
+
+    List<User> searchUsers(String keyword);
 
 }

@@ -19,6 +19,9 @@ public class UserDtoMapper {
                 .email(user.getEmailValue())
                 .fullName(user.getProfile().getFullName())
                 .avatarUrl(user.getProfile().getAvatarUrl())
+                .address(user.getProfile().getAddress())
+                .phone(user.getProfile().getPhone())
+                .jobTitle(user.getProfile().getJobTitle())
                 .status(user.getStatus().name())
                 .emailVerified(user.isEmailVerified())
                 .build();

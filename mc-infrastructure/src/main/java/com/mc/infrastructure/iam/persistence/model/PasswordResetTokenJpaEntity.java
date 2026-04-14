@@ -1,6 +1,6 @@
 package com.mc.infrastructure.iam.persistence.model;
 
-import com.mc.infrastructure.persistence.model.BaseJpaEntity;
+import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

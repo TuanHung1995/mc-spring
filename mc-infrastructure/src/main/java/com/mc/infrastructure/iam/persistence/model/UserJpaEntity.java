@@ -1,18 +1,14 @@
 package com.mc.infrastructure.iam.persistence.model;
 
-import com.mc.domain.model.enums.AccountStatus;
-import com.mc.domain.model.enums.AuthProvider;
-import com.mc.infrastructure.persistence.model.BaseJpaEntity;
+import com.mc.domain.iam.model.enums.AccountStatus;
+import com.mc.domain.iam.model.enums.AuthProvider;
+import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "iam_users")
@@ -37,6 +33,15 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "job_title")
+    private String jobTitle;
+
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
@@ -45,6 +50,9 @@ public class UserJpaEntity extends BaseJpaEntity {
 
     @Column(name = "email_verified")
     private boolean emailVerified;
+
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
 
     @Column(name = "unlock_token")
     private String unlockToken;
