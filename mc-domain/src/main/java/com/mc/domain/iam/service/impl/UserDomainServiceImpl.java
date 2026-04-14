@@ -31,22 +31,6 @@ public class UserDomainServiceImpl implements UserDomainService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User registerWithEmail(String email, String rawPassword, String fullName) {
-        Email emailVO = new Email(email);
-        
-        // Check if user already exists
-        if (userRepository.existsByEmail(emailVO)) {
-            throw UserAlreadyExistsException.withEmail(email);
-        }
-        
-        // Create and save user
-        String passwordHash = passwordEncoder.encode(rawPassword);
-        User user = User.registerWithEmail(emailVO, passwordHash, fullName);
-        
-        return userRepository.save(user);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Optional<User> findById(UUID userId) {
         return userRepository.findById(userId);
@@ -59,20 +43,14 @@ public class UserDomainServiceImpl implements UserDomainService {
     }
 
     @Override
-    public User updateProfile(UUID userId, String fullName, String avatarUrl, String bio) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> UserNotFoundException.withId(userId));
-        
-        user.updateProfile(fullName, avatarUrl, bio);
-        
-        return userRepository.save(user);
+    public User updateProfile(User currentUser, String fullName, String avatarUrl, String address, String phone, String jobTitle) {
+        currentUser.updateProfile(fullName, avatarUrl, address, phone, jobTitle);
+        return userRepository.save(currentUser);
     }
 
     @Override
-    public void changePassword(UUID userId, String oldPassword, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> UserNotFoundException.withId(userId));
-        
+    public void changePassword(User user, String oldPassword, String newPassword) {
+
         // Verify old password
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new InvalidCredentialsException("Current password is incorrect");
@@ -88,7 +66,17 @@ public class UserDomainServiceImpl implements UserDomainService {
     @Override
     @Transactional(readOnly = true)
     public List<User> searchUsers(String keyword, UUID excludeUserId) {
-        // TODO: Implement search in repository
-        return List.of();
+        return userRepository.searchUsers(keyword).stream()
+                .filter(user -> !user.getId().equals(excludeUserId))
+                .filter(User::isActive)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getCurrentUser(String email) {
+        Email emailVO = new Email(email);
+        return userRepository.findByEmail(emailVO)
+                .orElseThrow(() -> UserNotFoundException.withEmail(email));
     }
 }

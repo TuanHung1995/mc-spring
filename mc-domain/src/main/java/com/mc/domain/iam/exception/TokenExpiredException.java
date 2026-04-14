@@ -1,6 +1,6 @@
 package com.mc.domain.iam.exception;
 
-import com.mc.domain.exception.DomainException;
+import com.mc.domain.core.exception.DomainException;
 
 /**
  * Exception thrown when a token (refresh, reset, etc.) has expired.

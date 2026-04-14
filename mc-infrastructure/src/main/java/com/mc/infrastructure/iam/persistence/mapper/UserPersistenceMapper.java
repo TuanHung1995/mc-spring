@@ -23,11 +23,15 @@ public class UserPersistenceMapper {
         if (domain.getProfile() != null) {
             entity.setFullName(domain.getProfile().getFullName());
             entity.setAvatarUrl(domain.getProfile().getAvatarUrl());
+            entity.setAddress(domain.getProfile().getAddress());
+            entity.setPhone(domain.getProfile().getPhone());
+            entity.setJobTitle(domain.getProfile().getJobTitle());
         }
 
         entity.setProvider(domain.getProvider());
         entity.setStatus(domain.getStatus());
         entity.setEmailVerified(domain.isEmailVerified());
+        entity.setEmailVerifiedAt(domain.getEmailVerifiedAt());
         entity.setUnlockToken(domain.getUnlockToken());
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());
@@ -44,10 +48,17 @@ public class UserPersistenceMapper {
                 new Email(entity.getEmail()), // Reconstruct VO
                 entity.getPassword(),
                 entity.getFailedLoginAttempts(),
-                new UserProfile(entity.getFullName(), entity.getAvatarUrl()), // Reconstruct VO
+                new UserProfile(
+                        entity.getFullName(),
+                        entity.getAvatarUrl(),
+                        entity.getAddress(),
+                        entity.getPhone(),
+                        entity.getJobTitle()
+                ), // Reconstruct VO
                 entity.getProvider(),
                 entity.getStatus(),
                 entity.isEmailVerified(),
+                entity.getEmailVerifiedAt(),
                 entity.getUnlockToken(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),

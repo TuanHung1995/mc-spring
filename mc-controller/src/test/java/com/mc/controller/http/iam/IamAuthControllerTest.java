@@ -3,7 +3,8 @@ package com.mc.controller.http.iam;
 import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
 import com.mc.application.iam.service.AuthAppService;
-import com.mc.infrastructure.utils.CookieUtils;
+import com.mc.controller.iam.http.IamAuthController;
+import com.mc.infrastructure.core.utils.CookieUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,7 +21,6 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

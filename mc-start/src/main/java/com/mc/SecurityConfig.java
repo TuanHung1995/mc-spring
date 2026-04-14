@@ -1,13 +1,12 @@
 package com.mc;
 
-import com.mc.domain.repository.TokenBlacklistRepository;
-import com.mc.infrastructure.config.security.CustomPermissionEvaluator;
-import com.mc.infrastructure.config.security.oauth2.CustomOAuth2UserService;
-import com.mc.infrastructure.config.security.oauth2.CustomOidcUserService;
-import com.mc.infrastructure.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.mc.domain.iam.repository.TokenBlacklistRepository;
+import com.mc.infrastructure.core.config.security.CustomPermissionEvaluator;
+import com.mc.infrastructure.core.config.security.oauth2.CustomOAuth2UserService;
+import com.mc.infrastructure.core.config.security.oauth2.CustomOidcUserService;
+import com.mc.infrastructure.core.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.mc.infrastructure.iam.security.jwt.JwtAuthenticationEntryPoint;
 import com.mc.infrastructure.iam.security.jwt.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +15,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

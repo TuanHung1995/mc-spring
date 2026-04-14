@@ -21,6 +21,9 @@ public class UserResponse {
     private String email;
     private String fullName;
     private String avatarUrl;
+    private String address;
+    private String phone;
+    private String jobTitle;
     private String status;
     private boolean emailVerified;
 }

@@ -4,7 +4,6 @@ import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
 import com.mc.application.iam.mapper.UserDtoMapper;
 import com.mc.application.iam.service.AuthAppService;
-import com.mc.application.model.auth.JwtAuthResponse;
 import com.mc.domain.iam.exception.*;
 import com.mc.domain.iam.model.PasswordResetToken;
 import com.mc.domain.iam.model.RefreshToken;
@@ -14,7 +13,6 @@ import com.mc.domain.iam.repository.PasswordResetTokenRepository;
 import com.mc.domain.iam.repository.RefreshTokenRepository;
 import com.mc.domain.iam.repository.TokenBlacklistRepository;
 import com.mc.domain.iam.repository.UserRepository;
-import com.mc.domain.iam.model.TokenBlacklist;
 import com.mc.domain.iam.service.AuthenticationService;
 import com.mc.infrastructure.iam.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +28,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
 
 /**
  * Auth Application Service Implementation - IAM Bounded Context
@@ -78,7 +74,9 @@ public class AuthAppServiceImpl implements AuthAppService {
 
             User user = authenticationService.authenticate(request.getEmail(), request.getPassword());
 
-            authenticationService.resetFailedLogin(request.getEmail());
+            if (user.getFailedLoginAttempts() > 0) {
+                authenticationService.resetFailedLogin(request.getEmail());
+            }
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -110,20 +108,9 @@ public class AuthAppServiceImpl implements AuthAppService {
             throw new InvalidCredentialsException("Passwords do not match");
         }
 
-        Email email = new Email(request.getEmail());
+        User savedUser = authenticationService.registerWithEmail(request.getEmail(), request.getPassword(), request.getFullName());
 
-        // Check if user exists
-        if (userRepository.existsByEmail(email)) {
-            throw UserAlreadyExistsException.withEmail(request.getEmail());
-        }
-
-        // Create user using domain factory method
-        String passwordHash = passwordEncoder.encode(request.getPassword());
-        User user = User.registerWithEmail(email, passwordHash, request.getFullName());
-
-        User savedUser = userRepository.save(user);
-
-        log.info("New user registered: {}", email.getValue());
+        log.info("New user registered: {}", savedUser.getEmail().getValue());
 
         return RegisterResponse.success(
                 savedUser.getId(),
@@ -234,6 +221,26 @@ public class AuthAppServiceImpl implements AuthAppService {
         log.info("Account unlocked for user: {}", email);
 
         return MessageResponse.success("Account has been unlocked successfully. You can now login.");
+    }
+
+    @Override
+    public MessageResponse sendVerifyEmailCode() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        authenticationService.sendEmailVerificationCode(email);
+
+        return MessageResponse.success("Verification email sent successfully");
+    }
+
+    @Override
+    public MessageResponse verifyEmail(VerifyEmailRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        authenticationService.verifyEmail(email, request.getVerificationCode());
+
+        log.info("Email verified for user: {}", email);
+
+        return MessageResponse.success("Email has been verified successfully");
     }
 
     // =================================================================

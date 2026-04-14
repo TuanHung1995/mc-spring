@@ -9,8 +9,10 @@ import com.mc.infrastructure.iam.persistence.model.UserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * User Repository Implementation - Infrastructure Layer
@@ -44,5 +46,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByEmail(Email email) {
         return jpaRepository.existsByEmail(email.getValue());
+    }
+
+    @Override
+    public List<User> searchUsers(String keyword) {
+        return jpaRepository.searchUsers(keyword).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }
