@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 
 /**
@@ -36,14 +38,14 @@ public class BoardController {
     // =================================================================
 
     @PostMapping
-//    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'BOARD:CREATE')")
+    @PreAuthorize("@workSecurity.canAccessWorkspace(#request.workspaceId, 'BOARD:CREATE')")
     public ResponseEntity<BoardResponse> createBoard(@Valid @RequestBody CreateBoardRequest request) {
         log.info("Creating board in workspace {}", request.getWorkspaceId());
         return ResponseEntity.ok(boardAppService.createBoard(request));
     }
 
     @GetMapping("/{boardId}")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:VIEW')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:VIEW')")
     public ResponseEntity<BoardResponse> getBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardAppService.getBoardById(boardId));
     }
@@ -58,7 +60,7 @@ public class BoardController {
      * POST kept instead of DELETE for semantic clarity — trash is reversible.
      */
     @PostMapping("/{boardId}/trash")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:TRASH')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:TRASH')")
     public ResponseEntity<Void> trashBoard(@PathVariable Long boardId) {
         boardAppService.trashBoard(boardId);
         return ResponseEntity.noContent().build();
@@ -68,7 +70,7 @@ public class BoardController {
      * Permanently removes a board and all its data. Irreversible.
      */
     @DeleteMapping("/{boardId}/permanent")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:DELETE')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:DELETE')")
     public ResponseEntity<Void> deleteBoardPermanently(@PathVariable Long boardId) {
         boardAppService.deleteBoardPermanently(boardId);
         return ResponseEntity.noContent().build();
@@ -83,7 +85,7 @@ public class BoardController {
      * Uses a discriminator type field ("TASK_GROUP" | "COLUMN" | "ITEM").
      */
     @PutMapping("/{boardId}/elements")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:EDIT')")
     public ResponseEntity<Void> updateBoardElement(
             @PathVariable Long boardId,
             @RequestBody UpdateBoardElementRequest request) {
@@ -99,7 +101,7 @@ public class BoardController {
      * Reorders task groups within a board (drag-and-drop).
      */
     @PutMapping("/groups/reorder")
-//    @PreAuthorize("hasPermission(#request.targetId, 'Group', 'BOARD:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessGroup(#request.targetId, 'BOARD:EDIT')")
     public ResponseEntity<Void> reorderGroup(@RequestBody ReorderRequest request) {
         boardAppService.reorderGroup(request);
         return ResponseEntity.noContent().build();
@@ -109,7 +111,7 @@ public class BoardController {
      * Reorders columns within a board (drag-and-drop).
      */
     @PutMapping("/columns/reorder")
-//    @PreAuthorize("hasPermission(#request.targetId, 'Column', 'BOARD:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessColumn(#request.targetId, 'BOARD:EDIT')")
     public ResponseEntity<Void> reorderColumn(@RequestBody ReorderRequest request) {
         boardAppService.reorderColumn(request);
         return ResponseEntity.noContent().build();
@@ -119,7 +121,7 @@ public class BoardController {
      * Reorders items within or across task groups (drag-and-drop).
      */
     @PutMapping("/items/reorder")
-//    @PreAuthorize("hasPermission(#request.targetId, 'Item', 'BOARD:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessItem(#request.targetId, 'BOARD:EDIT')")
     public ResponseEntity<Void> reorderItem(@RequestBody ReorderRequest request) {
         boardAppService.reorderItem(request);
         return ResponseEntity.noContent().build();

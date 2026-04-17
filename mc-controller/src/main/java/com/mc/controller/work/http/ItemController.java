@@ -31,32 +31,32 @@ public class ItemController {
     private final ItemAppService itemAppService;
 
     @PostMapping
-//    @PreAuthorize("hasPermission(#request.boardId, 'Board', 'ITEM:CREATE')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#request.boardId, 'ITEM:CREATE')")
     public ResponseEntity<ItemResponse> createItem(@Valid @RequestBody CreateItemRequest request) {
         log.info("Creating item in board {} group {}", request.getBoardId(), request.getGroupId());
         return ResponseEntity.ok(itemAppService.createItem(request));
     }
 
     @GetMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Item', 'ITEM:VIEW')")
+    @PreAuthorize("@workSecurity.canAccessItem(#id, 'ITEM:VIEW')")
     public ResponseEntity<ItemResponse> getItem(@PathVariable Long id) {
         return ResponseEntity.ok(itemAppService.getItemById(id));
     }
 
     @GetMapping("/group/{groupId}")
-//    @PreAuthorize("hasPermission(#groupId, 'Group', 'ITEM:VIEW')")
+    @PreAuthorize("@workSecurity.canAccessGroup(#groupId, 'ITEM:VIEW')")
     public ResponseEntity<List<ItemResponse>> getItemsByGroup(@PathVariable Long groupId) {
         return ResponseEntity.ok(itemAppService.getItemsByGroup(groupId));
     }
 
     @GetMapping("/board/{boardId}")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'ITEM:VIEW')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'ITEM:VIEW')")
     public ResponseEntity<List<ItemResponse>> getItemsByBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(itemAppService.getItemsByBoard(boardId));
     }
 
     @PutMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Item', 'ITEM:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessItem(#id, 'ITEM:EDIT')")
     public ResponseEntity<ItemResponse> updateItem(
             @PathVariable Long id,
             @RequestParam String name) {
@@ -64,7 +64,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Item', 'ITEM:DELETE')")
+    @PreAuthorize("@workSecurity.canAccessItem(#id, 'ITEM:DELETE')")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         itemAppService.deleteItem(id);
         return ResponseEntity.noContent().build();
