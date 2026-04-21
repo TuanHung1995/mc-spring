@@ -12,7 +12,7 @@ import java.util.UUID;
  *
  * <p>Outbound port for Board persistence. Implementation lives in mc-infrastructure.</p>
  */
-@Component("workBoardRepository")
+//@Component("workBoardRepository")
 public interface BoardRepository {
 
     Board save(Board board);
@@ -21,6 +21,9 @@ public interface BoardRepository {
 
     /** Returns all boards where ${userId} is a member. */
     List<Board> findAllByUserId(UUID userId);
+
+    /** Returns all boards belonging to a specific workspace. */
+    List<Board> findAllByWorkspaceId(UUID workspaceId);
 
     /** Returns all boards soft-deleted by the given user (for Trash UI). */
     List<Board> findAllTrashedByUserId(Long userId);
@@ -33,4 +36,7 @@ public interface BoardRepository {
 
     /** Restores a soft-deleted board (sets is_deleted = 0). */
     void restore(Long boardId);
+
+    int softDeleteByWorkspaceIdInBatch(UUID workspaceID, UUID deletedById, int batchSize);
+
 }

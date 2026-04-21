@@ -38,7 +38,7 @@ public class BoardPersistenceMapper {
         BoardType type = null;
         if (entity.getType() != null) {
             try { type = BoardType.valueOf(entity.getType()); }
-            catch (IllegalArgumentException ignored) { type = BoardType.BOARD; }
+            catch (IllegalArgumentException ignored) { type = BoardType.PUBLIC; }
         }
 
         return new Board(

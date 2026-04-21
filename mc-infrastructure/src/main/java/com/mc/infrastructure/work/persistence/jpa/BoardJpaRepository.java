@@ -19,6 +19,19 @@ import java.util.UUID;
 public interface BoardJpaRepository extends JpaRepository<BoardJpaEntity, Long> {
 
     /**
+     * Finds all non-deleted boards belonging to a workspace.
+     */
+    @Query(value = "SELECT * FROM work_boards WHERE workspace_id = :workspaceId AND is_deleted = 0", nativeQuery = true)
+    List<BoardJpaEntity> findAllByWorkspaceId(@Param("workspaceId") UUID workspaceId);
+
+    @Modifying
+    @Query(value = "UPDATE work_boards SET is_deleted = true, updated_at = NOW(), deleted_at = NOW(), deleted_by = :deletedById " +
+            "WHERE workspace_id = :workspaceId " +
+            "AND is_deleted = false " +
+            "LIMIT :batchSize", nativeQuery = true)
+    int softDeleteByWorkspaceIdInBatch(@Param("workspaceId") UUID workspaceId, @Param("deletedById") UUID deletedById, @Param("batchSize") int batchSize);
+
+    /**
      * Returns all boards the given user is a member of (via board_members join table).
      * Uses a native join because board_members is a simple join table.
      */

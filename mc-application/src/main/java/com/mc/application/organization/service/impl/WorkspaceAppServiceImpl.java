@@ -12,6 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mc.domain.core.event.broker.rabbitMQ.WorkspaceDeletedIntegrationEvent;
+import com.mc.domain.organization.port.out.WorkspaceMessagePort;
+import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +37,7 @@ public class WorkspaceAppServiceImpl implements WorkspaceAppService {
 
     private final WorkspaceRepository workspaceRepository;
     private final OrgUserContextPort orgUserContextPort;
+    private final WorkspaceMessagePort workspaceMessagePort;
 
     @Override
     @Transactional
@@ -74,6 +79,11 @@ public class WorkspaceAppServiceImpl implements WorkspaceAppService {
         // Domain entity enforces deletion invariants (e.g., already-deleted guard)
         workspace.softDelete(currentUser.id());
         workspaceRepository.save(workspace);
+
+        // Publish internal Integration Event to trigger Async cascades (e.g. Work Bounded Context)
+        workspaceMessagePort.publishWorkspaceDeletedEvent(
+                new WorkspaceDeletedIntegrationEvent(id, currentUser.id(), LocalDateTime.now())
+        );
     }
 
     private WorkspaceResponse toResponse(Workspace workspace) {

@@ -8,7 +8,7 @@ package com.mc.domain.work.model.enums;
  * PRIVATE boards are hidden from non-members.</p>
  */
 public enum BoardType {
-    BOARD,
+    PUBLIC,
     PRIVATE,
     SHAREABLE
 }

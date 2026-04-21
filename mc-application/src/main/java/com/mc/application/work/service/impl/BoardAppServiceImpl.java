@@ -273,9 +273,9 @@ public class BoardAppServiceImpl implements BoardAppService {
 
     private BoardType parseBoardType(String type) {
         try {
-            return type != null ? BoardType.valueOf(type.toUpperCase()) : BoardType.BOARD;
+            return type != null ? BoardType.valueOf(type.toUpperCase()) : BoardType.PUBLIC;
         } catch (IllegalArgumentException e) {
-            return BoardType.BOARD;
+            return BoardType.PUBLIC;
         }
     }
 

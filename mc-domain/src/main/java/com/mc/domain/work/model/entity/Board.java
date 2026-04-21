@@ -98,7 +98,7 @@ public class Board extends BaseWorkEntity {
         Board board = new Board();
         board.initNew(null); // id = null → DB assigns AUTO_INCREMENT value
         board.name = name.trim();
-        board.type = type != null ? type : BoardType.BOARD;
+        board.type = type != null ? type : BoardType.PUBLIC;
         board.purpose = purpose;
         board.createdById = createdById;
         board.workspaceId = workspaceId;

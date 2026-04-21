@@ -877,3 +877,37 @@ create table workspace_members
 )
     collate = utf8mb4_unicode_ci;
 
+DELIMITER $$
+CREATE PROCEDURE SeedOneThousandBoards()
+BEGIN
+    DECLARE i INT DEFAULT 1;
+    -- Dùng VARCHAR(36) để khai báo biến, ta sẽ convert nó ở lệnh INSERT
+    DECLARE target_org_workspace_id VARCHAR(36) DEFAULT '76253820-ed31-4c40-bef9-d623a8606901';
+
+    -- Tắt tự động commit để chạy cực nhanh
+    SET autocommit = 0;
+
+    WHILE i <= 1000000 DO
+            INSERT INTO work_boards (id, workspace_id, name, created_at)
+            VALUES (
+                       i + 10,
+                       UUID_TO_BIN(target_org_workspace_id),
+                       CONCAT('Test Board ', i + 10),
+                       NOW()
+                   );
+
+            -- Commit mỗi 10,000 dòng để không tràn bộ nhớ DB
+            IF i % 10000 = 0 THEN
+                COMMIT;
+            END IF;
+
+            SET i = i + 1;
+        END WHILE;
+
+    COMMIT;
+    SET autocommit = 1;
+END$$
+DELIMITER ;
+
+-- Gọi hàm để bắt đầu tạo data
+CALL SeedOneThousandBoards();
