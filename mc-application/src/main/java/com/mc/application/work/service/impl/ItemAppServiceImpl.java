@@ -29,12 +29,9 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Component("workItemAppService")
 public class ItemAppServiceImpl implements ItemAppService {
 
-    @Qualifier("workItemRepository")
     private final ItemRepository itemRepository;
-    @Qualifier("workTaskGroupRepository")
     private final TaskGroupRepository taskGroupRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;

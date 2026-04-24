@@ -27,10 +27,8 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Component("workBoardColumnAppService")
 public class BoardColumnAppServiceImpl implements BoardColumnAppService {
 
-    @Qualifier("workBoardColumnRepository")
     private final BoardColumnRepository columnRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;

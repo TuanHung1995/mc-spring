@@ -29,10 +29,8 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Component("workTaskGroupAppService")
 public class TaskGroupAppServiceImpl implements TaskGroupAppService {
 
-    @Qualifier("workTaskGroupRepository")
     private final TaskGroupRepository taskGroupRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;

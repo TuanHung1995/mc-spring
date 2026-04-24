@@ -24,14 +24,14 @@ public class WorkspaceRabbitMQAdapter implements WorkspaceMessagePort {
 
     @Override
     public void publishWorkspaceDeletedEvent(WorkspaceDeletedIntegrationEvent event) {
-        log.info("Publishing WorkspaceDeletedIntegrationEvent for workspaceId: {}", event.workspaceId());
+        log.info("Publishing WorkspaceDeletedIntegrationEvent for workspaceId: {}", event.getWorkspaceId());
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQConfig.EXCHANGE_NAME,
                     RabbitMQConfig.DELETE_WORKSPACE_ROUTING_KEY,
                     event
             );
-            log.info("Successfully published WorkspaceDeletedIntegrationEvent for workspaceId: {}", event.workspaceId());
+            log.info("Successfully published WorkspaceDeletedIntegrationEvent for workspaceId: {}", event.getWorkspaceId());
         } catch (Exception e) {
             log.error("Failed to publish WorkspaceDeletedIntegrationEvent: {}", e.getMessage(), e);
             // Depending on reliability requirements, we could rethrow, push to an outbox table, etc.

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
  */
 @Repository
 @RequiredArgsConstructor
-@Component("workColumnValueRepository")
 public class ColumnValueRepositoryImpl implements ColumnValueRepository {
 
     private final ColumnValueJpaRepository jpaRepository;
@@ -50,5 +50,10 @@ public class ColumnValueRepositoryImpl implements ColumnValueRepository {
     public List<ColumnValue> findByBoardId(Long boardId) {
         return jpaRepository.findByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public int softDeleteByWorkspaceIdInBatch(UUID workspaceId, UUID deletedById, int batchSize) {
+        return jpaRepository.softDeleteByWorkspaceIdInBatch(workspaceId, deletedById, batchSize);
     }
 }

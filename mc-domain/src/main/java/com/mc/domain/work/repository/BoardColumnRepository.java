@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * BoardColumnRepository — Domain Repository Port (Work Context)
  */
-@Component("workBoardColumnRepository")
 public interface BoardColumnRepository {
 
     BoardColumn save(BoardColumn column);
@@ -27,4 +27,6 @@ public interface BoardColumnRepository {
 
     /** Soft-deletes a column. */
     void delete(BoardColumn column);
+
+    int softDeleteByWorkspaceIdInBatch(UUID workspaceId, UUID deletedById, int batchSize);
 }

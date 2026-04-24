@@ -25,12 +25,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/boards")
-@Component("workBoardController")
 @RequiredArgsConstructor
 @Slf4j
 public class BoardController {
 
-    @Qualifier("workBoardAppService")
     private final BoardAppService boardAppService;
 
     // =================================================================

@@ -11,7 +11,6 @@ import java.util.List;
  *
  * <p>Covers Board CRUD, inline element editing, and drag-and-drop reorder.</p>
  */
-@Component("workBoardAppService")
 public interface BoardAppService {
 
     BoardResponse createBoard(CreateBoardRequest request);

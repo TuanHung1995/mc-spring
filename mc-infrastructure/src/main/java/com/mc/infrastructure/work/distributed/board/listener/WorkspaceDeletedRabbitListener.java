@@ -1,4 +1,4 @@
-package com.mc.infrastructure.work.distributed.board;
+package com.mc.infrastructure.work.distributed.board.listener;
 
 import com.mc.domain.work.port.in.WorkspaceWorkerPort;
 import com.mc.domain.core.event.broker.rabbitMQ.WorkspaceDeletedIntegrationEvent;
@@ -47,7 +47,7 @@ public class WorkspaceDeletedRabbitListener {
             channel.basicAck(deliveryTag, false);
             log.info("Successfully acknowledged message with delivery tag: {}", deliveryTag);
         } catch (Exception e) {
-            log.error("Error processing WorkspaceDeletedIntegrationEvent for workspaceId: {}", event.workspaceId(), e);
+            log.error("Error processing WorkspaceDeletedIntegrationEvent for workspaceId: {}", event.getWorkspaceId(), e);
 
             // Nack the message so it goes back to the queue (or DLQ if configured)
             // Multiple is false, requeue is false (so it routes to the Dead Letter Exchange)

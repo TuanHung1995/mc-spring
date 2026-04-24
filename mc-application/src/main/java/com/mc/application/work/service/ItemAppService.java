@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * ItemAppService — Application Service Port (Work Context)
  */
-@Component("workItemAppService")
 public interface ItemAppService {
 
     ItemResponse createItem(CreateItemRequest request);

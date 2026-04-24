@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * BoardColumnAppService — Application Service Port (Work Context)
  */
-@Component("workBoardColumnAppService")
 public interface BoardColumnAppService {
 
     ColumnResponse createColumn(CreateColumnRequest request);

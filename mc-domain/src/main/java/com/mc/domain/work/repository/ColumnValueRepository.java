@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * ColumnValueRepository — Domain Repository Port (Work Context)
  */
-@Component("workColumnValueRepository")
 public interface ColumnValueRepository {
 
     ColumnValue save(ColumnValue columnValue);
@@ -23,4 +23,6 @@ public interface ColumnValueRepository {
 
     /** Returns all column values for a board (used for full board load). */
     List<ColumnValue> findByBoardId(Long boardId);
+
+    int softDeleteByWorkspaceIdInBatch(UUID workspaceId, UUID deletedById, int batchSize);
 }

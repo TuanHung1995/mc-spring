@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * TaskGroupRepository — Domain Repository Port (Work Context)
  */
-@Component("workTaskGroupRepository")
 public interface TaskGroupRepository {
 
     TaskGroup save(TaskGroup group);
@@ -39,4 +39,6 @@ public interface TaskGroupRepository {
 
     /** Physically removes a group from the database (bypasses soft-delete). */
     void permanentDelete(TaskGroup group);
+
+    int softDeleteByWorkspaceIdInBatch(UUID workspaceId, UUID deletedById, int batchSize);
 }

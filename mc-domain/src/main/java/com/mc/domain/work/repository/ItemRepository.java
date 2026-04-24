@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * ItemRepository — Domain Repository Port (Work Context)
  */
-@Component("workItemRepository")
 public interface ItemRepository {
 
     Item save(Item item);
@@ -30,4 +30,6 @@ public interface ItemRepository {
 
     /** Soft-deletes an item. */
     void delete(Item item);
+
+    int softDeleteByWorkspaceIdInBatch(UUID workspaceId, UUID deletedById, int batchSize);
 }

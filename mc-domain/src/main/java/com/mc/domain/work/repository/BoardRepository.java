@@ -12,7 +12,6 @@ import java.util.UUID;
  *
  * <p>Outbound port for Board persistence. Implementation lives in mc-infrastructure.</p>
  */
-//@Component("workBoardRepository")
 public interface BoardRepository {
 
     Board save(Board board);
@@ -38,5 +37,7 @@ public interface BoardRepository {
     void restore(Long boardId);
 
     int softDeleteByWorkspaceIdInBatch(UUID workspaceID, UUID deletedById, int batchSize);
+
+    Long countByWorkspaceId(UUID workspaceId);
 
 }

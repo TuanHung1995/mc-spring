@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mc.domain.core.event.broker.rabbitMQ.WorkspaceDeletedIntegrationEvent;
 import com.mc.domain.organization.port.out.WorkspaceMessagePort;
-import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.UUID;
@@ -82,7 +81,7 @@ public class WorkspaceAppServiceImpl implements WorkspaceAppService {
 
         // Publish internal Integration Event to trigger Async cascades (e.g. Work Bounded Context)
         workspaceMessagePort.publishWorkspaceDeletedEvent(
-                new WorkspaceDeletedIntegrationEvent(id, currentUser.id(), LocalDateTime.now())
+                new WorkspaceDeletedIntegrationEvent(id, currentUser.id())
         );
     }
 

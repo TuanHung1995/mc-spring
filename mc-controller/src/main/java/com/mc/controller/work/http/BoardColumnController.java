@@ -22,12 +22,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/columns")
-@Component("workBoardColumnController")
 @RequiredArgsConstructor
 @Slf4j
 public class BoardColumnController {
 
-    @Qualifier("workBoardColumnAppService")
     private final BoardColumnAppService boardColumnAppService;
 
     @PostMapping

@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
  */
 @Repository
 @RequiredArgsConstructor
-@Component("workBoardRepository")
 public class BoardRepositoryImpl implements BoardRepository {
 
     private final BoardJpaRepository jpaRepository;
@@ -78,6 +77,11 @@ public class BoardRepositoryImpl implements BoardRepository {
     @Override
     public int softDeleteByWorkspaceIdInBatch(UUID workspaceID, UUID deletedById, int batchSize) {
         return jpaRepository.softDeleteByWorkspaceIdInBatch(workspaceID, deletedById, batchSize);
+    }
+
+    @Override
+    public Long countByWorkspaceId(UUID workspaceId) {
+        return jpaRepository.countByWorkspaceId(workspaceId);
     }
 
 }

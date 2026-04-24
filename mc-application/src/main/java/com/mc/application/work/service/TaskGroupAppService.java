@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * TaskGroupAppService — Application Service Port (Work Context)
  */
-@Component("workTaskGroupAppService")
 public interface TaskGroupAppService {
 
     TaskGroupResponse createGroup(CreateTaskGroupRequest request);

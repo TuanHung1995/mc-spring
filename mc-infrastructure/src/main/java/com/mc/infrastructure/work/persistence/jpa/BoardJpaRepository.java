@@ -63,4 +63,6 @@ public interface BoardJpaRepository extends JpaRepository<BoardJpaEntity, Long> 
     @Query(value = "UPDATE work_boards SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE id = :boardId",
            nativeQuery = true)
     void restore(@Param("boardId") Long boardId);
+
+    Long countByWorkspaceId(UUID workspaceId);
 }

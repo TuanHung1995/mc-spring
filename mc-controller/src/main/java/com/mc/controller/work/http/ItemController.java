@@ -22,12 +22,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/items")
-@Component("workItemController")
 @RequiredArgsConstructor
 @Slf4j
 public class ItemController {
 
-    @Qualifier("workItemAppService")
     private final ItemAppService itemAppService;
 
     @PostMapping

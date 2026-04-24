@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * TaskGroupJpaRepository — Spring Data JPA Repository (Work Context)
@@ -55,4 +56,11 @@ public interface TaskGroupJpaRepository extends JpaRepository<TaskGroupJpaEntity
     @Modifying
     @Query(value = "DELETE FROM work_task_groups WHERE id = :id", nativeQuery = true)
     void permanentDeleteById(@Param("id") Long id);
+
+    @Modifying
+    @Query(value = "UPDATE work_task_groups SET is_deleted = true, updated_at = NOW(), deleted_at = NOW(), deleted_by = :deletedById " +
+            "WHERE workspace_id = :workspaceId " +
+            "AND is_deleted = false " +
+            "LIMIT :batchSize", nativeQuery = true)
+    int softDeleteByWorkspaceIdInBatch(@Param("workspaceId") UUID workspaceId, @Param("deletedById") UUID deletedById, @Param("batchSize") int batchSize);
 }

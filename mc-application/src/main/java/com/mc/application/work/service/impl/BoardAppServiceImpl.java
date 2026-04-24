@@ -36,20 +36,14 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Component("workBoardAppService")
 public class BoardAppServiceImpl implements BoardAppService {
 
-    @Qualifier("workBoardRepository")
     private final BoardRepository boardRepository;
     @Qualifier("workBoardMemberRepository")
     private final BoardMemberRepository boardMemberRepository;
-    @Qualifier("workTaskGroupRepository")
     private final TaskGroupRepository taskGroupRepository;
-    @Qualifier("workBoardColumnRepository")
     private final BoardColumnRepository columnRepository;
-    @Qualifier("workItemRepository")
     private final ItemRepository itemRepository;
-    @Qualifier("workColumnValueRepository")
     private final ColumnValueRepository columnValueRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;

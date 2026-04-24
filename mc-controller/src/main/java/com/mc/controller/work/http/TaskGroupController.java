@@ -25,12 +25,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/task-groups")
-@Component("workTaskGroupController")
 @RequiredArgsConstructor
 @Slf4j
 public class TaskGroupController {
 
-    @Qualifier("workTaskGroupAppService")
     private final TaskGroupAppService taskGroupAppService;
 
     @PostMapping
