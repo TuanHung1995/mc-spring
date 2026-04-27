@@ -57,7 +57,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
     }
 
     @Override
-    public void softDeleteByIds(UUID teamId, UUID deletedBy) {
-        workspaceJpaRepository.softDeleteByIds(teamId, deletedBy);
+    public void softDeleteByTeamId(UUID teamId, UUID deletedBy) {
+        workspaceJpaRepository.softDeleteByTeamId(teamId, deletedBy);
     }
 }
