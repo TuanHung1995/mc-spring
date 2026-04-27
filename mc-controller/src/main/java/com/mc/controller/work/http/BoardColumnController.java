@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * BoardColumnController — HTTP Adapter (Work Context)
@@ -22,16 +23,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/columns")
-@Component("workBoardColumnController")
 @RequiredArgsConstructor
 @Slf4j
 public class BoardColumnController {
 
-    @Qualifier("workBoardColumnAppService")
     private final BoardColumnAppService boardColumnAppService;
 
     @PostMapping
-//    @PreAuthorize("hasPermission(#request.boardId, 'Board', 'COLUMN:CREATE')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#request.boardId, 'COLUMN:CREATE')")
     public ResponseEntity<ColumnResponse> createColumn(
             @Valid @RequestBody CreateColumnRequest request) {
         log.info("Creating column in board {}", request.getBoardId());
@@ -39,19 +38,19 @@ public class BoardColumnController {
     }
 
     @GetMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:VIEW')")
+    @PreAuthorize("@workSecurity.canAccessColumn(#id, 'COLUMN:VIEW')")
     public ResponseEntity<ColumnResponse> getColumn(@PathVariable Long id) {
         return ResponseEntity.ok(boardColumnAppService.getColumnById(id));
     }
 
     @GetMapping("/board/{boardId}")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'COLUMN:VIEW')")
-    public ResponseEntity<List<ColumnResponse>> getColumnsByBoard(@PathVariable Long boardId) {
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'COLUMN:VIEW')")
+    public ResponseEntity<List<ColumnResponse>> getColumnsByBoard(@PathVariable UUID boardId) {
         return ResponseEntity.ok(boardColumnAppService.getColumnsByBoard(boardId));
     }
 
     @PutMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessColumn(#id, 'COLUMN:EDIT')")
     public ResponseEntity<ColumnResponse> updateColumn(
             @PathVariable Long id,
             @RequestParam String title) {
@@ -59,7 +58,7 @@ public class BoardColumnController {
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Column', 'COLUMN:DELETE')")
+    @PreAuthorize("@workSecurity.canAccessColumn(#id, 'COLUMN:DELETE')")
     public ResponseEntity<Void> deleteColumn(@PathVariable Long id) {
         boardColumnAppService.deleteColumn(id);
         return ResponseEntity.noContent().build();

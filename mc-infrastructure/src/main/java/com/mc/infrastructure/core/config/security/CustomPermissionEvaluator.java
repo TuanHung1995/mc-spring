@@ -52,7 +52,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         }
         return false;
     }
-//
+
     @Override
     public boolean hasPermission(Authentication auth, Serializable targetId, String targetType, Object permission) {
         if (auth == null || targetId == null || permission == null) return false;

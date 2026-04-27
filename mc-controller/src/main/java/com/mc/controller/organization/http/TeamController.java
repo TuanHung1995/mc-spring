@@ -46,4 +46,10 @@ public class TeamController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTeam(@PathVariable UUID id) {
+        teamAppService.deleteTeam(id);
+        return ResponseEntity.noContent().build();
+    }
 }

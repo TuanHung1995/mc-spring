@@ -12,7 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
+import java.util.UUID;
 
 /**
  * BoardController — HTTP Adapter (Work Context)
@@ -23,12 +26,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/boards")
-@Component("workBoardController")
 @RequiredArgsConstructor
 @Slf4j
 public class BoardController {
 
-    @Qualifier("workBoardAppService")
     private final BoardAppService boardAppService;
 
     // =================================================================
@@ -36,15 +37,15 @@ public class BoardController {
     // =================================================================
 
     @PostMapping
-//    @PreAuthorize("hasPermission(#request.workspaceId, 'Workspace', 'BOARD:CREATE')")
+    @PreAuthorize("@workSecurity.canAccessWorkspace(#request.workspaceId, 'BOARD:CREATE')")
     public ResponseEntity<BoardResponse> createBoard(@Valid @RequestBody CreateBoardRequest request) {
         log.info("Creating board in workspace {}", request.getWorkspaceId());
         return ResponseEntity.ok(boardAppService.createBoard(request));
     }
 
     @GetMapping("/{boardId}")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:VIEW')")
-    public ResponseEntity<BoardResponse> getBoard(@PathVariable Long boardId) {
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:VIEW')")
+    public ResponseEntity<BoardResponse> getBoard(@PathVariable UUID boardId) {
         return ResponseEntity.ok(boardAppService.getBoardById(boardId));
     }
 
@@ -58,8 +59,8 @@ public class BoardController {
      * POST kept instead of DELETE for semantic clarity — trash is reversible.
      */
     @PostMapping("/{boardId}/trash")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:TRASH')")
-    public ResponseEntity<Void> trashBoard(@PathVariable Long boardId) {
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:TRASH')")
+    public ResponseEntity<Void> trashBoard(@PathVariable UUID boardId) {
         boardAppService.trashBoard(boardId);
         return ResponseEntity.noContent().build();
     }
@@ -68,8 +69,8 @@ public class BoardController {
      * Permanently removes a board and all its data. Irreversible.
      */
     @DeleteMapping("/{boardId}/permanent")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:DELETE')")
-    public ResponseEntity<Void> deleteBoardPermanently(@PathVariable Long boardId) {
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:DELETE')")
+    public ResponseEntity<Void> deleteBoardPermanently(@PathVariable UUID boardId) {
         boardAppService.deleteBoardPermanently(boardId);
         return ResponseEntity.noContent().build();
     }
@@ -83,9 +84,9 @@ public class BoardController {
      * Uses a discriminator type field ("TASK_GROUP" | "COLUMN" | "ITEM").
      */
     @PutMapping("/{boardId}/elements")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'BOARD:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:EDIT')")
     public ResponseEntity<Void> updateBoardElement(
-            @PathVariable Long boardId,
+            @PathVariable UUID boardId,
             @RequestBody UpdateBoardElementRequest request) {
         boardAppService.updateBoardElement(request);
         return ResponseEntity.noContent().build();
@@ -99,7 +100,7 @@ public class BoardController {
      * Reorders task groups within a board (drag-and-drop).
      */
     @PutMapping("/groups/reorder")
-//    @PreAuthorize("hasPermission(#request.targetId, 'Group', 'BOARD:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessGroup(#request.targetId, 'BOARD:EDIT')")
     public ResponseEntity<Void> reorderGroup(@RequestBody ReorderRequest request) {
         boardAppService.reorderGroup(request);
         return ResponseEntity.noContent().build();
@@ -109,8 +110,8 @@ public class BoardController {
      * Reorders columns within a board (drag-and-drop).
      */
     @PutMapping("/columns/reorder")
-//    @PreAuthorize("hasPermission(#request.targetId, 'Column', 'BOARD:EDIT')")
-    public ResponseEntity<Void> reorderColumn(@RequestBody ReorderRequest request) {
+    @PreAuthorize("@workSecurity.canAccessColumn(#request.targetId, 'BOARD:EDIT')")
+    public ResponseEntity<Void> reorderColumn(@RequestBody ReorderColumnRequest request) {
         boardAppService.reorderColumn(request);
         return ResponseEntity.noContent().build();
     }
@@ -119,7 +120,7 @@ public class BoardController {
      * Reorders items within or across task groups (drag-and-drop).
      */
     @PutMapping("/items/reorder")
-//    @PreAuthorize("hasPermission(#request.targetId, 'Item', 'BOARD:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessItem(#request.targetId, 'BOARD:EDIT')")
     public ResponseEntity<Void> reorderItem(@RequestBody ReorderRequest request) {
         boardAppService.reorderItem(request);
         return ResponseEntity.noContent().build();

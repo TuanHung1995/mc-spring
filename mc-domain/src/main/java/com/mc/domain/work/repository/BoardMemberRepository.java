@@ -11,7 +11,7 @@ import java.util.UUID;
 @Component("workBoardMemberRepository")
 public interface BoardMemberRepository {
 
-    Optional<Role> findRoleByBoardIdAndUserId(Long boardId, UUID userId);
+    Optional<Role> findRoleByBoardIdAndUserId(UUID boardId, UUID userId);
 
     BoardMember save(BoardMember boardMember);
 
@@ -22,6 +22,6 @@ public interface BoardMemberRepository {
      * @param userId  the ID of the user
      * @return true if the user is a member, false otherwise
      */
-    boolean existsByBoardIdAndUserId(Long boardId, UUID userId);
+    boolean existsByBoardIdAndUserId(UUID boardId, UUID userId);
 
 }

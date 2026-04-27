@@ -29,12 +29,9 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Component("workItemAppService")
 public class ItemAppServiceImpl implements ItemAppService {
 
-    @Qualifier("workItemRepository")
     private final ItemRepository itemRepository;
-    @Qualifier("workTaskGroupRepository")
     private final TaskGroupRepository taskGroupRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;
@@ -59,59 +56,59 @@ public class ItemAppServiceImpl implements ItemAppService {
                 request.getName(), newPos, userId);
         Item saved = itemRepository.save(item);
 
-        publishEvent("ITEM_CREATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
+//        publishEvent("ITEM_CREATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
         return toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ItemResponse getItemById(Long itemId) {
+    public ItemResponse getItemById(UUID itemId) {
         return toResponse(requireItem(itemId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemResponse> getItemsByGroup(Long groupId) {
+    public List<ItemResponse> getItemsByGroup(UUID groupId) {
         return itemRepository.findByGroupId(groupId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemResponse> getItemsByBoard(Long boardId) {
+    public List<ItemResponse> getItemsByBoard(UUID boardId) {
         return itemRepository.findByBoardId(boardId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public ItemResponse updateItemName(Long itemId, String newName) {
+    public ItemResponse updateItemName(UUID itemId, String newName) {
 
         UUID userId = workUserContextPort.getCurrentUser().id();
 
         Item item = requireItem(itemId);
         item.rename(newName, userId);
         Item saved = itemRepository.save(item);
-        publishEvent("ITEM_UPDATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
+//        publishEvent("ITEM_UPDATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
         return toResponse(saved);
     }
 
     @Override
     @Transactional
-    public void deleteItem(Long itemId) {
+    public void deleteItem(UUID itemId) {
         UUID userId = workUserContextPort.getCurrentUser().id();
         Item item = requireItem(itemId);
-        Long boardId = item.getBoardId();
+        UUID boardId = item.getBoardId();
         item.trash(userId);
         itemRepository.delete(item);
-        publishEvent("ITEM_DELETED", itemId, boardId, null);
+//        publishEvent("ITEM_DELETED", itemId, boardId, null);
     }
 
     // =================================================================
     // HELPERS
     // =================================================================
 
-    private Item requireItem(Long itemId) {
+    private Item requireItem(UUID itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId));
     }

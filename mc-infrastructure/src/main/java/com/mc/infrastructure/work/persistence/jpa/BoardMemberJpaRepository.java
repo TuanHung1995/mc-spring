@@ -17,8 +17,8 @@ public interface BoardMemberJpaRepository extends JpaRepository<BoardMemberJpaEn
             "WHERE r.id = (SELECT bm.role_id FROM work_board_members bm " +
             "WHERE bm.board_id = :boardId AND bm.user_id = :userId)",
             nativeQuery = true)
-    Optional<Role> findRoleByBoardIdAndUserId(@Param("boardId") Long boardId, @Param("userId") UUID userId);
+    Optional<Role> findRoleByBoardIdAndUserId(@Param("boardId") UUID boardId, @Param("userId") UUID userId);
 
-    boolean existsByBoardIdAndUserId(Long boardId, UUID userId);
+    boolean existsByBoardIdAndUserId(UUID boardId, UUID userId);
 
 }

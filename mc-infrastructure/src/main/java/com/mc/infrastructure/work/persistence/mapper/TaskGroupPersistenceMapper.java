@@ -23,8 +23,8 @@ public class TaskGroupPersistenceMapper {
         entity.setArchived(domain.isArchived());
         entity.setDeleted(domain.isDeleted());
         entity.setArchivedById(domain.getArchivedBy());
-        entity.setCreatedById(domain.getCreatedBy());
-        entity.setUpdatedById(domain.getUpdatedBy());
+        entity.setCreatedBy(domain.getCreatedBy());
+        entity.setUpdatedBy(domain.getUpdatedBy());
         entity.setDeletedById(domain.getDeletedBy());
         entity.setDeletedAt(domain.getDeletedAt());
         entity.setCreatedAt(domain.getCreatedAt());
@@ -46,8 +46,8 @@ public class TaskGroupPersistenceMapper {
                 entity.isArchived(),
                 entity.getArchivedAt(),
                 entity.getArchivedById(),
-                entity.getCreatedById(),
-                entity.getUpdatedById(),
+                entity.getCreatedBy(),
+                entity.getUpdatedBy(),
                 entity.getDeletedById(),
                 entity.getDeletedAt(),
                 entity.getCreatedAt(),

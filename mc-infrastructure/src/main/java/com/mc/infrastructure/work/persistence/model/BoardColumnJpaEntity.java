@@ -1,5 +1,6 @@
 package com.mc.infrastructure.work.persistence.model;
 
+import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import com.mc.infrastructure.core.persistence.model.BaseLongJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,7 +26,7 @@ import org.hibernate.type.SqlTypes;
 public class BoardColumnJpaEntity extends BaseLongJpaEntity {
 
     @Column(name = "board_id")
-    private Long boardId;
+    private UUID boardId;
 
     @Column(name = "title")
     private String title;

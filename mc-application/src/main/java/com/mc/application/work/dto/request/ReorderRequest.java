@@ -2,6 +2,8 @@ package com.mc.application.work.dto.request;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 /**
  * ReorderRequest — Application DTO (Work Context)
  *
@@ -17,9 +19,9 @@ import lombok.Data;
  */
 @Data
 public class ReorderRequest {
-    private Long targetId;
-    private Long previousId;
-    private Long nextId;
+    private UUID targetId;
+    private UUID previousId;
+    private UUID nextId;
     /** Only populated for item reorder — indicates the target group after a cross-group move. */
-    private Long targetGroupId;
+    private UUID targetGroupId;
 }

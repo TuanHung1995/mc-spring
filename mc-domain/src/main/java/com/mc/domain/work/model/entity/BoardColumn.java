@@ -29,7 +29,7 @@ public class BoardColumn extends BaseWorkEntity {
     // =================================================================
 
     /** The parent Board's ID. */
-    private Long boardId;
+    private UUID boardId;
 
     private String title;
     private BoardColumnType type;
@@ -50,7 +50,7 @@ public class BoardColumn extends BaseWorkEntity {
     private BoardColumn() {}
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
-    public BoardColumn(Long id, Long boardId, String title, BoardColumnType type, String description,
+    public BoardColumn(Long id, UUID boardId, String title, BoardColumnType type, String description,
                        double position, int width, boolean hidden,
                        UUID createdById, UUID updatedById, UUID deletedById, LocalDateTime deletedAt,
                        LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
@@ -81,7 +81,7 @@ public class BoardColumn extends BaseWorkEntity {
      * @param position    Fractional position for ordering.
      * @param createdById ID of the user creating the column.
      */
-    public static BoardColumn create(Long boardId, String title, BoardColumnType type,
+    public static BoardColumn create(UUID boardId, String title, BoardColumnType type,
                                      double position, UUID createdById) {
         if (boardId == null) {
             throw new DomainException("BoardColumn must belong to a Board");

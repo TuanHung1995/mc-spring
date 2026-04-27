@@ -12,7 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
+import java.util.UUID;
 
 /**
  * TaskGroupController — HTTP Adapter (Work Context)
@@ -23,16 +26,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v2/task-groups")
-@Component("workTaskGroupController")
 @RequiredArgsConstructor
 @Slf4j
 public class TaskGroupController {
 
-    @Qualifier("workTaskGroupAppService")
     private final TaskGroupAppService taskGroupAppService;
 
     @PostMapping
-//    @PreAuthorize("hasPermission(#request.boardId, 'Board', 'GROUP:CREATE')")
+    @PreAuthorize("@workSecurity.canAccessBoard(#request.boardId, 'GROUP:CREATE')")
     public ResponseEntity<TaskGroupResponse> createGroup(
             @Valid @RequestBody CreateTaskGroupRequest request) {
         log.info("Creating task group in board {}", request.getBoardId());
@@ -40,74 +41,74 @@ public class TaskGroupController {
     }
 
     @GetMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:VIEW')")
-    public ResponseEntity<TaskGroupResponse> getGroup(@PathVariable Long id) {
+    @PreAuthorize("@workSecurity.canAccessGroup(#id, 'GROUP:VIEW')")
+    public ResponseEntity<TaskGroupResponse> getGroup(@PathVariable UUID id) {
         return ResponseEntity.ok(taskGroupAppService.getGroupById(id));
     }
 
     @GetMapping("/board/{boardId}")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'GROUP:VIEW')")
-    public ResponseEntity<List<TaskGroupResponse>> getGroupsByBoard(@PathVariable Long boardId) {
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'GROUP:VIEW')")
+    public ResponseEntity<List<TaskGroupResponse>> getGroupsByBoard(@PathVariable UUID boardId) {
         return ResponseEntity.ok(taskGroupAppService.getGroupsByBoard(boardId));
     }
 
     @PutMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:EDIT')")
+    @PreAuthorize("@workSecurity.canAccessGroup(#id, 'GROUP:EDIT')")
     public ResponseEntity<TaskGroupResponse> updateGroup(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody UpdateTaskGroupRequest request) {
         return ResponseEntity.ok(taskGroupAppService.updateGroup(id, request));
     }
 
     /** Soft-deletes (trashes) a task group. Recoverable via /restore. */
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:TRASH')")
-    public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
+    @PreAuthorize("@workSecurity.canAccessGroup(#id, 'GROUP:TRASH')")
+    public ResponseEntity<Void> deleteGroup(@PathVariable UUID id) {
         taskGroupAppService.deleteGroup(id);
         return ResponseEntity.noContent().build();
     }
 
     /** Archives a group — hidden from main board view but still accessible. */
     @PutMapping("/{id}/archive")
-//    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:ARCHIVE')")
-    public ResponseEntity<Void> archiveGroup(@PathVariable Long id) {
+    @PreAuthorize("@workSecurity.canAccessGroup(#id, 'GROUP:ARCHIVE')")
+    public ResponseEntity<Void> archiveGroup(@PathVariable UUID id) {
         taskGroupAppService.archiveGroup(id);
         return ResponseEntity.noContent().build();
     }
 
     /** Unarchives a previously archived group. */
     @PutMapping("/{id}/unarchive")
-//    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:ARCHIVE')")
-    public ResponseEntity<Void> unarchiveGroup(@PathVariable Long id) {
+    @PreAuthorize("@workSecurity.canAccessGroup(#id, 'GROUP:ARCHIVE')")
+    public ResponseEntity<Void> unarchiveGroup(@PathVariable UUID id) {
         taskGroupAppService.unarchiveGroup(id);
         return ResponseEntity.noContent().build();
     }
 
     /** Restores a soft-deleted (trashed) group. */
     @PutMapping("/{id}/restore")
-//    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:RESTORE')")
-    public ResponseEntity<Void> restoreGroup(@PathVariable Long id) {
+    @PreAuthorize("@workSecurity.canAccessGroup(#id, 'GROUP:RESTORE')")
+    public ResponseEntity<Void> restoreGroup(@PathVariable UUID id) {
         taskGroupAppService.restoreGroup(id);
         return ResponseEntity.noContent().build();
     }
 
     /** Permanently deletes a trashed group. Irreversible. */
     @DeleteMapping("/{id}/permanent")
-//    @PreAuthorize("hasPermission(#id, 'Group', 'GROUP:DELETE')")
-    public ResponseEntity<Void> permanentDeleteGroup(@PathVariable Long id) {
+    @PreAuthorize("@workSecurity.canAccessGroup(#id, 'GROUP:DELETE')")
+    public ResponseEntity<Void> permanentDeleteGroup(@PathVariable UUID id) {
         taskGroupAppService.permanentDeleteGroup(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/board/{boardId}/archived")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'GROUP:VIEW')")
-    public ResponseEntity<List<TaskGroupResponse>> getArchivedGroups(@PathVariable Long boardId) {
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'GROUP:VIEW')")
+    public ResponseEntity<List<TaskGroupResponse>> getArchivedGroups(@PathVariable UUID boardId) {
         return ResponseEntity.ok(taskGroupAppService.getArchivedGroupsByBoard(boardId));
     }
 
     @GetMapping("/board/{boardId}/trashed")
-//    @PreAuthorize("hasPermission(#boardId, 'Board', 'GROUP:VIEW')")
-    public ResponseEntity<List<TaskGroupResponse>> getTrashedGroups(@PathVariable Long boardId) {
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'GROUP:VIEW')")
+    public ResponseEntity<List<TaskGroupResponse>> getTrashedGroups(@PathVariable UUID boardId) {
         return ResponseEntity.ok(taskGroupAppService.getTrashedGroupsByBoard(boardId));
     }
 }

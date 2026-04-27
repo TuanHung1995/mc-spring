@@ -26,12 +26,12 @@ public class BoardMemberRepositoryImpl implements BoardMemberRepository {
     }
 
     @Override
-    public Optional<Role> findRoleByBoardIdAndUserId(Long boardId, UUID userId) {
+    public Optional<Role> findRoleByBoardIdAndUserId(UUID boardId, UUID userId) {
         return jpaRepository.findRoleByBoardIdAndUserId(boardId, userId);
     }
 
     @Override
-    public boolean existsByBoardIdAndUserId(Long boardId, UUID userId) {
+    public boolean existsByBoardIdAndUserId(UUID boardId, UUID userId) {
         return jpaRepository.existsByBoardIdAndUserId(boardId, userId);
     }
 

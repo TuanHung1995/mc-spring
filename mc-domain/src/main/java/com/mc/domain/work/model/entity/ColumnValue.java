@@ -1,9 +1,11 @@
 package com.mc.domain.work.model.entity;
 
-import com.mc.domain.work.model.BaseWorkEntity;
+import com.mc.domain.core.model.BaseDomainEntity;
+import com.mc.domain.core.util.IdUtils;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * ColumnValue — Domain Entity (Work Bounded Context)
@@ -18,15 +20,15 @@ import java.time.LocalDateTime;
  * (strings), some use {@code color} (for STATUS labels).</p>
  */
 @Getter
-public class ColumnValue extends BaseWorkEntity {
+public class ColumnValue extends BaseDomainEntity {
 
     // =================================================================
     // STATE
     // =================================================================
 
-    private Long itemId;
+    private UUID itemId;
     private Long columnId;
-    private Long boardId;
+    private UUID boardId;
 
     /** Generic value field (used for PERSON: user ID, LINK: URL, etc.) */
     private String value;
@@ -49,7 +51,7 @@ public class ColumnValue extends BaseWorkEntity {
     private ColumnValue() {}
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
-    public ColumnValue(Long id, Long itemId, Long columnId, Long boardId,
+    public ColumnValue(UUID id, UUID itemId, Long columnId, UUID boardId,
                        String value, String textValue, String color, String type,
                        LocalDateTime deletedAt, LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
@@ -78,11 +80,11 @@ public class ColumnValue extends BaseWorkEntity {
      * @param color      Color hex (nullable; only for STATUS columns).
      * @param type       Column type string matching {@code BoardColumnType}).
      */
-    public static ColumnValue createDefault(Long itemId, Long columnId, Long boardId,
+    public static ColumnValue createDefault(UUID itemId, Long columnId, UUID boardId,
                                             String value, String textValue,
                                             String color, String type) {
         ColumnValue cv = new ColumnValue();
-        cv.initNew(null);
+        cv.initializeNewEntity(IdUtils.newId());
         cv.itemId = itemId;
         cv.columnId = columnId;
         cv.boardId = boardId;
@@ -104,6 +106,6 @@ public class ColumnValue extends BaseWorkEntity {
         if (value != null) this.value = value;
         if (textValue != null) this.textValue = textValue;
         if (color != null) this.color = color;
-        touch();
+        markAsModified();
     }
 }

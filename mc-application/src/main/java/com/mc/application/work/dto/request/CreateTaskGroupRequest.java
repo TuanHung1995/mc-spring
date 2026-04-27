@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.UUID;
+
 /**
  * CreateTaskGroupRequest — Application DTO (Work Context)
  */
@@ -11,7 +13,7 @@ import lombok.Data;
 public class CreateTaskGroupRequest {
 
     @NotNull(message = "boardId is required")
-    private Long boardId;
+    private UUID boardId;
 
     @NotBlank(message = "title is required")
     private String title;

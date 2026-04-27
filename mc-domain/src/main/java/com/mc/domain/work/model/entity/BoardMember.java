@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 public class BoardMember extends BaseWorkEntity {
 
-    private Long boardId;
+    private UUID boardId;
     private UUID userId;
     private Long roleId;
     private UUID createdBy;
@@ -21,7 +21,7 @@ public class BoardMember extends BaseWorkEntity {
     private BoardMember() {}
 
     public BoardMember(Long id, LocalDateTime createdAt, LocalDateTime updatedAt,
-                       boolean deleted, Long boardId, UUID userId, Long roleId,
+                       boolean deleted, UUID boardId, UUID userId, Long roleId,
                        UUID createdBy, UUID deletedBy, UUID updatedBy, LocalDateTime joinedAt,
                        LocalDateTime deletedAt) {
         super(id, createdAt, updatedAt, deleted);
@@ -35,7 +35,7 @@ public class BoardMember extends BaseWorkEntity {
         this.deletedAt = deletedAt;
     }
 
-    public static BoardMember addMember(Long boardId, UUID userId, Long roleId) {
+    public static BoardMember addMember(UUID boardId, UUID userId, Long roleId) {
         BoardMember member = new BoardMember();
         member.initNew(null);
         member.boardId = boardId;

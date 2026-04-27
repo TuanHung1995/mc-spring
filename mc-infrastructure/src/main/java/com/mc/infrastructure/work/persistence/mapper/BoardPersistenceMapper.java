@@ -24,7 +24,7 @@ public class BoardPersistenceMapper {
         entity.setType(domain.getType() != null ? domain.getType().name() : null);
         entity.setPurpose(domain.getPurpose());
         entity.setWorkspaceId(domain.getWorkspaceId());
-        entity.setCreatedById(domain.getCreatedById());
+        entity.setCreatedBy(domain.getCreatedById());
         entity.setDeletedById(domain.getDeletedById());
         entity.setDeletedAt(domain.getDeletedAt());
         entity.setCreatedAt(domain.getCreatedAt());
@@ -38,7 +38,7 @@ public class BoardPersistenceMapper {
         BoardType type = null;
         if (entity.getType() != null) {
             try { type = BoardType.valueOf(entity.getType()); }
-            catch (IllegalArgumentException ignored) { type = BoardType.BOARD; }
+            catch (IllegalArgumentException ignored) { type = BoardType.PUBLIC; }
         }
 
         return new Board(
@@ -48,7 +48,7 @@ public class BoardPersistenceMapper {
                 type,
                 entity.getPurpose(),
                 entity.getWorkspaceId(),
-                entity.getCreatedById(),
+                entity.getCreatedBy(),
                 entity.getDeletedById(),
                 entity.getDeletedAt(),
                 entity.getCreatedAt(),

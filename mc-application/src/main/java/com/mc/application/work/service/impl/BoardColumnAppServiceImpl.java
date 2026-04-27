@@ -27,10 +27,8 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Component("workBoardColumnAppService")
 public class BoardColumnAppServiceImpl implements BoardColumnAppService {
 
-    @Qualifier("workBoardColumnRepository")
     private final BoardColumnRepository columnRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;
@@ -47,7 +45,7 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
         BoardColumn col = BoardColumn.create(request.getBoardId(), request.getTitle(), type, newPos, userId);
         BoardColumn saved = columnRepository.save(col);
 
-        publishEvent("COLUMN_CREATED", saved.getId(), saved.getBoardId());
+//        publishEvent("COLUMN_CREATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 
@@ -59,7 +57,7 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ColumnResponse> getColumnsByBoard(Long boardId) {
+    public List<ColumnResponse> getColumnsByBoard(UUID boardId) {
         return columnRepository.findAllByBoardId(boardId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
@@ -73,7 +71,7 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
         BoardColumn col = requireColumn(columnId);
         col.rename(newTitle, userId);
         BoardColumn saved = columnRepository.save(col);
-        publishEvent("COLUMN_UPDATED", saved.getId(), saved.getBoardId());
+//        publishEvent("COLUMN_UPDATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 
@@ -82,10 +80,10 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
     public void deleteColumn(Long columnId) {
         UUID userId = workUserContextPort.getCurrentUser().id();
         BoardColumn col = requireColumn(columnId);
-        Long boardId = col.getBoardId();
+        UUID boardId = col.getBoardId();
         col.trash(userId);
         columnRepository.delete(col);
-        publishEvent("COLUMN_DELETED", columnId, boardId);
+//        publishEvent("COLUMN_DELETED", columnId, boardId);
     }
 
     // =================================================================

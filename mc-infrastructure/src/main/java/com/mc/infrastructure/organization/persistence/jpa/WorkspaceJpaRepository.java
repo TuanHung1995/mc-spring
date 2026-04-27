@@ -2,6 +2,9 @@ package com.mc.infrastructure.organization.persistence.jpa;
 
 import com.mc.infrastructure.organization.persistence.model.WorkspaceJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,4 +24,13 @@ public interface WorkspaceJpaRepository extends JpaRepository<WorkspaceJpaEntity
      * @param teamId UUID of the parent Team.
      */
     List<WorkspaceJpaEntity> findAllByTeamId(UUID teamId);
+
+    List<UUID> findIdsByTeamId(UUID teamId);
+
+    @Modifying
+    @Query(value = "UPDATE org_workspaces SET is_deleted = true, updated_at = NOW(), deleted_at = NOW(), deleted_by = :deletedBy " +
+            "WHERE team_id = :teamId " +
+            "AND is_deleted = false", nativeQuery = true)
+    void softDeleteByTeamId(@Param("teamId") UUID teamId, @Param("deletedBy") UUID deletedBy);
+
 }

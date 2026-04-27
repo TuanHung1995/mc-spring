@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * TaskGroupResponse — Application DTO (Work Context)
@@ -13,8 +14,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskGroupResponse {
-    private Long id;
-    private Long boardId;
+    private UUID id;
+    private UUID boardId;
     private String title;
     private String color;
     private double position;
