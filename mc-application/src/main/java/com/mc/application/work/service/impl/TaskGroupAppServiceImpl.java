@@ -47,19 +47,19 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
                 request.getColor(), newPos, userId);
         TaskGroup saved = taskGroupRepository.save(group);
 
-        publishEvent("GROUP_CREATED", saved.getId(), saved.getBoardId());
+//        publishEvent("GROUP_CREATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TaskGroupResponse getGroupById(Long groupId) {
+    public TaskGroupResponse getGroupById(UUID groupId) {
         return toResponse(requireGroup(groupId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskGroupResponse> getGroupsByBoard(Long boardId) {
+    public List<TaskGroupResponse> getGroupsByBoard(UUID boardId) {
         return taskGroupRepository.findActiveByBoardId(boardId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
@@ -114,7 +114,7 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
         group.restore();
         TaskGroup saved = taskGroupRepository.save(group);
-        publishEvent("GROUP_RESTORED", saved.getId(), saved.getBoardId());
+//        publishEvent("GROUP_RESTORED", saved.getId(), saved.getBoardId());
     }
 
     @Override
@@ -124,7 +124,7 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
         UUID boardId = group.getBoardId();
         taskGroupRepository.permanentDelete(group);
-        publishEvent("GROUP_PERMANENTLY_DELETED", groupId, boardId);
+//        publishEvent("GROUP_PERMANENTLY_DELETED", groupId, boardId);
     }
 
     @Override

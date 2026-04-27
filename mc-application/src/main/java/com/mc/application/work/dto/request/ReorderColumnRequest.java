@@ -7,8 +7,8 @@ import java.util.UUID;
 @Data
 public class ReorderColumnRequest {
 
-    private UUID targetId;
-    private UUID previousId;
-    private UUID nextId;
+    private Long targetId;
+    private Long previousId;
+    private Long nextId;
 
 }

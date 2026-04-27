@@ -18,11 +18,11 @@ public interface BoardColumnJpaRepository extends JpaRepository<BoardColumnJpaEn
 
     /** All active (non-deleted) columns for a board, ordered by position. */
     @Query("SELECT c FROM BoardColumnJpaEntity c WHERE c.boardId = :boardId ORDER BY c.position ASC")
-    List<BoardColumnJpaEntity> findAllByBoardId(@Param("boardId") Long boardId);
+    List<BoardColumnJpaEntity> findAllByBoardId(@Param("boardId") UUID boardId);
 
     /** Max position in a board (for append-to-end new column logic). */
     @Query("SELECT MAX(c.position) FROM BoardColumnJpaEntity c WHERE c.boardId = :boardId")
-    Double getMaxPositionByBoardId(@Param("boardId") Long boardId);
+    Double getMaxPositionByBoardId(@Param("boardId") UUID boardId);
 
     /** Position of a specific column (for drag-and-drop calculation). */
     @Query("SELECT c.position FROM BoardColumnJpaEntity c WHERE c.id = :id")

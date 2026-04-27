@@ -22,15 +22,15 @@ public interface ItemJpaRepository extends JpaRepository<ItemJpaEntity, UUID> {
 
     /** All active items on a board. */
     @Query("SELECT i FROM ItemJpaEntity i WHERE i.boardId = :boardId ORDER BY i.position ASC")
-    List<ItemJpaEntity> findByBoardId(@Param("boardId") Long boardId);
+    List<ItemJpaEntity> findByBoardId(@Param("boardId") UUID boardId);
 
     /** Max position within a group (for append-to-end logic). */
     @Query("SELECT MAX(i.position) FROM ItemJpaEntity i WHERE i.groupId = :groupId")
-    Double getMaxPositionByGroupId(@Param("groupId") Long groupId);
+    Double getMaxPositionByGroupId(@Param("groupId") UUID groupId);
 
     /** Position of a specific item (for drag-and-drop calculation). */
     @Query("SELECT i.position FROM ItemJpaEntity i WHERE i.id = :id")
-    Double getPositionById(@Param("id") Long id);
+    Double getPositionById(@Param("id") UUID id);
 
     @Modifying
     @Query(value = "UPDATE work_items SET is_deleted = true, updated_at = NOW(), deleted_at = NOW(), deleted_by = :deletedById " +

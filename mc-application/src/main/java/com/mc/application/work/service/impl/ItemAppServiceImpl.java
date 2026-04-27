@@ -89,26 +89,26 @@ public class ItemAppServiceImpl implements ItemAppService {
         Item item = requireItem(itemId);
         item.rename(newName, userId);
         Item saved = itemRepository.save(item);
-        publishEvent("ITEM_UPDATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
+//        publishEvent("ITEM_UPDATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
         return toResponse(saved);
     }
 
     @Override
     @Transactional
-    public void deleteItem(Long itemId) {
+    public void deleteItem(UUID itemId) {
         UUID userId = workUserContextPort.getCurrentUser().id();
         Item item = requireItem(itemId);
-        Long boardId = item.getBoardId();
+        UUID boardId = item.getBoardId();
         item.trash(userId);
         itemRepository.delete(item);
-        publishEvent("ITEM_DELETED", itemId, boardId, null);
+//        publishEvent("ITEM_DELETED", itemId, boardId, null);
     }
 
     // =================================================================
     // HELPERS
     // =================================================================
 
-    private Item requireItem(Long itemId) {
+    private Item requireItem(UUID itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId));
     }

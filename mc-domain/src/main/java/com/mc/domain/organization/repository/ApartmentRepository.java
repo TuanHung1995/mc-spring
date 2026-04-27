@@ -30,5 +30,5 @@ public interface ApartmentRepository {
     /** Deletes an Apartment by UUID. Prefer soft-delete via the domain entity. */
     void delete(UUID id);
 
-    void softDeleteByWorkspaceId(UUID workspaceId);
+    void softDeleteByWorkspaceId(UUID workspaceId, UUID deletedBy);
 }

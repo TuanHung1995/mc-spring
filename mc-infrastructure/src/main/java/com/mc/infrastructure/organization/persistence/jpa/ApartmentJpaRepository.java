@@ -2,6 +2,8 @@ package com.mc.infrastructure.organization.persistence.jpa;
 
 import com.mc.infrastructure.organization.persistence.model.ApartmentJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,5 +24,9 @@ public interface ApartmentJpaRepository extends JpaRepository<ApartmentJpaEntity
      */
     List<ApartmentJpaEntity> findAllByWorkspaceId(UUID workspaceId);
 
-    void softDeleteByWorkspaceId(UUID workspaceId);
+    @Modifying
+    @Query(value = "UPDATE org_apartments SET is_deleted = true, updated_at = NOW(), deleted_at = NOW(), deleted_by = :deletedBy " +
+            "WHERE workspace_id = :workspaceId " +
+            "AND is_deleted = false", nativeQuery = true)
+    void softDeleteByWorkspaceId(UUID workspaceId, UUID deletedBy);
 }

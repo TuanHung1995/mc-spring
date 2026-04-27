@@ -79,8 +79,8 @@ public class WorkspaceAppServiceImpl implements WorkspaceAppService {
 
         // Domain entity enforces deletion invariants (e.g., already-deleted guard)
         workspace.softDelete(currentUser.id());
-        apartmentRepository.softDeleteByWorkspaceId(id);
         workspaceRepository.save(workspace);
+        apartmentRepository.softDeleteByWorkspaceId(id, currentUser.id());
 
         // Publish internal Integration Event to trigger Async cascades (e.g. Work Bounded Context)
         workspaceMessagePort.publishWorkspaceDeletedEvent(

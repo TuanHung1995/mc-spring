@@ -51,7 +51,7 @@ public class ApartmentRepositoryImpl implements ApartmentRepository {
     }
 
     @Override
-    public void softDeleteByWorkspaceId(UUID workspaceId) {
-        apartmentJpaRepository.softDeleteByWorkspaceId(workspaceId);
+    public void softDeleteByWorkspaceId(UUID workspaceId, UUID deletedBy) {
+        apartmentJpaRepository.softDeleteByWorkspaceId(workspaceId, deletedBy);
     }
 }

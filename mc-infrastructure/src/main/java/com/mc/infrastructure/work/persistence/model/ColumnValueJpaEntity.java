@@ -1,12 +1,9 @@
 package com.mc.infrastructure.work.persistence.model;
 
 import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
-import com.mc.infrastructure.core.persistence.model.BaseLongJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SoftDelete;
-import org.hibernate.type.NumericBooleanConverter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,7 +21,6 @@ import java.util.UUID;
 @Table(name = "work_column_values")
 @Getter
 @Setter
-@SoftDelete(columnName = "is_deleted", converter = NumericBooleanConverter.class)
 public class ColumnValueJpaEntity extends BaseJpaEntity {
 
     @Column(name = "item_id")

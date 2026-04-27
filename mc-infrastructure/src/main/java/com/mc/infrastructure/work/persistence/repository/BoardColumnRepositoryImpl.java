@@ -34,13 +34,13 @@ public class BoardColumnRepositoryImpl implements BoardColumnRepository {
     }
 
     @Override
-    public List<BoardColumn> findAllByBoardId(Long boardId) {
+    public List<BoardColumn> findAllByBoardId(UUID boardId) {
         return jpaRepository.findAllByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public Double getMaxPositionByBoardId(Long boardId) {
+    public Double getMaxPositionByBoardId(UUID boardId) {
         return jpaRepository.getMaxPositionByBoardId(boardId);
     }
 
