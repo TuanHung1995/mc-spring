@@ -270,11 +270,12 @@ create table org_apartment_members
 
 create table work_boards
 (
-    id           bigint unsigned auto_increment
+    id           binary(16)
         primary key,
-    workspace_id binary(16)                                                            not null,
-    created_by   binary(16)                                                            null,
-    deleted_by   binary(16)                                                            null,
+    workspace_id binary(16)                                                        not null,
+    created_by   binary(16)                                                        null,
+    updated_by   binary(16)                                                        null,
+    deleted_by   binary(16)                                                        null,
     name         varchar(255)                                                      not null,
     type         enum ('PUBLIC', 'PRIVATE', 'SHAREABLE') default 'PUBLIC'          null,
     purpose      varchar(255)                                                      null,
@@ -282,15 +283,24 @@ create table work_boards
     is_deleted   tinyint(1)                              default 0                 not null,
     created_at   datetime                                default CURRENT_TIMESTAMP null,
     updated_at   datetime                                default (now())           null on update CURRENT_TIMESTAMP,
-    deleted_at   datetime                                                          null
+    deleted_at   datetime                                                          null,
+    team_id      binary(16)                                                        not null
 )
     collate = utf8mb4_unicode_ci;
+
+create index idx_board_team
+    on work_boards (team_id);
+
+create index idx_board_workspace
+    on work_boards (workspace_id);
 
 create table work_board_columns
 (
     id          bigint unsigned auto_increment
         primary key,
-    board_id    bigint unsigned                                                                                 not null,
+    board_id    binary(16)                                                                                not null,
+    workspace_id    binary(16)                                                                              not null,
+    team_id    binary(16)                                                                             not null,
     created_by  binary(16)                                                                                           null,
     deleted_by  binary(16)                                                                                           null,
     archived_by binary(16)                                                                                           null,
@@ -313,30 +323,27 @@ create table work_board_columns
 )
     collate = utf8mb4_unicode_ci;
 
-create index idx_board_columns
+create index idx_bc_board
     on work_board_columns (board_id);
 
 create table work_board_members
 (
-    id        bigint auto_increment
+    id         bigint auto_increment
         primary key,
-    board_id  bigint unsigned                    not null,
-    user_id   binary(16)                              not null,
-    role_id   bigint                             not null,
-    created_by   binary(16)                              not null,
-    updated_by   binary(16)                              not null,
-    deleted_by   binary(16)                              not null,
-    joined_at datetime default CURRENT_TIMESTAMP null,
-    created_at   datetime default CURRENT_TIMESTAMP null,
-    updated_at   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    deleted_at   datetime default CURRENT_TIMESTAMP null,
+    board_id   binary(16)                         not null,
+    user_id    binary(16)                         not null,
+    role_id    bigint                             not null,
+    created_by binary(16)                         not null,
+    updated_by binary(16)                         null,
+    deleted_by binary(16)                         null,
+    joined_at  datetime default CURRENT_TIMESTAMP null,
+    created_at datetime default CURRENT_TIMESTAMP null,
+    updated_at datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    deleted_at datetime default CURRENT_TIMESTAMP null,
     constraint fk_work_bm_board
         foreign key (board_id) references work_boards (id)
             on delete cascade
 );
-
-create index idx_workspace
-    on work_boards (workspace_id);
 
 # create table folders
 # (
@@ -367,9 +374,9 @@ create index idx_workspace
 
 create table work_task_groups
 (
-    id           bigint unsigned auto_increment
+    id           binary(16)
         primary key,
-    board_id     bigint unsigned                        not null,
+    board_id     binary(16)                             not null,
     created_by   binary(16)                             null,
     updated_by   binary(16)                             null,
     deleted_by   binary(16)                             null,
@@ -392,12 +399,15 @@ create table work_task_groups
 )
     collate = utf8mb4_unicode_ci;
 
+create index idx_btg_board
+    on work_task_groups (board_id);
+
 create table work_items
 (
-    id           bigint unsigned auto_increment
+    id           binary(16)
         primary key,
-    group_id     bigint unsigned                      not null,
-    board_id     bigint unsigned                      not null,
+    task_group_id     binary(16)                      not null,
+    board_id     binary(16)                    not null,
     created_by   binary(16)                           null,
     updated_by   binary(16)                           null,
     deleted_by   binary(16)                           null,
@@ -416,36 +426,24 @@ create table work_items
         foreign key (board_id) references work_boards (id)
             on delete cascade,
     constraint fk_work_item_group
-        foreign key (group_id) references work_task_groups (id)
+        foreign key (task_group_id) references work_task_groups (id)
             on delete cascade
 )
     collate = utf8mb4_unicode_ci;
 
-create index idx_board_columns_team
-    on work_items (team_id);
+create index idx_items_board
+    on work_items (board_id);
 
-create index idx_board_columns_workspace
-    on work_items (workspace_id);
-
-create index idx_items_team
-    on work_items (team_id);
-
-create index idx_items_workspace
-    on work_items (workspace_id);
-
-create index idx_task_group_team
-    on work_items (team_id);
-
-create index idx_task_group_workspace
-    on work_items (workspace_id);
+create index idx_items_task_group
+    on work_items (task_group_id);
 
 create table work_column_values
 (
-    id           bigint unsigned auto_increment
+    id           binary(16)
         primary key,
-    item_id      bigint unsigned                      not null,
+    item_id      binary(16)                      not null,
     column_id    bigint unsigned                      not null,
-    board_id     bigint unsigned                      not null,
+    board_id     binary(16)                           not null,
     created_by   binary(16)                           null,
     updated_by   binary(16)                           null,
     deleted_by   binary(16)                           null,
@@ -459,7 +457,7 @@ create table work_column_values
     deleted_at   datetime                             null,
     workspace_id binary(16)                           not null,
     team_id      binary(16)                           not null,
-    group_id     bigint unsigned                      not null,
+    task_group_id     binary(16)                      not null,
     constraint unique_cell_work
         unique (item_id, column_id),
     constraint fk_work_cv_board
@@ -470,18 +468,24 @@ create table work_column_values
             on delete cascade,
     constraint fk_work_cv_item
         foreign key (item_id) references work_items (id)
+            on delete cascade,
+    constraint fk_work_cv_task_group
+        foreign key (task_group_id) references work_task_groups (id)
             on delete cascade
 )
     collate = utf8mb4_unicode_ci;
 
-create index idx_column_values_group
-    on work_column_values (group_id);
+create index idx_column_values_task_group
+    on work_column_values (task_group_id);
 
-create index idx_column_values_team
-    on work_column_values (team_id);
+create index idx_column_values_board
+    on work_column_values (board_id);
 
-create index idx_column_values_workspace
-    on work_column_values (workspace_id);
+create index idx_column_values_column
+    on work_column_values (column_id);
+
+create index idx_column_values_item
+    on work_column_values (item_id);
 
 # create table user_medias
 # (

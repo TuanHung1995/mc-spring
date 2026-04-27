@@ -16,7 +16,7 @@ import java.util.UUID;
  * <p>Operates on {@link BoardJpaEntity}, keeping all queries within the infrastructure layer.</p>
  */
 @Repository
-public interface BoardJpaRepository extends JpaRepository<BoardJpaEntity, Long> {
+public interface BoardJpaRepository extends JpaRepository<BoardJpaEntity, UUID> {
 
     /**
      * Finds all non-deleted boards belonging to a workspace.
@@ -46,7 +46,7 @@ public interface BoardJpaRepository extends JpaRepository<BoardJpaEntity, Long> 
      */
     @Query(value = "SELECT * FROM work_boards WHERE is_deleted = 1 AND deleted_by = :userId",
            nativeQuery = true)
-    List<BoardJpaEntity> findAllTrashedByUserId(@Param("userId") Long userId);
+    List<BoardJpaEntity> findAllTrashedByUserId(@Param("userId") UUID userId);
 
     /**
      * Physically removes a board row, bypassing Hibernate's @SoftDelete.
@@ -54,7 +54,7 @@ public interface BoardJpaRepository extends JpaRepository<BoardJpaEntity, Long> 
      */
     @Modifying
     @Query(value = "DELETE FROM work_boards WHERE id = :id", nativeQuery = true)
-    void deletePhysical(@Param("id") Long id);
+    void deletePhysical(@Param("id") UUID id);
 
     /**
      * Restores a soft-deleted board.
@@ -62,7 +62,7 @@ public interface BoardJpaRepository extends JpaRepository<BoardJpaEntity, Long> 
     @Modifying
     @Query(value = "UPDATE work_boards SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE id = :boardId",
            nativeQuery = true)
-    void restore(@Param("boardId") Long boardId);
+    void restore(@Param("boardId") UUID boardId);
 
     Long countByWorkspaceId(UUID workspaceId);
 }

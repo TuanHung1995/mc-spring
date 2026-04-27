@@ -21,4 +21,6 @@ public interface ApartmentJpaRepository extends JpaRepository<ApartmentJpaEntity
      * @param workspaceId UUID of the parent Workspace.
      */
     List<ApartmentJpaEntity> findAllByWorkspaceId(UUID workspaceId);
+
+    void softDeleteByWorkspaceId(UUID workspaceId);
 }

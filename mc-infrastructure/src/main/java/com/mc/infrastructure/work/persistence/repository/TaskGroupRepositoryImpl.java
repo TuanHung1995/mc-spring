@@ -30,40 +30,40 @@ public class TaskGroupRepositoryImpl implements TaskGroupRepository {
     }
 
     @Override
-    public Optional<TaskGroup> findById(Long id) {
+    public Optional<TaskGroup> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override
-    public Optional<TaskGroup> findByIdIncludingDeleted(Long id) {
+    public Optional<TaskGroup> findByIdIncludingDeleted(UUID id) {
         return jpaRepository.findByIdIncludingDeleted(id).map(mapper::toDomain);
     }
 
     @Override
-    public List<TaskGroup> findActiveByBoardId(Long boardId) {
+    public List<TaskGroup> findActiveByBoardId(UUID boardId) {
         return jpaRepository.findActiveByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public List<TaskGroup> findArchivedByBoardId(Long boardId) {
+    public List<TaskGroup> findArchivedByBoardId(UUID boardId) {
         return jpaRepository.findArchivedByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public List<TaskGroup> findTrashedByBoardId(Long boardId) {
+    public List<TaskGroup> findTrashedByBoardId(UUID boardId) {
         return jpaRepository.findTrashedByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public Double getMaxPositionByBoardId(Long boardId) {
+    public Double getMaxPositionByBoardId(UUID boardId) {
         return jpaRepository.getMaxPositionByBoardId(boardId);
     }
 
     @Override
-    public Double getPositionById(Long groupId) {
+    public Double getPositionById(UUID groupId) {
         return jpaRepository.getPositionById(groupId);
     }
 

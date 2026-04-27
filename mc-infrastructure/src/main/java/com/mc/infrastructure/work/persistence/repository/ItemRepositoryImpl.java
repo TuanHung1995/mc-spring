@@ -29,29 +29,29 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Optional<Item> findById(Long itemId) {
+    public Optional<Item> findById(UUID itemId) {
         return jpaRepository.findById(itemId).map(mapper::toDomain);
     }
 
     @Override
-    public List<Item> findByGroupId(Long groupId) {
+    public List<Item> findByGroupId(UUID groupId) {
         return jpaRepository.findByGroupId(groupId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public List<Item> findByBoardId(Long boardId) {
+    public List<Item> findByBoardId(UUID boardId) {
         return jpaRepository.findByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public Double getMaxPositionByGroupId(Long groupId) {
+    public Double getMaxPositionByGroupId(UUID groupId) {
         return jpaRepository.getMaxPositionByGroupId(groupId);
     }
 
     @Override
-    public Double getPositionById(Long itemId) {
+    public Double getPositionById(UUID itemId) {
         return jpaRepository.getPositionById(itemId);
     }
 

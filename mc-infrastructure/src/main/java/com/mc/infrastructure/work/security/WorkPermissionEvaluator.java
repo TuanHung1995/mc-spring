@@ -26,7 +26,7 @@ public class WorkPermissionEvaluator {
         return null;
     }
 
-    public boolean canAccessWorkspace(Long workspaceId, String permission) {
+    public boolean canAccessWorkspace(UUID workspaceId, String permission) {
         UUID userId = getCurrentUserId();
         if (userId == null) return false;
         
@@ -35,7 +35,7 @@ public class WorkPermissionEvaluator {
         return true;
     }
 
-    public boolean canAccessBoard(Long boardId, String permission) {
+    public boolean canAccessBoard(UUID boardId, String permission) {
         UUID userId = getCurrentUserId();
         if (userId == null) return false;
         
@@ -44,7 +44,7 @@ public class WorkPermissionEvaluator {
         return true;
     }
 
-    public boolean canAccessGroup(Long groupId, String permission) {
+    public boolean canAccessGroup(UUID groupId, String permission) {
         UUID userId = getCurrentUserId();
         if (userId == null) return false;
         
@@ -62,7 +62,7 @@ public class WorkPermissionEvaluator {
         return true;
     }
 
-    public boolean canAccessItem(Long itemId, String permission) {
+    public boolean canAccessItem(UUID itemId, String permission) {
         UUID userId = getCurrentUserId();
         if (userId == null) return false;
         

@@ -72,7 +72,7 @@ public class BoardAppServiceImpl implements BoardAppService {
 
     @Override
     @Transactional(readOnly = true)
-    public BoardResponse getBoardById(Long boardId) {
+    public BoardResponse getBoardById(UUID boardId) {
         return boardRepository.findById(boardId)
                 .map(this::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
@@ -89,7 +89,7 @@ public class BoardAppServiceImpl implements BoardAppService {
 
     @Override
     @Transactional
-    public void trashBoard(Long boardId) {
+    public void trashBoard(UUID boardId) {
         UUID userId = workUserContextPort.getCurrentUser().id();
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
@@ -99,7 +99,7 @@ public class BoardAppServiceImpl implements BoardAppService {
 
     @Override
     @Transactional
-    public void deleteBoardPermanently(Long boardId) {
+    public void deleteBoardPermanently(UUID boardId) {
         boardRepository.deletePhysical(boardId);
     }
 
@@ -219,12 +219,12 @@ public class BoardAppServiceImpl implements BoardAppService {
         createDefaultGroup(board.getId(), "Done",        "#75FF33", 3000.0, userId, columns, board.getId());
     }
 
-    private BoardColumn createColumn(Long boardId, String title, BoardColumnType type, double pos, UUID userId) {
+    private BoardColumn createColumn(UUID boardId, String title, BoardColumnType type, double pos, UUID userId) {
         return columnRepository.save(BoardColumn.create(boardId, title, type, pos, userId));
     }
 
-    private void createDefaultGroup(Long boardId, String title, String color, double pos,
-                                    UUID userId, List<BoardColumn> columns, Long masterBoardId) {
+    private void createDefaultGroup(UUID boardId, String title, String color, double pos,
+                                    UUID userId, List<BoardColumn> columns, UUID masterBoardId) {
         TaskGroup group = taskGroupRepository.save(TaskGroup.create(boardId, title, color, pos, userId));
 
         Item item = itemRepository.save(Item.create(boardId, group.getId(),
@@ -282,7 +282,7 @@ public class BoardAppServiceImpl implements BoardAppService {
         );
     }
 
-    private void addBoardMember(Long boardId, UUID userId, Long roleId) {
+    private void addBoardMember(UUID boardId, UUID userId, Long roleId) {
         boardMemberRepository.save(BoardMember.addMember(boardId, userId, roleId));
     }
 }

@@ -14,19 +14,19 @@ public interface ItemRepository {
 
     Item save(Item item);
 
-    Optional<Item> findById(Long itemId);
+    Optional<Item> findById(UUID itemId);
 
     /** Returns all active items for a task group, ordered by position. */
-    List<Item> findByGroupId(Long groupId);
+    List<Item> findByGroupId(UUID groupId);
 
     /** Returns all active items for a board. */
-    List<Item> findByBoardId(Long boardId);
+    List<Item> findByBoardId(UUID boardId);
 
     /** Returns the max position within a group (for append-to-end logic). */
-    Double getMaxPositionByGroupId(Long groupId);
+    Double getMaxPositionByGroupId(UUID groupId);
 
     /** Returns the position of a specific item (for reorder calculations). */
-    Double getPositionById(Long itemId);
+    Double getPositionById(UUID itemId);
 
     /** Soft-deletes an item. */
     void delete(Item item);

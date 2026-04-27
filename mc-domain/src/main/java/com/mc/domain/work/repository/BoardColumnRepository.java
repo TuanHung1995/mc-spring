@@ -17,10 +17,10 @@ public interface BoardColumnRepository {
     Optional<BoardColumn> findById(Long columnId);
 
     /** Returns all active (non-deleted) columns for a board, ordered by position. */
-    List<BoardColumn> findAllByBoardId(Long boardId);
+    List<BoardColumn> findAllByBoardId(UUID boardId);
 
     /** Returns the max position among all columns on a board (for append-to-end logic). */
-    Double getMaxPositionByBoardId(Long boardId);
+    Double getMaxPositionByBoardId(UUID boardId);
 
     /** Returns the position of a specific column (for reorder calculations). */
     Double getPositionById(Long columnId);

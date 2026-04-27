@@ -1,5 +1,6 @@
 package com.mc.infrastructure.work.persistence.model;
 
+import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import com.mc.infrastructure.core.persistence.model.BaseLongJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,7 +24,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @SoftDelete(columnName = "is_deleted", converter = NumericBooleanConverter.class)
-public class BoardJpaEntity extends BaseLongJpaEntity {
+public class BoardJpaEntity extends BaseJpaEntity {
 
     @Column(name = "name")
     private String name;

@@ -7,6 +7,7 @@ import com.mc.domain.core.exception.ResourceNotFoundException;
 import com.mc.domain.organization.model.entity.Workspace;
 import com.mc.domain.organization.port.OrgUserContextPort;
 import com.mc.domain.organization.port.OrgUserView;
+import com.mc.domain.organization.repository.ApartmentRepository;
 import com.mc.domain.organization.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 public class WorkspaceAppServiceImpl implements WorkspaceAppService {
 
     private final WorkspaceRepository workspaceRepository;
+    private final ApartmentRepository apartmentRepository;
     private final OrgUserContextPort orgUserContextPort;
     private final WorkspaceMessagePort workspaceMessagePort;
 
@@ -77,6 +79,7 @@ public class WorkspaceAppServiceImpl implements WorkspaceAppService {
 
         // Domain entity enforces deletion invariants (e.g., already-deleted guard)
         workspace.softDelete(currentUser.id());
+        apartmentRepository.softDeleteByWorkspaceId(id);
         workspaceRepository.save(workspace);
 
         // Publish internal Integration Event to trigger Async cascades (e.g. Work Bounded Context)

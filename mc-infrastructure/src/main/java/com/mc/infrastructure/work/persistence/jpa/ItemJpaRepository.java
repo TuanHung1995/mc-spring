@@ -14,11 +14,11 @@ import java.util.UUID;
  * ItemJpaRepository — Spring Data JPA Repository (Work Context)
  */
 @Repository
-public interface ItemJpaRepository extends JpaRepository<ItemJpaEntity, Long> {
+public interface ItemJpaRepository extends JpaRepository<ItemJpaEntity, UUID> {
 
     /** All active items in a group, ordered by position. */
     @Query("SELECT i FROM ItemJpaEntity i WHERE i.groupId = :groupId ORDER BY i.position ASC")
-    List<ItemJpaEntity> findByGroupId(@Param("groupId") Long groupId);
+    List<ItemJpaEntity> findByGroupId(@Param("groupId") UUID groupId);
 
     /** All active items on a board. */
     @Query("SELECT i FROM ItemJpaEntity i WHERE i.boardId = :boardId ORDER BY i.position ASC")

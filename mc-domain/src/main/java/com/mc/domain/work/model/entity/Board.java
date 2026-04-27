@@ -1,6 +1,8 @@
 package com.mc.domain.work.model.entity;
 
 import com.mc.domain.core.exception.DomainException;
+import com.mc.domain.core.model.BaseDomainEntity;
+import com.mc.domain.core.util.IdUtils;
 import com.mc.domain.work.model.BaseWorkEntity;
 import com.mc.domain.work.model.enums.BoardType;
 import lombok.Getter;
@@ -24,7 +26,7 @@ import java.util.UUID;
  * Persistence is handled by {@code BoardJpaEntity} in mc-infrastructure.</p>
  */
 @Getter
-public class Board extends BaseWorkEntity {
+public class Board extends BaseDomainEntity {
 
     // =================================================================
     // STATE
@@ -53,7 +55,7 @@ public class Board extends BaseWorkEntity {
     /**
      * Reconstitution constructor — persistence mapper only.
      */
-    public Board(Long id, String name, String description, BoardType type, String purpose,
+    public Board(UUID id, String name, String description, BoardType type, String purpose,
                  UUID workspaceId, UUID createdById, UUID deletedById, LocalDateTime deletedAt,
                  LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
@@ -96,7 +98,7 @@ public class Board extends BaseWorkEntity {
         }
 
         Board board = new Board();
-        board.initNew(null); // id = null → DB assigns AUTO_INCREMENT value
+        board.initializeNewEntity(IdUtils.newId());
         board.name = name.trim();
         board.type = type != null ? type : BoardType.PUBLIC;
         board.purpose = purpose;
@@ -117,7 +119,7 @@ public class Board extends BaseWorkEntity {
             throw new DomainException("Board name cannot be blank");
         }
         this.name = newName.trim();
-        touch();
+        markAsModified();
     }
 
     /**
@@ -131,6 +133,6 @@ public class Board extends BaseWorkEntity {
         }
         this.deletedById = deletedById;
         this.deletedAt = LocalDateTime.now();
-        markDeleted();
+        markAsDeleted();
     }
 }

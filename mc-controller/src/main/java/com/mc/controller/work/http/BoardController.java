@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * BoardController — HTTP Adapter (Work Context)
@@ -44,7 +45,7 @@ public class BoardController {
 
     @GetMapping("/{boardId}")
     @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:VIEW')")
-    public ResponseEntity<BoardResponse> getBoard(@PathVariable Long boardId) {
+    public ResponseEntity<BoardResponse> getBoard(@PathVariable UUID boardId) {
         return ResponseEntity.ok(boardAppService.getBoardById(boardId));
     }
 
@@ -59,7 +60,7 @@ public class BoardController {
      */
     @PostMapping("/{boardId}/trash")
     @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:TRASH')")
-    public ResponseEntity<Void> trashBoard(@PathVariable Long boardId) {
+    public ResponseEntity<Void> trashBoard(@PathVariable UUID boardId) {
         boardAppService.trashBoard(boardId);
         return ResponseEntity.noContent().build();
     }
@@ -69,7 +70,7 @@ public class BoardController {
      */
     @DeleteMapping("/{boardId}/permanent")
     @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:DELETE')")
-    public ResponseEntity<Void> deleteBoardPermanently(@PathVariable Long boardId) {
+    public ResponseEntity<Void> deleteBoardPermanently(@PathVariable UUID boardId) {
         boardAppService.deleteBoardPermanently(boardId);
         return ResponseEntity.noContent().build();
     }
@@ -85,7 +86,7 @@ public class BoardController {
     @PutMapping("/{boardId}/elements")
     @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:EDIT')")
     public ResponseEntity<Void> updateBoardElement(
-            @PathVariable Long boardId,
+            @PathVariable UUID boardId,
             @RequestBody UpdateBoardElementRequest request) {
         boardAppService.updateBoardElement(request);
         return ResponseEntity.noContent().build();
@@ -110,7 +111,7 @@ public class BoardController {
      */
     @PutMapping("/columns/reorder")
     @PreAuthorize("@workSecurity.canAccessColumn(#request.targetId, 'BOARD:EDIT')")
-    public ResponseEntity<Void> reorderColumn(@RequestBody ReorderRequest request) {
+    public ResponseEntity<Void> reorderColumn(@RequestBody ReorderColumnRequest request) {
         boardAppService.reorderColumn(request);
         return ResponseEntity.noContent().build();
     }

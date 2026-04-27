@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * BoardColumnController — HTTP Adapter (Work Context)
@@ -44,7 +45,7 @@ public class BoardColumnController {
 
     @GetMapping("/board/{boardId}")
     @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'COLUMN:VIEW')")
-    public ResponseEntity<List<ColumnResponse>> getColumnsByBoard(@PathVariable Long boardId) {
+    public ResponseEntity<List<ColumnResponse>> getColumnsByBoard(@PathVariable UUID boardId) {
         return ResponseEntity.ok(boardColumnAppService.getColumnsByBoard(boardId));
     }
 

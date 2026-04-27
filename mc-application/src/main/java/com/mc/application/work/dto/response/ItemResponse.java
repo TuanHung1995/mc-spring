@@ -14,9 +14,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemResponse {
-    private Long id;
-    private Long boardId;
-    private Long groupId;
+    private UUID id;
+    private UUID boardId;
+    private UUID groupId;
     private String name;
     private double position;
     private UUID createdById;

@@ -17,7 +17,7 @@ import java.util.UUID;
 public class BoardMemberJpaEntity extends BaseLongJpaEntity {
 
     @Column(name = "board_id")
-    private Long boardId;
+    private UUID boardId;
 
     @Column(name = "user_id", columnDefinition = "BINARY(16)")
     private UUID userId;

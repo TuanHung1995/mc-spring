@@ -34,7 +34,7 @@ public class BoardRepositoryImpl implements BoardRepository {
     }
 
     @Override
-    public Optional<Board> findById(Long boardId) {
+    public Optional<Board> findById(UUID boardId) {
         return jpaRepository.findById(boardId).map(mapper::toDomain);
     }
 
@@ -51,7 +51,7 @@ public class BoardRepositoryImpl implements BoardRepository {
     }
 
     @Override
-    public List<Board> findAllTrashedByUserId(Long userId) {
+    public List<Board> findAllTrashedByUserId(UUID userId) {
         return jpaRepository.findAllTrashedByUserId(userId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
@@ -64,13 +64,13 @@ public class BoardRepositoryImpl implements BoardRepository {
 
     @Override
     @Transactional
-    public void deletePhysical(Long boardId) {
+    public void deletePhysical(UUID boardId) {
         jpaRepository.deletePhysical(boardId);
     }
 
     @Override
     @Transactional
-    public void restore(Long boardId) {
+    public void restore(UUID boardId) {
         jpaRepository.restore(boardId);
     }
 

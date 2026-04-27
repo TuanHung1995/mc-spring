@@ -1,6 +1,8 @@
 package com.mc.domain.work.model.entity;
 
 import com.mc.domain.core.exception.DomainException;
+import com.mc.domain.core.model.BaseDomainEntity;
+import com.mc.domain.core.util.IdUtils;
 import com.mc.domain.work.model.BaseWorkEntity;
 import lombok.Getter;
 
@@ -20,14 +22,14 @@ import java.util.UUID;
  * trashed → permanently deleted (irreversible)</p>
  */
 @Getter
-public class TaskGroup extends BaseWorkEntity {
+public class TaskGroup extends BaseDomainEntity {
 
     // =================================================================
     // STATE
     // =================================================================
 
     /** The parent Board's Long ID. */
-    private Long boardId;
+    private UUID boardId;
 
     private String title;
     private String color;
@@ -55,7 +57,7 @@ public class TaskGroup extends BaseWorkEntity {
     private TaskGroup() {}
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
-    public TaskGroup(Long id, Long boardId, String title, String color, double position,
+    public TaskGroup(UUID id, UUID boardId, String title, String color, double position,
                      boolean collapsed, boolean archived, LocalDateTime archivedAt, UUID archivedBy,
                      UUID createdBy, UUID updatedBy, UUID deletedBy, LocalDateTime deletedAt,
                      LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
@@ -87,7 +89,7 @@ public class TaskGroup extends BaseWorkEntity {
      * @param position  The fractional position (calculated by the service).
      * @param createdBy The user creating this group.
      */
-    public static TaskGroup create(Long boardId, String title, String color,
+    public static TaskGroup create(UUID boardId, String title, String color,
                                    double position, UUID createdBy) {
         if (boardId == null) {
             throw new DomainException("TaskGroup must belong to a Board");
@@ -97,7 +99,7 @@ public class TaskGroup extends BaseWorkEntity {
         }
 
         TaskGroup group = new TaskGroup();
-        group.initNew(null);
+        group.initializeNewEntity(IdUtils.newId());
         group.boardId = boardId;
         group.title = title.trim();
         group.color = (color != null && !color.isBlank()) ? color : "#579bfc";
@@ -122,14 +124,14 @@ public class TaskGroup extends BaseWorkEntity {
         }
 
         this.updatedBy = updatedBy;
-        touch();
+        markAsModified();
     }
 
     /** Moves this group to a new drag-and-drop position. */
     public void moveTo(double newPosition, UUID updatedBy) {
         this.position = newPosition;
         this.updatedBy = updatedBy;
-        touch();
+        markAsModified();
     }
 
     /** Archives this group (hides it from the main board view). */
@@ -140,7 +142,7 @@ public class TaskGroup extends BaseWorkEntity {
         this.archived = true;
         this.archivedAt = LocalDateTime.now();
         this.archivedBy = archivedBy;
-        touch();
+        markAsModified();
     }
 
     /** Unarchives this group, making it visible again. */
@@ -151,7 +153,7 @@ public class TaskGroup extends BaseWorkEntity {
         this.archived = false;
         this.archivedAt = null;
         this.archivedBy = null;
-        touch();
+        markAsModified();
     }
 
     /** Soft-deletes (trashes) this group. */
@@ -161,7 +163,7 @@ public class TaskGroup extends BaseWorkEntity {
         }
         this.deletedBy = deletedBy;
         this.deletedAt = LocalDateTime.now();
-        markDeleted();
+        markAsDeleted();
     }
 
     /** Restores a trashed group back to active state. */
