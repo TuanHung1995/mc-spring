@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
  */
 @Repository
 @RequiredArgsConstructor
-@Component("workBoardRepository")
 public class BoardRepositoryImpl implements BoardRepository {
 
     private final BoardJpaRepository jpaRepository;
@@ -35,7 +34,7 @@ public class BoardRepositoryImpl implements BoardRepository {
     }
 
     @Override
-    public Optional<Board> findById(Long boardId) {
+    public Optional<Board> findById(UUID boardId) {
         return jpaRepository.findById(boardId).map(mapper::toDomain);
     }
 
@@ -46,7 +45,13 @@ public class BoardRepositoryImpl implements BoardRepository {
     }
 
     @Override
-    public List<Board> findAllTrashedByUserId(Long userId) {
+    public List<Board> findAllByWorkspaceId(UUID workspaceId) {
+        return jpaRepository.findAllByWorkspaceId(workspaceId).stream()
+                .map(mapper::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Board> findAllTrashedByUserId(UUID userId) {
         return jpaRepository.findAllTrashedByUserId(userId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
@@ -59,13 +64,24 @@ public class BoardRepositoryImpl implements BoardRepository {
 
     @Override
     @Transactional
-    public void deletePhysical(Long boardId) {
+    public void deletePhysical(UUID boardId) {
         jpaRepository.deletePhysical(boardId);
     }
 
     @Override
     @Transactional
-    public void restore(Long boardId) {
+    public void restore(UUID boardId) {
         jpaRepository.restore(boardId);
     }
+
+    @Override
+    public int softDeleteByWorkspaceIdInBatch(UUID workspaceID, UUID deletedById, int batchSize) {
+        return jpaRepository.softDeleteByWorkspaceIdInBatch(workspaceID, deletedById, batchSize);
+    }
+
+    @Override
+    public Long countByWorkspaceId(UUID workspaceId) {
+        return jpaRepository.countByWorkspaceId(workspaceId);
+    }
+
 }

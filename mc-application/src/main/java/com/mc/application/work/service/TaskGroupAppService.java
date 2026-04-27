@@ -5,24 +5,24 @@ import com.mc.application.work.dto.response.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * TaskGroupAppService — Application Service Port (Work Context)
  */
-@Component("workTaskGroupAppService")
 public interface TaskGroupAppService {
 
     TaskGroupResponse createGroup(CreateTaskGroupRequest request);
-    TaskGroupResponse getGroupById(Long groupId);
-    List<TaskGroupResponse> getGroupsByBoard(Long boardId);
-    TaskGroupResponse updateGroup(Long groupId, UpdateTaskGroupRequest request);
+    TaskGroupResponse getGroupById(UUID groupId);
+    List<TaskGroupResponse> getGroupsByBoard(UUID boardId);
+    TaskGroupResponse updateGroup(UUID groupId, UpdateTaskGroupRequest request);
 
-    void deleteGroup(Long groupId);
-    void archiveGroup(Long groupId);
-    void unarchiveGroup(Long groupId);
-    void restoreGroup(Long groupId);
-    void permanentDeleteGroup(Long groupId);
+    void deleteGroup(UUID groupId);
+    void archiveGroup(UUID groupId);
+    void unarchiveGroup(UUID groupId);
+    void restoreGroup(UUID groupId);
+    void permanentDeleteGroup(UUID groupId);
 
-    List<TaskGroupResponse> getArchivedGroupsByBoard(Long boardId);
-    List<TaskGroupResponse> getTrashedGroupsByBoard(Long boardId);
+    List<TaskGroupResponse> getArchivedGroupsByBoard(UUID boardId);
+    List<TaskGroupResponse> getTrashedGroupsByBoard(UUID boardId);
 }

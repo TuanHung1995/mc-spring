@@ -1,6 +1,8 @@
 package com.mc.domain.work.model.entity;
 
 import com.mc.domain.core.exception.DomainException;
+import com.mc.domain.core.model.BaseDomainEntity;
+import com.mc.domain.core.util.IdUtils;
 import com.mc.domain.work.model.BaseWorkEntity;
 import lombok.Getter;
 
@@ -19,17 +21,17 @@ import java.util.UUID;
  * — this changes their {@code groupId} reference.</p>
  */
 @Getter
-public class Item extends BaseWorkEntity {
+public class Item extends BaseDomainEntity {
 
     // =================================================================
     // STATE
     // =================================================================
 
     /** The parent Board's ID. */
-    private Long boardId;
+    private UUID boardId;
 
     /** The current TaskGroup this item belongs to. */
-    private Long groupId;
+    private UUID groupId;
 
     private String name;
 
@@ -51,7 +53,7 @@ public class Item extends BaseWorkEntity {
     private Item() {}
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
-    public Item(Long id, Long boardId, Long groupId, String name, double position,
+    public Item(UUID id, UUID boardId, UUID groupId, String name, double position,
                 UUID createdById, UUID updatedById, UUID deletedById, LocalDateTime deletedAt,
                 LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
@@ -78,7 +80,7 @@ public class Item extends BaseWorkEntity {
      * @param position    Fractional position (append to end of group).
      * @param createdById ID of the creating user.
      */
-    public static Item create(Long boardId, Long groupId, String name,
+    public static Item create(UUID boardId, UUID groupId, String name,
                               double position, UUID createdById) {
         if (boardId == null || groupId == null) {
             throw new DomainException("Item requires both boardId and groupId");
@@ -88,7 +90,7 @@ public class Item extends BaseWorkEntity {
         }
 
         Item item = new Item();
-        item.initNew(null);
+        item.initializeNewEntity(IdUtils.newId());
         item.boardId = boardId;
         item.groupId = groupId;
         item.name = name.trim();
@@ -108,7 +110,7 @@ public class Item extends BaseWorkEntity {
         }
         this.name = newName.trim();
         this.updatedById = updatedById;
-        touch();
+        markAsModified();
     }
 
     /**
@@ -120,14 +122,14 @@ public class Item extends BaseWorkEntity {
      * @param newPosition The new fractional position.
      * @param newGroupId  The target group's ID (maybe same group for in-group reorder).
      */
-    public void moveTo(double newPosition, Long newGroupId, UUID updatedById) {
+    public void moveTo(double newPosition, UUID newGroupId, UUID updatedById) {
         this.position = newPosition;
         if (newGroupId != null) {
             this.groupId = newGroupId;
         }
 
         this.updatedById = updatedById;
-        touch();
+        markAsModified();
     }
 
     /** Soft-deletes this item. */
@@ -137,6 +139,6 @@ public class Item extends BaseWorkEntity {
         }
         this.deletedById = deletedById;
         this.deletedAt = LocalDateTime.now();
-        markDeleted();
+        markAsDeleted();
     }
 }

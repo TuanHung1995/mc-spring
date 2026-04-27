@@ -26,4 +26,6 @@ public interface TeamAppService {
      * Finds a team by its UUID.
      */
     Optional<TeamResponse> getTeamById(UUID id);
+
+    void deleteTeam(UUID id);
 }

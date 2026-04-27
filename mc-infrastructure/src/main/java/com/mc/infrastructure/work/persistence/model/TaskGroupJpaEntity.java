@@ -1,6 +1,6 @@
 package com.mc.infrastructure.work.persistence.model;
 
-import com.mc.infrastructure.core.persistence.model.BaseLongJpaEntity;
+import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,13 +25,13 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "work_task_groups")
 @Getter
 @Setter
-@SoftDelete(columnName = "is_deleted", converter = NumericBooleanConverter.class)
-@FilterDef(name = "deleted_wtg_Filter", parameters = @ParamDef(name = "deleted", type = Boolean.class))
-@Filter(name = "deleted_wtg_Filter", condition = "is_deleted = :deleted")
-public class TaskGroupJpaEntity extends BaseLongJpaEntity {
+//@SoftDelete(columnName = "is_deleted", converter = NumericBooleanConverter.class)
+//@FilterDef(name = "deleted_wtg_Filter", parameters = @ParamDef(name = "deleted", type = Boolean.class))
+//@Filter(name = "deleted_wtg_Filter", condition = "is_deleted = :deleted")
+public class TaskGroupJpaEntity extends BaseJpaEntity {
 
     @Column(name = "board_id")
-    private Long boardId;
+    private UUID boardId;
 
     @Column(name = "title")
     private String title;

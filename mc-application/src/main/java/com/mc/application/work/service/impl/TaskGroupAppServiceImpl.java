@@ -29,10 +29,8 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Component("workTaskGroupAppService")
 public class TaskGroupAppServiceImpl implements TaskGroupAppService {
 
-    @Qualifier("workTaskGroupRepository")
     private final TaskGroupRepository taskGroupRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;
@@ -49,96 +47,96 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
                 request.getColor(), newPos, userId);
         TaskGroup saved = taskGroupRepository.save(group);
 
-        publishEvent("GROUP_CREATED", saved.getId(), saved.getBoardId());
+//        publishEvent("GROUP_CREATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TaskGroupResponse getGroupById(Long groupId) {
+    public TaskGroupResponse getGroupById(UUID groupId) {
         return toResponse(requireGroup(groupId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskGroupResponse> getGroupsByBoard(Long boardId) {
+    public List<TaskGroupResponse> getGroupsByBoard(UUID boardId) {
         return taskGroupRepository.findActiveByBoardId(boardId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public TaskGroupResponse updateGroup(Long groupId, UpdateTaskGroupRequest request) {
+    public TaskGroupResponse updateGroup(UUID groupId, UpdateTaskGroupRequest request) {
 
         UUID userId = workUserContextPort.getCurrentUser().id();
 
         TaskGroup group = requireGroup(groupId);
         group.update(request.getTitle(), request.getColor(), userId);
         TaskGroup saved = taskGroupRepository.save(group);
-        publishEvent("GROUP_UPDATED", saved.getId(), saved.getBoardId());
+//        publishEvent("GROUP_UPDATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 
     @Override
     @Transactional
-    public void deleteGroup(Long groupId) {
+    public void deleteGroup(UUID groupId) {
         UUID userId = workUserContextPort.getCurrentUser().id();
         TaskGroup group = requireGroup(groupId);
-        Long boardId = group.getBoardId();
+        UUID boardId = group.getBoardId();
         group.trash(userId);
         taskGroupRepository.delete(group);
-        publishEvent("GROUP_DELETED", groupId, boardId);
+//        publishEvent("GROUP_DELETED", groupId, boardId);
     }
 
     @Override
     @Transactional
-    public void archiveGroup(Long groupId) {
+    public void archiveGroup(UUID groupId) {
         UUID userId = workUserContextPort.getCurrentUser().id();
         TaskGroup group = requireGroup(groupId);
         group.archive(userId);
         TaskGroup saved = taskGroupRepository.save(group);
-        publishEvent("GROUP_ARCHIVED", saved.getId(), saved.getBoardId());
+//        publishEvent("GROUP_ARCHIVED", saved.getId(), saved.getBoardId());
     }
 
     @Override
     @Transactional
-    public void unarchiveGroup(Long groupId) {
+    public void unarchiveGroup(UUID groupId) {
         TaskGroup group = requireGroup(groupId);
         group.unarchive();
         TaskGroup saved = taskGroupRepository.save(group);
-        publishEvent("GROUP_UNARCHIVED", saved.getId(), saved.getBoardId());
+//        publishEvent("GROUP_UNARCHIVED", saved.getId(), saved.getBoardId());
     }
 
     @Override
     @Transactional
-    public void restoreGroup(Long groupId) {
+    public void restoreGroup(UUID groupId) {
         TaskGroup group = taskGroupRepository.findByIdIncludingDeleted(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
         group.restore();
         TaskGroup saved = taskGroupRepository.save(group);
-        publishEvent("GROUP_RESTORED", saved.getId(), saved.getBoardId());
+//        publishEvent("GROUP_RESTORED", saved.getId(), saved.getBoardId());
     }
 
     @Override
     @Transactional
-    public void permanentDeleteGroup(Long groupId) {
+    public void permanentDeleteGroup(UUID groupId) {
         TaskGroup group = taskGroupRepository.findByIdIncludingDeleted(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
-        Long boardId = group.getBoardId();
+        UUID boardId = group.getBoardId();
         taskGroupRepository.permanentDelete(group);
-        publishEvent("GROUP_PERMANENTLY_DELETED", groupId, boardId);
+//        publishEvent("GROUP_PERMANENTLY_DELETED", groupId, boardId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskGroupResponse> getArchivedGroupsByBoard(Long boardId) {
+    public List<TaskGroupResponse> getArchivedGroupsByBoard(UUID boardId) {
         return taskGroupRepository.findArchivedByBoardId(boardId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskGroupResponse> getTrashedGroupsByBoard(Long boardId) {
+    public List<TaskGroupResponse> getTrashedGroupsByBoard(UUID boardId) {
         return taskGroupRepository.findTrashedByBoardId(boardId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
@@ -147,7 +145,7 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
     // HELPERS
     // =================================================================
 
-    private TaskGroup requireGroup(Long groupId) {
+    private TaskGroup requireGroup(UUID groupId) {
         return taskGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
     }

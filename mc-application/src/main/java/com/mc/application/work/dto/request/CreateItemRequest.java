@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.UUID;
+
 /**
  * CreateItemRequest — Application DTO (Work Context)
  */
@@ -11,10 +13,10 @@ import lombok.Data;
 public class CreateItemRequest {
 
     @NotNull(message = "boardId is required")
-    private Long boardId;
+    private UUID boardId;
 
     @NotNull(message = "groupId is required")
-    private Long groupId;
+    private UUID groupId;
 
     @NotBlank(message = "name is required")
     private String name;

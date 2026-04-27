@@ -61,7 +61,7 @@ public class SubscriptionSecurityInterceptor implements ChannelInterceptor {
 
         Matcher matcher = BOARD_TOPIC_PATTERN.matcher(destination);
         if (matcher.matches()) {
-            Long boardId = Long.parseLong(matcher.group(1));
+            UUID boardId = UUID.fromString(matcher.group(1));
             UUID userId = getUserIdFromPrincipal(principal);
 
             log.debug("Validating subscription: User {} -> Board {}", userId, boardId);

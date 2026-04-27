@@ -5,17 +5,17 @@ import com.mc.application.work.dto.response.ItemResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * ItemAppService — Application Service Port (Work Context)
  */
-@Component("workItemAppService")
 public interface ItemAppService {
 
     ItemResponse createItem(CreateItemRequest request);
-    ItemResponse getItemById(Long itemId);
-    List<ItemResponse> getItemsByGroup(Long groupId);
-    List<ItemResponse> getItemsByBoard(Long boardId);
-    ItemResponse updateItemName(Long itemId, String newName);
-    void deleteItem(Long itemId);
+    ItemResponse getItemById(UUID itemId);
+    List<ItemResponse> getItemsByGroup(UUID groupId);
+    List<ItemResponse> getItemsByBoard(UUID boardId);
+    ItemResponse updateItemName(UUID itemId, String newName);
+    void deleteItem(UUID itemId);
 }

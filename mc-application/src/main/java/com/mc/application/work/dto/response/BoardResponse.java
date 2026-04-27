@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardResponse {
-    private Long id;
+    private UUID id;
     private String name;
     private String description;
     private String type;

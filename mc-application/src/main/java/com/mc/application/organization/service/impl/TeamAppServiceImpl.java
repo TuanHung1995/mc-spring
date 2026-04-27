@@ -2,14 +2,23 @@ package com.mc.application.organization.service.impl;
 
 import com.mc.application.organization.dto.response.TeamResponse;
 import com.mc.application.organization.service.TeamAppService;
+import com.mc.domain.core.event.broker.rabbitMQ.WorkspaceDeletedIntegrationEvent;
+import com.mc.domain.core.exception.ResourceNotFoundException;
 import com.mc.domain.organization.model.entity.Team;
+import com.mc.domain.organization.model.entity.Workspace;
+import com.mc.domain.organization.port.OrgUserContextPort;
+import com.mc.domain.organization.port.OrgUserView;
+import com.mc.domain.organization.port.out.WorkspaceMessagePort;
 import com.mc.domain.organization.repository.TeamRepository;
+import com.mc.domain.organization.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +43,10 @@ public class TeamAppServiceImpl implements TeamAppService {
 
     @Qualifier("orgTeamRepository")
     private final TeamRepository teamRepository;
+    private final WorkspaceRepository workspaceRepository;
+    private final WorkspaceMessagePort workspaceMessagePort;
+    private final OrgUserContextPort orgUserContextPort;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * Creates a new team for the given user using the Team aggregate's factory method.
@@ -64,5 +77,31 @@ public class TeamAppServiceImpl implements TeamAppService {
                 team.getSlug(),
                 team.getDescription()
         );
+    }
+
+    @Override
+    @Transactional
+    public void deleteTeam(UUID teamId) {
+
+        OrgUserView currentUser = orgUserContextPort.getCurrentUser();
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new ResourceNotFoundException("Team", "id", teamId));
+
+        team.softDelete(currentUser.id());
+        teamRepository.save(team);
+
+        List<UUID> workspaceIds = workspaceRepository.findIdsByTeamId(teamId);
+        if (!workspaceIds.isEmpty()) {
+
+            workspaceRepository.softDeleteByTeamId(team.getId(), currentUser.id());
+
+            for (UUID wId : workspaceIds) {
+                applicationEventPublisher.publishEvent(
+                        new WorkspaceDeletedIntegrationEvent(wId, currentUser.id())
+                );
+            }
+        }
+
     }
 }
