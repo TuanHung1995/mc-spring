@@ -131,7 +131,7 @@ public class BoardAppServiceImpl implements BoardAppService {
             }
             default -> throw new BusinessLogicException("Unsupported element type: " + request.getType());
         }
-//        publishBoardEvent("ELEMENT_UPDATED", request.getTargetId(), boardId);
+        publishBoardEvent("ELEMENT_UPDATED", request.getTargetId(), boardId);
     }
 
     // =================================================================
@@ -152,7 +152,7 @@ public class BoardAppServiceImpl implements BoardAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", request.getTargetId()));
         group.moveTo(newPos, userId);
         taskGroupRepository.save(group);
-//        publishBoardEvent("GROUP_REORDER", group.getId(), group.getBoardId());
+        publishBoardEvent("GROUP_REORDER", group.getId(), group.getBoardId());
     }
 
     @Override
@@ -169,7 +169,7 @@ public class BoardAppServiceImpl implements BoardAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("BoardColumn", "id", request.getTargetId()));
         column.moveTo(newPos, userId);
         columnRepository.save(column);
-//        publishBoardEvent("COLUMN_REORDER", column.getId(), column.getBoardId());
+        publishBoardColumnEvent(column.getId(), column.getBoardId());
     }
 
     @Override
@@ -186,7 +186,7 @@ public class BoardAppServiceImpl implements BoardAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", request.getTargetId()));
         item.moveTo(newPos, request.getTargetGroupId(), userId);
         itemRepository.save(item);
-//        publishBoardEvent("ITEM_REORDER", item.getId(), item.getBoardId());
+        publishBoardEvent("ITEM_REORDER", item.getId(), item.getBoardId());
     }
 
     // =================================================================
@@ -250,10 +250,18 @@ public class BoardAppServiceImpl implements BoardAppService {
         return (prevPos + nextPos) / 2.0;
     }
 
-    private void publishBoardEvent(String eventType, Long entityId, Long boardId) {
+    private void publishBoardEvent(String eventType, UUID entityId, UUID boardId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("type", eventType);
         payload.put("entityId", entityId);
+        payload.put("boardId", boardId);
+        eventPublisher.publishEvent(new BoardChangedEvent(boardId, payload));
+    }
+
+    private void publishBoardColumnEvent(Long columnId, UUID boardId) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "COLUMN_UPDATED");
+        payload.put("entityId", columnId);
         payload.put("boardId", boardId);
         eventPublisher.publishEvent(new BoardChangedEvent(boardId, payload));
     }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class InviteAppServiceImpl implements InviteAppService {
 
     // API 1: Gửi lời mời
     @Override
-    public void inviteMember(Long boardId, InviteRequest request) {
+    public void inviteMember(UUID boardId, InviteRequest request) {
         // 1. Tạo Token
         String token = jwtTokenProvider.generateInviteToken(request.getEmail(), boardId, request.getRole());
 
@@ -48,7 +49,7 @@ public class InviteAppServiceImpl implements InviteAppService {
 
         Claims claims = jwtTokenProvider.getInviteClaims(token);
         String email = claims.getSubject();
-        Long boardId = claims.get("boardId", Long.class);
+        UUID boardId = claims.get("boardId", UUID.class);
         String role = claims.get("role", String.class);
 
         // 2. Add vào Board
