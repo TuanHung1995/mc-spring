@@ -1,8 +1,10 @@
 constants:
   auth-api-url: "/api/v1/auth"
+  auth-api-url-v2: "/api/v2/auth"
   development: true
   frontend: "localhost:5173"
   max-failed-login-attempts: 5
+  dev-url: "http://localhost:"
 
 app:
   oauth2:
@@ -131,6 +133,14 @@ resilience4j:
         limitRefreshPeriod: 1m     # Trong mỗi chu kỳ 1 phút
         timeoutDuration: 0         # Nếu hết lượt thì trả lỗi ngay lập tức (không chờ)
         registerHealthIndicator: true
+      sendVerificationCodeRateLimiter:
+        limitForPeriod: 1          # Cho phép tối đa 3 request
+        limitRefreshPeriod: 1m     # Trong mỗi chu kỳ 1 phút
+        timeoutDuration: 0         # Nếu hết lượt thì trả lỗi ngay lập tức (không chờ)
+      verifyEmailRateLimiter:
+        limitForPeriod: 3          # Cho phép tối đa 3 request
+        limitRefreshPeriod: 1m     # Trong mỗi chu kỳ 1 phút
+        timeoutDuration: 0         # Nếu hết lượt thì trả lỗi ngay lập tức (kh
 management:
   health:
     circuitbreakers:

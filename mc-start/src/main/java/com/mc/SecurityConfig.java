@@ -1,13 +1,13 @@
 package com.mc;
 
-import com.mc.domain.repository.TokenBlacklistRepository;
-import com.mc.infrastructure.config.security.CustomPermissionEvaluator;
-import com.mc.infrastructure.config.security.JwtAuthenticationEntryPoint;
-import com.mc.infrastructure.config.security.JwtAuthenticationFilter;
-import com.mc.infrastructure.config.security.oauth2.CustomOAuth2UserService;
-import com.mc.infrastructure.config.security.oauth2.CustomOidcUserService;
-import com.mc.infrastructure.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import lombok.RequiredArgsConstructor;
+import com.mc.domain.iam.repository.TokenBlacklistRepository;
+import com.mc.infrastructure.core.config.security.CustomPermissionEvaluator;
+import com.mc.infrastructure.core.config.security.oauth2.CustomOAuth2UserService;
+import com.mc.infrastructure.core.config.security.oauth2.CustomOidcUserService;
+import com.mc.infrastructure.core.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.mc.infrastructure.iam.security.jwt.JwtAuthenticationEntryPoint;
+import com.mc.infrastructure.iam.security.jwt.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,7 +35,9 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
+    @Qualifier("iamJwtAuthenticationFilter")
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Qualifier("iamJwtAuthenticationEntryPoint")
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOidcUserService customOidcUserService;
@@ -100,6 +101,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/**",
+                                "/api/v2/auth/**",
+                                "/api/v1/boards/accept-invite",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/",
