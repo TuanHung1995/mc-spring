@@ -35,4 +35,8 @@ public interface WorkspaceRepository {
      * so that the domain invariants are enforced before persistence.
      */
     void delete(UUID id);
+
+    List<UUID> findIdsByTeamId(UUID teamId);
+
+    void softDeleteByTeamId(UUID teamId, UUID deletedBy);
 }

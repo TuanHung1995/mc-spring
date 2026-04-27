@@ -50,4 +50,14 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
     public void delete(UUID id) {
         workspaceJpaRepository.deleteById(id);
     }
+
+    @Override
+    public List<UUID> findIdsByTeamId(UUID teamId) {
+        return workspaceJpaRepository.findIdsByTeamId(teamId);
+    }
+
+    @Override
+    public void softDeleteByIds(UUID teamId, UUID deletedBy) {
+        workspaceJpaRepository.softDeleteByIds(teamId, deletedBy);
+    }
 }

@@ -1,7 +1,9 @@
 package com.mc.domain.organization.model.entity;
 
+import com.mc.domain.core.exception.DomainException;
 import com.mc.domain.core.model.BaseDomainEntity;
 import com.mc.domain.core.util.IdUtils;
+import com.mc.domain.organization.model.enums.WorkspaceStatus;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -40,5 +42,17 @@ public class Team extends BaseDomainEntity {
         team.name = fullName + "'s Team";
         team.slug = "team-" + ownerId;
         return team;
+    }
+
+    public void softDelete(UUID deletedBy) {
+        if (this.isDeleted()) {
+            throw new DomainException("Workspace is already deleted");
+        }
+        if (deletedBy == null) {
+            throw new DomainException("deletedBy cannot be null for audit trail");
+        }
+        this.deletedBy = deletedBy;
+        this.deletedAt = LocalDateTime.now();
+        markAsDeleted(); // sets the base `deleted = true` flag for filtering
     }
 }
