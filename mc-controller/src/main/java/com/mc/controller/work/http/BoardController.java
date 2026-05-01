@@ -2,14 +2,13 @@ package com.mc.controller.work.http;
 
 import com.mc.application.work.dto.request.*;
 import com.mc.application.work.dto.response.BoardResponse;
+import com.mc.application.work.dto.response.ColumnValueResponse;
 import com.mc.application.work.service.BoardAppService;
 import com.mc.domain.core.port.in.UserContextPort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -90,6 +89,12 @@ public class BoardController {
             @RequestBody UpdateBoardElementRequest request) {
         boardAppService.updateBoardElement(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/col-values/{boardId}")
+    @PreAuthorize("@workSecurity.canAccessBoard(#boardId, 'BOARD:VIEW')")
+    public ResponseEntity<List<ColumnValueResponse>> getColumnValuesByBoard(@PathVariable UUID boardId) {
+        return ResponseEntity.ok(boardAppService.getColumnValuesByBoardId(boardId));
     }
 
     // =================================================================

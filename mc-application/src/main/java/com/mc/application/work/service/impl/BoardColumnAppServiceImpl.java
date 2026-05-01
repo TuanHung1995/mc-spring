@@ -10,9 +10,7 @@ import com.mc.domain.work.model.entity.BoardColumn;
 import com.mc.domain.work.model.enums.BoardColumnType;
 import com.mc.domain.work.repository.BoardColumnRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,10 +40,11 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
         double newPos = (maxPos != null) ? maxPos + 65536 : 65536;
 
         BoardColumnType type = parseType(request.getType());
-        BoardColumn col = BoardColumn.create(request.getBoardId(), request.getTitle(), type, newPos, userId);
+        BoardColumn col = BoardColumn.create(request.getBoardId(), request.getTitle(), type,
+                newPos, request.getWorkspaceId(), request.getTeamId(), userId);
         BoardColumn saved = columnRepository.save(col);
 
-//        publishEvent("COLUMN_CREATED", saved.getId(), saved.getBoardId());
+        publishEvent("COLUMN_CREATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 
@@ -71,7 +70,7 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
         BoardColumn col = requireColumn(columnId);
         col.rename(newTitle, userId);
         BoardColumn saved = columnRepository.save(col);
-//        publishEvent("COLUMN_UPDATED", saved.getId(), saved.getBoardId());
+        publishEvent("COLUMN_UPDATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 
@@ -95,7 +94,7 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("BoardColumn", "id", columnId));
     }
 
-    private void publishEvent(String type, Long entityId, Long boardId) {
+    private void publishEvent(String type, Long entityId, UUID boardId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("type", type);
         payload.put("entityId", entityId);

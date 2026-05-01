@@ -15,6 +15,12 @@ public class CreateColumnRequest {
     @NotNull(message = "boardId is required")
     private UUID boardId;
 
+    @NotNull(message = "workspaceId is required")
+    private UUID workspaceId;
+
+    @NotNull(message = "teamId is required")
+    private UUID teamId;
+
     @NotBlank(message = "title is required")
     private String title;
 

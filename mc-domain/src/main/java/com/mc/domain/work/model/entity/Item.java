@@ -32,6 +32,8 @@ public class Item extends BaseDomainEntity {
 
     /** The current TaskGroup this item belongs to. */
     private UUID groupId;
+    private UUID workspaceId;
+    private UUID teamId;
 
     private String name;
 
@@ -53,12 +55,14 @@ public class Item extends BaseDomainEntity {
     private Item() {}
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
-    public Item(UUID id, UUID boardId, UUID groupId, String name, double position,
+    public Item(UUID id, UUID boardId, UUID groupId, UUID workspaceId, UUID teamId, String name, double position,
                 UUID createdById, UUID updatedById, UUID deletedById, LocalDateTime deletedAt,
                 LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.boardId = boardId;
         this.groupId = groupId;
+        this.workspaceId = workspaceId;
+        this.teamId = teamId;
         this.name = name;
         this.position = position;
         this.createdById = createdById;
@@ -80,7 +84,7 @@ public class Item extends BaseDomainEntity {
      * @param position    Fractional position (append to end of group).
      * @param createdById ID of the creating user.
      */
-    public static Item create(UUID boardId, UUID groupId, String name,
+    public static Item create(UUID boardId, UUID groupId, UUID workspaceId, UUID teamId, String name,
                               double position, UUID createdById) {
         if (boardId == null || groupId == null) {
             throw new DomainException("Item requires both boardId and groupId");
@@ -93,6 +97,8 @@ public class Item extends BaseDomainEntity {
         item.initializeNewEntity(IdUtils.newId());
         item.boardId = boardId;
         item.groupId = groupId;
+        item.workspaceId = workspaceId;
+        item.teamId = teamId;
         item.name = name.trim();
         item.position = position;
         item.createdById = createdById;

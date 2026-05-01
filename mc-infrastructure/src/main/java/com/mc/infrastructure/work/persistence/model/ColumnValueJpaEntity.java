@@ -4,6 +4,8 @@ import com.mc.infrastructure.core.persistence.model.BaseJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -31,6 +33,17 @@ public class ColumnValueJpaEntity extends BaseJpaEntity {
 
     @Column(name = "board_id")
     private UUID boardId;
+
+    @Column(name = "task_group_id")
+    private UUID taskGroupId;
+
+    @Column(name = "workspace_id", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private UUID workspaceId;
+
+    @Column(name = "team_id", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private UUID teamId;
 
     @Column(name = "value")
     private String value;

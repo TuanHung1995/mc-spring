@@ -53,6 +53,7 @@ public class ItemAppServiceImpl implements ItemAppService {
         double newPos = (maxPos != null) ? maxPos + 65536 : 65536;
 
         Item item = Item.create(request.getBoardId(), request.getGroupId(),
+                request.getWorkspaceId(), request.getTeamId(),
                 request.getName(), newPos, userId);
         Item saved = itemRepository.save(item);
 
@@ -89,7 +90,7 @@ public class ItemAppServiceImpl implements ItemAppService {
         Item item = requireItem(itemId);
         item.rename(newName, userId);
         Item saved = itemRepository.save(item);
-//        publishEvent("ITEM_UPDATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
+        publishEvent("ITEM_UPDATED", saved.getId(), saved.getBoardId(), saved.getGroupId());
         return toResponse(saved);
     }
 
@@ -101,7 +102,7 @@ public class ItemAppServiceImpl implements ItemAppService {
         UUID boardId = item.getBoardId();
         item.trash(userId);
         itemRepository.delete(item);
-//        publishEvent("ITEM_DELETED", itemId, boardId, null);
+        publishEvent("ITEM_DELETED", itemId, boardId, null);
     }
 
     // =================================================================
@@ -113,7 +114,7 @@ public class ItemAppServiceImpl implements ItemAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId));
     }
 
-    private void publishEvent(String type, Long entityId, Long boardId, Long groupId) {
+    private void publishEvent(String type, UUID entityId, UUID boardId, UUID groupId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("type", type);
         payload.put("entityId", entityId);

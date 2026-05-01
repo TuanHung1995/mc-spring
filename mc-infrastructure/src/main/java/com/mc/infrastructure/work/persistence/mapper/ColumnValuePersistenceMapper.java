@@ -18,6 +18,9 @@ public class ColumnValuePersistenceMapper {
         entity.setItemId(domain.getItemId());
         entity.setColumnId(domain.getColumnId());
         entity.setBoardId(domain.getBoardId());
+        entity.setTaskGroupId(domain.getTaskGroupId());
+        entity.setWorkspaceId(domain.getWorkspaceId());
+        entity.setTeamId(domain.getTeamId());
         entity.setValue(domain.getValue());
         entity.setTextValue(domain.getTextValue());
         entity.setColor(domain.getColor());
@@ -36,6 +39,9 @@ public class ColumnValuePersistenceMapper {
                 entity.getItemId(),
                 entity.getColumnId(),
                 entity.getBoardId(),
+                entity.getTaskGroupId(),
+                entity.getWorkspaceId(),
+                entity.getTeamId(),
                 entity.getValue(),
                 entity.getTextValue(),
                 entity.getColor(),

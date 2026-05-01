@@ -17,10 +17,10 @@ import java.util.UUID;
 public interface ColumnValueJpaRepository extends JpaRepository<ColumnValueJpaEntity, Long> {
 
     @Query("SELECT cv FROM ColumnValueJpaEntity cv WHERE cv.itemId = :itemId")
-    List<ColumnValueJpaEntity> findByItemId(@Param("itemId") Long itemId);
+    List<ColumnValueJpaEntity> findByItemId(@Param("itemId") UUID itemId);
 
     @Query("SELECT cv FROM ColumnValueJpaEntity cv WHERE cv.boardId = :boardId")
-    List<ColumnValueJpaEntity> findByBoardId(@Param("boardId") Long boardId);
+    List<ColumnValueJpaEntity> findByBoardId(@Param("boardId") UUID boardId);
 
     @Modifying
     @Query(value = "UPDATE work_column_values SET is_deleted = true, updated_at = NOW(), deleted_at = NOW(), deleted_by = :deletedById " +

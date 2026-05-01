@@ -16,6 +16,8 @@ public class TaskGroupPersistenceMapper {
         TaskGroupJpaEntity entity = new TaskGroupJpaEntity();
         entity.setId(domain.getId());
         entity.setBoardId(domain.getBoardId());
+        entity.setWorkspaceId(domain.getWorkspaceId());
+        entity.setTeamId(domain.getTeamId());
         entity.setTitle(domain.getTitle());
         entity.setColor(domain.getColor());
         entity.setPosition(domain.getPosition());
@@ -39,6 +41,8 @@ public class TaskGroupPersistenceMapper {
         return new TaskGroup(
                 entity.getId(),
                 entity.getBoardId(),
+                entity.getWorkspaceId(),
+                entity.getTeamId(),
                 entity.getTitle(),
                 entity.getColor(),
                 entity.getPosition(),

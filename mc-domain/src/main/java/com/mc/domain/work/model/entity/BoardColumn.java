@@ -38,6 +38,9 @@ public class BoardColumn extends BaseWorkEntity {
     private int width;
     private boolean hidden;
 
+    private UUID workspaceId;
+    private UUID teamId;
+
     private UUID createdById;
     private UUID updatedById;
     private UUID deletedById;
@@ -52,6 +55,7 @@ public class BoardColumn extends BaseWorkEntity {
     /** Full-arg reconstitution constructor — persistence mapper only. */
     public BoardColumn(Long id, UUID boardId, String title, BoardColumnType type, String description,
                        double position, int width, boolean hidden,
+                       UUID workspaceId, UUID teamId,
                        UUID createdById, UUID updatedById, UUID deletedById, LocalDateTime deletedAt,
                        LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
@@ -62,6 +66,8 @@ public class BoardColumn extends BaseWorkEntity {
         this.position = position;
         this.width = width;
         this.hidden = hidden;
+        this.workspaceId = workspaceId;
+        this.teamId = teamId;
         this.createdById = createdById;
         this.updatedById = updatedById;
         this.deletedById = deletedById;
@@ -82,7 +88,7 @@ public class BoardColumn extends BaseWorkEntity {
      * @param createdById ID of the user creating the column.
      */
     public static BoardColumn create(UUID boardId, String title, BoardColumnType type,
-                                     double position, UUID createdById) {
+                                     double position, UUID createdById, UUID workspaceId, UUID teamId) {
         if (boardId == null) {
             throw new DomainException("BoardColumn must belong to a Board");
         }
@@ -102,6 +108,8 @@ public class BoardColumn extends BaseWorkEntity {
         col.width = 150; // default width in pixels
         col.hidden = false;
         col.createdById = createdById;
+        col.workspaceId = workspaceId;
+        col.teamId = teamId;
         return col;
     }
 
