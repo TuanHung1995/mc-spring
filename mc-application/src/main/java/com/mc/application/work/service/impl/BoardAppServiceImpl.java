@@ -286,7 +286,7 @@ public class BoardAppServiceImpl implements BoardAppService {
         return new BoardResponse(
                 board.getId(), board.getName(), board.getDescription(),
                 board.getType() != null ? board.getType().name() : null,
-                board.getPurpose(), board.getWorkspaceId(), board.getCreatedById(),
+                board.getPurpose(), board.getWorkspaceId(), board.getTeamId(), board.getCreatedById(),
                 board.getCreatedAt(), board.getUpdatedAt()
         );
     }

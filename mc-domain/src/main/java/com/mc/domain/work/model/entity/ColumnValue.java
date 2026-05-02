@@ -5,6 +5,7 @@ import com.mc.domain.core.util.IdUtils;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -103,6 +104,28 @@ public class ColumnValue extends BaseDomainEntity {
         cv.textValue = textValue;
         cv.color = color;
         cv.type = type;
+        return cv;
+    }
+
+    public static ColumnValue createBaseOnColumn(UUID itemId, Long columnId, UUID boardId,
+                                            UUID taskGroupId, UUID workspaceId, UUID teamId, String type) {
+        ColumnValue cv = new ColumnValue();
+        cv.initializeNewEntity(IdUtils.newId());
+        cv.itemId = itemId;
+        cv.columnId = columnId;
+        cv.boardId = boardId;
+        cv.taskGroupId = taskGroupId;
+        cv.workspaceId = workspaceId;
+        cv.teamId = teamId;
+        cv.type = type;
+        switch (type) {
+            case "TEXT":
+                cv.textValue = "TEXT";
+                break;
+            case "STATUS":
+                cv.value = "NORMAL";
+                break;
+        }
         return cv;
     }
 

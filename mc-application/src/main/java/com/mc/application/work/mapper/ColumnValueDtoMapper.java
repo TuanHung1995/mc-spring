@@ -1,6 +1,5 @@
 package com.mc.application.work.mapper;
 
-import com.mc.application.iam.dto.response.UserResponse;
 import com.mc.application.work.dto.response.ColumnValueResponse;
 import com.mc.domain.work.model.entity.ColumnValue;
 import org.springframework.stereotype.Component;
