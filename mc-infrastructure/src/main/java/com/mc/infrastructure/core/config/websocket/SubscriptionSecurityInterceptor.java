@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 @Slf4j
 public class SubscriptionSecurityInterceptor implements ChannelInterceptor {
 
-    @Qualifier("workBoardMemberRepository")
     private final BoardMemberRepository boardMemberRepository;
 
     // Regex to extract boardId from path: /topic/board/123

@@ -36,18 +36,18 @@ public class ColumnValueRepositoryImpl implements ColumnValueRepository {
     }
 
     @Override
-    public Optional<ColumnValue> findById(Long id) {
+    public Optional<ColumnValue> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override
-    public List<ColumnValue> findByItemId(Long itemId) {
+    public List<ColumnValue> findByItemId(UUID itemId) {
         return jpaRepository.findByItemId(itemId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public List<ColumnValue> findByBoardId(Long boardId) {
+    public List<ColumnValue> findByBoardId(UUID boardId) {
         return jpaRepository.findByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }

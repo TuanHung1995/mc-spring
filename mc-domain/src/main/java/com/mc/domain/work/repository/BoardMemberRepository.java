@@ -3,12 +3,10 @@ package com.mc.domain.work.repository;
 
 import com.mc.domain.iam.model.Role;
 import com.mc.domain.work.model.entity.BoardMember;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Component("workBoardMemberRepository")
 public interface BoardMemberRepository {
 
     Optional<Role> findRoleByBoardIdAndUserId(UUID boardId, UUID userId);

@@ -39,6 +39,7 @@ public class Board extends BaseDomainEntity {
 
     /** References the legacy workspace (Long FK). */
     private UUID workspaceId;
+    private UUID teamId;
 
     /** References the IAM user who created the board (Long FK → legacy users table). */
     private UUID createdById;
@@ -56,7 +57,7 @@ public class Board extends BaseDomainEntity {
      * Reconstitution constructor — persistence mapper only.
      */
     public Board(UUID id, String name, String description, BoardType type, String purpose,
-                 UUID workspaceId, UUID createdById, UUID deletedById, LocalDateTime deletedAt,
+                 UUID workspaceId, UUID teamId, UUID createdById, UUID deletedById, LocalDateTime deletedAt,
                  LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.name = name;
@@ -64,6 +65,7 @@ public class Board extends BaseDomainEntity {
         this.type = type;
         this.purpose = purpose;
         this.workspaceId = workspaceId;
+        this.teamId = teamId;
         this.createdById = createdById;
         this.deletedById = deletedById;
         this.deletedAt = deletedAt;
@@ -86,7 +88,7 @@ public class Board extends BaseDomainEntity {
      * @param workspaceId The Long ID of the parent Workspace.
      */
     public static Board create(String name, BoardType type, String purpose,
-                               UUID createdById, UUID workspaceId) {
+                               UUID createdById, UUID workspaceId, UUID teamId) {
         if (name == null || name.isBlank()) {
             throw new DomainException("Board name cannot be blank");
         }
@@ -104,6 +106,7 @@ public class Board extends BaseDomainEntity {
         board.purpose = purpose;
         board.createdById = createdById;
         board.workspaceId = workspaceId;
+        board.teamId = teamId;
         return board;
     }
 

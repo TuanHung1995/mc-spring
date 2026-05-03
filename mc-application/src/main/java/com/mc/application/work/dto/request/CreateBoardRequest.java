@@ -15,6 +15,9 @@ public class CreateBoardRequest {
     @NotNull(message = "workspaceId is required")
     private UUID workspaceId;
 
+    @NotNull(message = "teamId is required")
+    private UUID teamId;
+
     @NotBlank(message = "name is required")
     private String name;
 

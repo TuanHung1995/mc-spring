@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents a domain event indicating that the state of a board has changed.
@@ -20,7 +21,7 @@ public class BoardChangedEvent {
     /**
      * The unique identifier of the board that has changed.
      */
-    private final Long boardId;
+    private final UUID boardId;
 
     /**
      * The specific details of the change (e.g., REORDER, UPDATE_ITEM).

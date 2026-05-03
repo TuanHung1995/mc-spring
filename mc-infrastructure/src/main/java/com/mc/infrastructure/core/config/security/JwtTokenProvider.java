@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component("appJwtTokenProvider")
@@ -116,7 +117,7 @@ public class JwtTokenProvider implements TokenHelperPort {
     }
 
     /* Generate invite token with boardId and role */
-    public String generateInviteToken(String email, Long boardId, String role) {
+    public String generateInviteToken(String email, UUID boardId, String role) {
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + inviteTokenExpirationMs);
 

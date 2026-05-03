@@ -1,6 +1,7 @@
 package com.mc.application.work.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BoardResponse {
     private UUID id;
     private String name;
@@ -22,6 +24,7 @@ public class BoardResponse {
     private String type;
     private String purpose;
     private UUID workspaceId;
+    private UUID teamId;
     private UUID createdById;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

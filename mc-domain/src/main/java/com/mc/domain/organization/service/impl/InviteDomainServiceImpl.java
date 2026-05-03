@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -17,7 +19,7 @@ public class InviteDomainServiceImpl implements InviteDomainService {
 //    private final MailSender mailSender;
 
     @Override
-    public void sendInvitation(Long boardId, String email, String tokenLink) {
+    public void sendInvitation(UUID boardId, String email, String tokenLink) {
 //        Board board = boardRepository.findById(boardId)
 //                .orElseThrow(() -> new RuntimeException("Board not found"));
 //
@@ -29,7 +31,7 @@ public class InviteDomainServiceImpl implements InviteDomainService {
     }
 
     @Override
-    public void addUserToBoard(Long boardId, String email, String roleName) {
+    public void addUserToBoard(UUID boardId, String email, String roleName) {
 //        User user = userRepository.findByEmail(email)
 //                .orElseThrow(() -> new RuntimeException("User not found"));
 //
