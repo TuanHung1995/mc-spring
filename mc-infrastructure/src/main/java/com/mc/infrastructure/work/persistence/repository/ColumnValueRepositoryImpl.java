@@ -36,7 +36,7 @@ public class ColumnValueRepositoryImpl implements ColumnValueRepository {
     }
 
     @Override
-    public Optional<ColumnValue> findById(Long id) {
+    public Optional<ColumnValue> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
 

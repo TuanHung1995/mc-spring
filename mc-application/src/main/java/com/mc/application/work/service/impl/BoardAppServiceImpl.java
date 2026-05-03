@@ -129,6 +129,14 @@ public class BoardAppServiceImpl implements BoardAppService {
                 itemRepository.save(item);
                 boardId = item.getBoardId();
             }
+            case "COLUMN_VALUE" -> {
+                ColumnValue columnValue = columnValueRepository.findById(request.getTargetId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Column Value", "id", request.getTargetId()));
+
+                columnValue.updateValue(request.getValue(), request.getValue(), request.getColor());
+                columnValueRepository.save(columnValue);
+                boardId = columnValue.getBoardId();
+            }
             default -> throw new BusinessLogicException("Unsupported element type: " + request.getType());
         }
         publishBoardEvent("ELEMENT_UPDATED", request.getTargetId(), boardId);

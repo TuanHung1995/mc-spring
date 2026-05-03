@@ -14,7 +14,7 @@ import java.util.UUID;
  * ColumnValueJpaRepository — Spring Data JPA Repository (Work Context)
  */
 @Repository
-public interface ColumnValueJpaRepository extends JpaRepository<ColumnValueJpaEntity, Long> {
+public interface ColumnValueJpaRepository extends JpaRepository<ColumnValueJpaEntity, UUID> {
 
     @Query("SELECT cv FROM ColumnValueJpaEntity cv WHERE cv.itemId = :itemId")
     List<ColumnValueJpaEntity> findByItemId(@Param("itemId") UUID itemId);

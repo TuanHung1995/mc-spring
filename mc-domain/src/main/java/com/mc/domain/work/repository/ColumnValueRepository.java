@@ -16,7 +16,7 @@ public interface ColumnValueRepository {
 
     void saveAll(List<ColumnValue> columnValues);
 
-    Optional<ColumnValue> findById(Long id);
+    Optional<ColumnValue> findById(UUID id);
 
     /** Returns all column values for an item. */
     List<ColumnValue> findByItemId(UUID itemId);

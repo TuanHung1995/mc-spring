@@ -60,7 +60,7 @@ public class ItemAppServiceImpl implements ItemAppService {
                 request.getName(), newPos, userId);
         Item saved = itemRepository.save(item);
 
-        boardColumnRepository.findAllByBoardId(request.getBoardId()).stream().map(boardColumnDtoMapper::toResponse).forEach( columnResponse-> {;
+        boardColumnRepository.findAllByBoardId(request.getBoardId()).stream().map(boardColumnDtoMapper::toResponse).forEach( columnResponse-> {
             ColumnValue columnValue = ColumnValue.createBaseOnColumn(saved.getId(), columnResponse.getId(), request.getBoardId(),
                     request.getGroupId(), request.getWorkspaceId(), request.getTeamId(), columnResponse.getType());
             columnValueRepository.save(columnValue);
