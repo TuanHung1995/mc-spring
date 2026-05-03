@@ -28,6 +28,14 @@ public class ItemJpaEntity extends BaseJpaEntity {
     @Column(name = "task_group_id")
     private UUID groupId;
 
+    @Column(name = "workspace_id", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private UUID workspaceId;
+
+    @Column(name = "team_id", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private UUID teamId;
+
     @Column(name = "name")
     private String name;
 

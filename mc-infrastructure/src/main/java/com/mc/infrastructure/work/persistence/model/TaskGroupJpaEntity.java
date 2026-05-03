@@ -33,6 +33,14 @@ public class TaskGroupJpaEntity extends BaseJpaEntity {
     @Column(name = "board_id")
     private UUID boardId;
 
+    @Column(name = "workspace_id", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private UUID workspaceId;
+
+    @Column(name = "team_id", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private UUID teamId;
+
     @Column(name = "title")
     private String title;
 

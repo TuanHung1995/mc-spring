@@ -43,8 +43,8 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
         Double maxPos = taskGroupRepository.getMaxPositionByBoardId(request.getBoardId());
         double newPos = (maxPos != null) ? maxPos + 65536 : 65536;
 
-        TaskGroup group = TaskGroup.create(request.getBoardId(), request.getTitle(),
-                request.getColor(), newPos, userId);
+        TaskGroup group = TaskGroup.create(request.getBoardId(), request.getWorkspaceId(), request.getTeamId(),
+                request.getTitle(), request.getColor(), newPos, userId);
         TaskGroup saved = taskGroupRepository.save(group);
 
 //        publishEvent("GROUP_CREATED", saved.getId(), saved.getBoardId());
@@ -150,7 +150,7 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", groupId));
     }
 
-    private void publishEvent(String type, Long entityId, Long boardId) {
+    private void publishEvent(String type, UUID entityId, UUID boardId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("type", type);
         payload.put("entityId", entityId);

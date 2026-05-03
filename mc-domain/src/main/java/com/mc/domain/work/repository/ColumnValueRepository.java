@@ -16,13 +16,13 @@ public interface ColumnValueRepository {
 
     void saveAll(List<ColumnValue> columnValues);
 
-    Optional<ColumnValue> findById(Long id);
+    Optional<ColumnValue> findById(UUID id);
 
     /** Returns all column values for an item. */
-    List<ColumnValue> findByItemId(Long itemId);
+    List<ColumnValue> findByItemId(UUID itemId);
 
     /** Returns all column values for a board (used for full board load). */
-    List<ColumnValue> findByBoardId(Long boardId);
+    List<ColumnValue> findByBoardId(UUID boardId);
 
     int softDeleteByWorkspaceIdInBatch(UUID workspaceId, UUID deletedById, int batchSize);
 }

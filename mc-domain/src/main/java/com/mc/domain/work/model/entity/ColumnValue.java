@@ -5,6 +5,7 @@ import com.mc.domain.core.util.IdUtils;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -29,6 +30,9 @@ public class ColumnValue extends BaseDomainEntity {
     private UUID itemId;
     private Long columnId;
     private UUID boardId;
+    private UUID taskGroupId;
+    private UUID workspaceId;
+    private UUID teamId;
 
     /** Generic value field (used for PERSON: user ID, LINK: URL, etc.) */
     private String value;
@@ -52,12 +56,16 @@ public class ColumnValue extends BaseDomainEntity {
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
     public ColumnValue(UUID id, UUID itemId, Long columnId, UUID boardId,
+                       UUID taskGroupId, UUID workspaceId, UUID teamId,
                        String value, String textValue, String color, String type,
                        LocalDateTime deletedAt, LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.itemId = itemId;
         this.columnId = columnId;
         this.boardId = boardId;
+        this.taskGroupId = taskGroupId;
+        this.workspaceId = workspaceId;
+        this.teamId = teamId;
         this.value = value;
         this.textValue = textValue;
         this.color = color;
@@ -81,6 +89,7 @@ public class ColumnValue extends BaseDomainEntity {
      * @param type       Column type string matching {@code BoardColumnType}).
      */
     public static ColumnValue createDefault(UUID itemId, Long columnId, UUID boardId,
+                                            UUID taskGroupId, UUID workspaceId, UUID teamId,
                                             String value, String textValue,
                                             String color, String type) {
         ColumnValue cv = new ColumnValue();
@@ -88,10 +97,35 @@ public class ColumnValue extends BaseDomainEntity {
         cv.itemId = itemId;
         cv.columnId = columnId;
         cv.boardId = boardId;
+        cv.taskGroupId = taskGroupId;
+        cv.workspaceId = workspaceId;
+        cv.teamId = teamId;
         cv.value = value;
         cv.textValue = textValue;
         cv.color = color;
         cv.type = type;
+        return cv;
+    }
+
+    public static ColumnValue createBaseOnColumn(UUID itemId, Long columnId, UUID boardId,
+                                            UUID taskGroupId, UUID workspaceId, UUID teamId, String type) {
+        ColumnValue cv = new ColumnValue();
+        cv.initializeNewEntity(IdUtils.newId());
+        cv.itemId = itemId;
+        cv.columnId = columnId;
+        cv.boardId = boardId;
+        cv.taskGroupId = taskGroupId;
+        cv.workspaceId = workspaceId;
+        cv.teamId = teamId;
+        cv.type = type;
+        switch (type) {
+            case "TEXT":
+                cv.textValue = "TEXT";
+                break;
+            case "STATUS":
+                cv.value = "NORMAL";
+                break;
+        }
         return cv;
     }
 

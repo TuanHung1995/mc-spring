@@ -1,8 +1,10 @@
 package com.mc.domain.organization.service;
 
+import java.util.UUID;
+
 public interface InviteDomainService {
 
-    void sendInvitation(Long boardId, String email, String role);
-    void addUserToBoard(Long boardId, String email, String roleName);
+    void sendInvitation(UUID boardId, String email, String role);
+    void addUserToBoard(UUID boardId, String email, String roleName);
 
 }

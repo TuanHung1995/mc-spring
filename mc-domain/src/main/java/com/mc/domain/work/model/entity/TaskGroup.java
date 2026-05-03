@@ -30,6 +30,8 @@ public class TaskGroup extends BaseDomainEntity {
 
     /** The parent Board's Long ID. */
     private UUID boardId;
+    private UUID workspaceId;
+    private UUID teamId;
 
     private String title;
     private String color;
@@ -57,12 +59,14 @@ public class TaskGroup extends BaseDomainEntity {
     private TaskGroup() {}
 
     /** Full-arg reconstitution constructor — persistence mapper only. */
-    public TaskGroup(UUID id, UUID boardId, String title, String color, double position,
+    public TaskGroup(UUID id, UUID boardId, UUID workspaceId, UUID teamId, String title, String color, double position,
                      boolean collapsed, boolean archived, LocalDateTime archivedAt, UUID archivedBy,
                      UUID createdBy, UUID updatedBy, UUID deletedBy, LocalDateTime deletedAt,
                      LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.boardId = boardId;
+        this.workspaceId = workspaceId;
+        this.teamId = teamId;
         this.title = title;
         this.color = color;
         this.position = position;
@@ -89,7 +93,7 @@ public class TaskGroup extends BaseDomainEntity {
      * @param position  The fractional position (calculated by the service).
      * @param createdBy The user creating this group.
      */
-    public static TaskGroup create(UUID boardId, String title, String color,
+    public static TaskGroup create(UUID boardId, UUID workspaceId, UUID teamId, String title, String color,
                                    double position, UUID createdBy) {
         if (boardId == null) {
             throw new DomainException("TaskGroup must belong to a Board");
@@ -101,6 +105,8 @@ public class TaskGroup extends BaseDomainEntity {
         TaskGroup group = new TaskGroup();
         group.initializeNewEntity(IdUtils.newId());
         group.boardId = boardId;
+        group.workspaceId = workspaceId;
+        group.teamId = teamId;
         group.title = title.trim();
         group.color = (color != null && !color.isBlank()) ? color : "#579bfc";
         group.position = position;

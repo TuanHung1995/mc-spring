@@ -38,6 +38,10 @@ public class BoardJpaEntity extends BaseJpaEntity {
     @JdbcTypeCode(SqlTypes.BINARY)
     private UUID workspaceId;
 
+    @Column(name = "team_id", columnDefinition = "BINARY(16)")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private UUID teamId;
+
     @Column(name = "deleted_by", columnDefinition = "BINARY(16)")
     @JdbcTypeCode(SqlTypes.BINARY)
     private UUID deletedById;

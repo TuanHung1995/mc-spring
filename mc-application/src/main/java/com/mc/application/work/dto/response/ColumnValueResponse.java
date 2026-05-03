@@ -8,21 +8,23 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * ColumnResponse — Application DTO (Work Context)
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ColumnResponse {
-    private Long id;
+public class ColumnValueResponse {
+
+    private UUID id;
     private UUID boardId;
-    private String title;
+    private Long columnId;
+    private UUID taskGroupId;
+    private UUID itemId;
+    private String value;
+    private String textValue;
+    private String color;
     private String type;
-    private String description;
-    private double position;
-    private int width;
-    private boolean hidden;
+    private UUID createdById;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 }

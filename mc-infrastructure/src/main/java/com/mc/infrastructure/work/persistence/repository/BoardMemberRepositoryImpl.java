@@ -6,7 +6,6 @@ import com.mc.domain.work.repository.BoardMemberRepository;
 import com.mc.infrastructure.work.persistence.jpa.BoardMemberJpaRepository;
 import com.mc.infrastructure.work.persistence.mapper.BoardMemberPersistenceMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,7 +13,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Component("workBoardMemberRepository")
 public class BoardMemberRepositoryImpl implements BoardMemberRepository {
 
     private final BoardMemberJpaRepository jpaRepository;
@@ -34,6 +32,5 @@ public class BoardMemberRepositoryImpl implements BoardMemberRepository {
     public boolean existsByBoardIdAndUserId(UUID boardId, UUID userId) {
         return jpaRepository.existsByBoardIdAndUserId(boardId, userId);
     }
-
 
 }

@@ -27,6 +27,8 @@ public interface BoardAppService {
     /** Inline field edit: updates a group title/color, column title, or item name. */
     void updateBoardElement(UpdateBoardElementRequest request);
 
+    List<ColumnValueResponse> getColumnValuesByBoardId(UUID boardId);
+
     // Drag-and-drop reorder
     void reorderGroup(ReorderRequest request);
     void reorderColumn(ReorderColumnRequest request);

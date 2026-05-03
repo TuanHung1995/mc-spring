@@ -2,6 +2,7 @@ package com.mc.application.work.service.impl;
 
 import com.mc.application.work.dto.request.*;
 import com.mc.application.work.dto.response.*;
+import com.mc.application.work.mapper.ColumnValueDtoMapper;
 import com.mc.application.work.service.BoardAppService;
 import com.mc.domain.core.event.BoardChangedEvent;
 import com.mc.domain.core.exception.BusinessLogicException;
@@ -12,9 +13,7 @@ import com.mc.domain.work.model.enums.BoardType;
 import com.mc.domain.work.port.WorkUserContextPort;
 import com.mc.domain.work.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
 public class BoardAppServiceImpl implements BoardAppService {
 
     private final BoardRepository boardRepository;
-    @Qualifier("workBoardMemberRepository")
     private final BoardMemberRepository boardMemberRepository;
     private final TaskGroupRepository taskGroupRepository;
     private final BoardColumnRepository columnRepository;
@@ -47,6 +45,8 @@ public class BoardAppServiceImpl implements BoardAppService {
     private final ColumnValueRepository columnValueRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;
+
+    private final ColumnValueDtoMapper columnValueDtoMapper;
 
     // =================================================================
     // BOARD CRUD
@@ -59,7 +59,7 @@ public class BoardAppServiceImpl implements BoardAppService {
 
         BoardType type = parseBoardType(request.getType());
         Board board = Board.create(request.getName(), type, request.getPurpose(),
-                userId, request.getWorkspaceId());
+                userId, request.getWorkspaceId(), request.getTeamId());
         Board saved = boardRepository.save(board);
 
         addBoardMember(saved.getId(), userId, 1L); // Add creator as member with default role (e.g., Owner)
@@ -129,9 +129,25 @@ public class BoardAppServiceImpl implements BoardAppService {
                 itemRepository.save(item);
                 boardId = item.getBoardId();
             }
+            case "COLUMN_VALUE" -> {
+                ColumnValue columnValue = columnValueRepository.findById(request.getTargetId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Column Value", "id", request.getTargetId()));
+
+                columnValue.updateValue(request.getValue(), request.getValue(), request.getColor());
+                columnValueRepository.save(columnValue);
+                boardId = columnValue.getBoardId();
+            }
             default -> throw new BusinessLogicException("Unsupported element type: " + request.getType());
         }
-//        publishBoardEvent("ELEMENT_UPDATED", request.getTargetId(), boardId);
+        publishBoardEvent("ELEMENT_UPDATED", request.getTargetId(), boardId);
+    }
+
+    @Override
+    @Transactional
+    public List<ColumnValueResponse> getColumnValuesByBoardId(UUID boardId) {
+        return columnValueRepository.findByBoardId(boardId).stream()
+                .map(columnValueDtoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     // =================================================================
@@ -152,7 +168,7 @@ public class BoardAppServiceImpl implements BoardAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("TaskGroup", "id", request.getTargetId()));
         group.moveTo(newPos, userId);
         taskGroupRepository.save(group);
-//        publishBoardEvent("GROUP_REORDER", group.getId(), group.getBoardId());
+        publishBoardEvent("GROUP_REORDER", group.getId(), group.getBoardId());
     }
 
     @Override
@@ -169,7 +185,7 @@ public class BoardAppServiceImpl implements BoardAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("BoardColumn", "id", request.getTargetId()));
         column.moveTo(newPos, userId);
         columnRepository.save(column);
-//        publishBoardEvent("COLUMN_REORDER", column.getId(), column.getBoardId());
+        publishBoardColumnEvent(column.getId(), column.getBoardId());
     }
 
     @Override
@@ -186,7 +202,7 @@ public class BoardAppServiceImpl implements BoardAppService {
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", request.getTargetId()));
         item.moveTo(newPos, request.getTargetGroupId(), userId);
         itemRepository.save(item);
-//        publishBoardEvent("ITEM_REORDER", item.getId(), item.getBoardId());
+        publishBoardEvent("ITEM_REORDER", item.getId(), item.getBoardId());
     }
 
     // =================================================================
@@ -199,28 +215,28 @@ public class BoardAppServiceImpl implements BoardAppService {
      */
     private void initializeDefaultBoardStructure(Board board, UUID userId) {
         // Create default columns
-        BoardColumn textCol   = createColumn(board.getId(), board.getPurpose() != null ? board.getPurpose() : "Task", BoardColumnType.TEXT,   1000.0, userId);
-        BoardColumn personCol = createColumn(board.getId(), "Person",  BoardColumnType.PERSON, 2000.0, userId);
-        BoardColumn statusCol = createColumn(board.getId(), "Status",  BoardColumnType.STATUS, 3000.0, userId);
-        BoardColumn dateCol   = createColumn(board.getId(), "Date",    BoardColumnType.DATE,   4000.0, userId);
+        BoardColumn textCol   = createColumn(board.getId(), board.getWorkspaceId(), board.getTeamId(), board.getPurpose() != null ? board.getPurpose() : "Task", BoardColumnType.TEXT,   1000.0, userId);
+        BoardColumn personCol = createColumn(board.getId(), board.getWorkspaceId(), board.getTeamId(), "Person",  BoardColumnType.PERSON, 2000.0, userId);
+        BoardColumn statusCol = createColumn(board.getId(), board.getWorkspaceId(), board.getTeamId(), "Status",  BoardColumnType.STATUS, 3000.0, userId);
+        BoardColumn dateCol   = createColumn(board.getId(), board.getWorkspaceId(), board.getTeamId(), "Date",    BoardColumnType.DATE,   4000.0, userId);
 
         List<BoardColumn> columns = List.of(textCol, personCol, statusCol, dateCol);
 
         // Create default task groups with one item each
-        createDefaultGroup(board.getId(), "To Do",       "#FF5733", 1000.0, userId, columns, board.getId());
-        createDefaultGroup(board.getId(), "In Progress", "#33C1FF", 2000.0, userId, columns, board.getId());
-        createDefaultGroup(board.getId(), "Done",        "#75FF33", 3000.0, userId, columns, board.getId());
+        createDefaultGroup(board.getId(), board.getWorkspaceId(), board.getTeamId(), "To Do",       "#FF5733", 1000.0, userId, columns, board.getId());
+        createDefaultGroup(board.getId(), board.getWorkspaceId(), board.getTeamId(), "In Progress", "#33C1FF", 2000.0, userId, columns, board.getId());
+        createDefaultGroup(board.getId(), board.getWorkspaceId(), board.getTeamId(), "Done",        "#75FF33", 3000.0, userId, columns, board.getId());
     }
 
-    private BoardColumn createColumn(UUID boardId, String title, BoardColumnType type, double pos, UUID userId) {
-        return columnRepository.save(BoardColumn.create(boardId, title, type, pos, userId));
+    private BoardColumn createColumn(UUID boardId, UUID workspaceId, UUID teamId, String title, BoardColumnType type, double pos, UUID userId) {
+        return columnRepository.save(BoardColumn.create(boardId, title, type, pos, userId, workspaceId, teamId));
     }
 
-    private void createDefaultGroup(UUID boardId, String title, String color, double pos,
+    private void createDefaultGroup(UUID boardId, UUID workspaceId, UUID teamId, String title, String color, double pos,
                                     UUID userId, List<BoardColumn> columns, UUID masterBoardId) {
-        TaskGroup group = taskGroupRepository.save(TaskGroup.create(boardId, title, color, pos, userId));
+        TaskGroup group = taskGroupRepository.save(TaskGroup.create(boardId, workspaceId, teamId, title, color, pos, userId));
 
-        Item item = itemRepository.save(Item.create(boardId, group.getId(),
+        Item item = itemRepository.save(Item.create(boardId, group.getId(), workspaceId, teamId,
                 "Item " + (int)(pos / 1000), pos, userId));
 
         // Create default column values for the item (skip the first TEXT column — it's the name)
@@ -234,7 +250,7 @@ public class BoardAppServiceImpl implements BoardAppService {
             };
             String colorVal = col.getType() == BoardColumnType.STATUS ? "#FF0000" : null;
             columnValueRepository.save(
-                    ColumnValue.createDefault(item.getId(), col.getId(), masterBoardId,
+                    ColumnValue.createDefault(item.getId(), col.getId(), masterBoardId, group.getId(), workspaceId, teamId,
                             null, textVal, colorVal, col.getType().name()));
         }
     }
@@ -250,10 +266,18 @@ public class BoardAppServiceImpl implements BoardAppService {
         return (prevPos + nextPos) / 2.0;
     }
 
-    private void publishBoardEvent(String eventType, Long entityId, Long boardId) {
+    private void publishBoardEvent(String eventType, UUID entityId, UUID boardId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("type", eventType);
         payload.put("entityId", entityId);
+        payload.put("boardId", boardId);
+        eventPublisher.publishEvent(new BoardChangedEvent(boardId, payload));
+    }
+
+    private void publishBoardColumnEvent(Long columnId, UUID boardId) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "COLUMN_UPDATED");
+        payload.put("entityId", columnId);
         payload.put("boardId", boardId);
         eventPublisher.publishEvent(new BoardChangedEvent(boardId, payload));
     }
@@ -270,7 +294,7 @@ public class BoardAppServiceImpl implements BoardAppService {
         return new BoardResponse(
                 board.getId(), board.getName(), board.getDescription(),
                 board.getType() != null ? board.getType().name() : null,
-                board.getPurpose(), board.getWorkspaceId(), board.getCreatedById(),
+                board.getPurpose(), board.getWorkspaceId(), board.getTeamId(), board.getCreatedById(),
                 board.getCreatedAt(), board.getUpdatedAt()
         );
     }

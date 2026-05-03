@@ -24,6 +24,7 @@ public class BoardPersistenceMapper {
         entity.setType(domain.getType() != null ? domain.getType().name() : null);
         entity.setPurpose(domain.getPurpose());
         entity.setWorkspaceId(domain.getWorkspaceId());
+        entity.setTeamId(domain.getTeamId());
         entity.setCreatedBy(domain.getCreatedById());
         entity.setDeletedById(domain.getDeletedById());
         entity.setDeletedAt(domain.getDeletedAt());
@@ -48,6 +49,7 @@ public class BoardPersistenceMapper {
                 type,
                 entity.getPurpose(),
                 entity.getWorkspaceId(),
+                entity.getTeamId(),
                 entity.getCreatedBy(),
                 entity.getDeletedById(),
                 entity.getDeletedAt(),

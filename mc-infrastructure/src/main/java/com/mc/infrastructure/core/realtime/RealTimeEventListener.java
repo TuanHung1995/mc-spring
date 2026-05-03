@@ -2,6 +2,7 @@ package com.mc.infrastructure.core.realtime;
 
 import com.mc.domain.core.event.BoardChangedEvent;
 import com.mc.domain.core.port.in.RealTimeUpdatePort;
+import com.mc.domain.organization.event.WorkspaceChatEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -32,5 +33,22 @@ public class RealTimeEventListener {
 
         // Call Port to send real-time update via WebSocket
         realTimeUpdatePort.sendBoardUpdate(event.getBoardId(), event.getPayload());
+    }
+
+    /**
+     * Listens for WorkspaceChatEvent specifically AFTER the DB transaction commits.
+     * <p>
+     * ARCHITECTURE NOTE: Using TransactionPhase.AFTER_COMMIT guarantees that
+     * the frontend clients will only receive the WebSocket message AFTER the chat
+     * data is safely persisted in the database. This eliminates race conditions
+     * where a client fetches chat history before the new message is fully committed.
+     * </p>
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleWorkspaceChatEvent(WorkspaceChatEvent event) {
+        log.debug("DB Committed. Broadcasting chat event for Workspace ID: {}", event.getWorkspaceId());
+
+        // Delegate the actual socket transmission to the Port implementation
+        realTimeUpdatePort.sendWorkspaceUpdate(event.getWorkspaceId(), event.getPayload());
     }
 }

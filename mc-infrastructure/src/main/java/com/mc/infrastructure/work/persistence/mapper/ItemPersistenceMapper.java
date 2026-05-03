@@ -17,8 +17,11 @@ public class ItemPersistenceMapper {
         entity.setId(domain.getId());
         entity.setBoardId(domain.getBoardId());
         entity.setGroupId(domain.getGroupId());
+        entity.setWorkspaceId(domain.getWorkspaceId());
+        entity.setTeamId(domain.getTeamId());
         entity.setName(domain.getName());
         entity.setPosition(domain.getPosition());
+        entity.setDeleted(domain.isDeleted());
         entity.setCreatedBy(domain.getCreatedById());
         entity.setUpdatedBy(domain.getUpdatedById());
         entity.setDeletedById(domain.getDeletedById());
@@ -35,6 +38,8 @@ public class ItemPersistenceMapper {
                 entity.getId(),
                 entity.getBoardId(),
                 entity.getGroupId(),
+                entity.getWorkspaceId(),
+                entity.getTeamId(),
                 entity.getName(),
                 entity.getPosition(),
                 entity.getCreatedBy(),
