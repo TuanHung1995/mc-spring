@@ -44,6 +44,9 @@ public interface TaskGroupJpaRepository extends JpaRepository<TaskGroupJpaEntity
            nativeQuery = true)
     Optional<TaskGroupJpaEntity> findByIdIncludingDeleted(@Param("id") UUID id);
 
+    @Query(value = "SELECT * FROM work_task_groups WHERE id = :id", nativeQuery = true)
+    List<TaskGroupJpaEntity> findByBoardId(@Param("boardId") UUID boardId);
+
     /** Max position value in a board (for append-to-end logic). */
     @Query("SELECT MAX(tg.position) FROM TaskGroupJpaEntity tg WHERE tg.boardId = :boardId")
     Double getMaxPositionByBoardId(@Param("boardId") UUID boardId);

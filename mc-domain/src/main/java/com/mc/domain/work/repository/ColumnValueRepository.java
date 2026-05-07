@@ -21,6 +21,8 @@ public interface ColumnValueRepository {
     /** Returns all column values for an item. */
     List<ColumnValue> findByItemId(UUID itemId);
 
+    List<ColumnValue> findByColumnId(Long columnId);
+
     /** Returns all column values for a board (used for full board load). */
     List<ColumnValue> findByBoardId(UUID boardId);
 

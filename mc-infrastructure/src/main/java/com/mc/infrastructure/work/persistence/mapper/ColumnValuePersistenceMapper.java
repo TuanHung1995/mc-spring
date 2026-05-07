@@ -25,6 +25,7 @@ public class ColumnValuePersistenceMapper {
         entity.setTextValue(domain.getTextValue());
         entity.setColor(domain.getColor());
         entity.setType(domain.getType());
+        entity.setDeleted(domain.isDeleted());
         entity.setDeletedAt(domain.getDeletedAt());
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());

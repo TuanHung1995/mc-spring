@@ -47,6 +47,7 @@ public class ColumnValue extends BaseDomainEntity {
     private String type;
 
     private LocalDateTime deletedAt;
+    private UUID deletedBy;
 
     // =================================================================
     // CONSTRUCTORS
@@ -141,5 +142,11 @@ public class ColumnValue extends BaseDomainEntity {
         if (textValue != null) this.textValue = textValue;
         if (color != null) this.color = color;
         markAsModified();
+    }
+
+    public void trash(UUID deletedById) {
+        this.deletedBy = deletedById;
+        this.deletedAt = LocalDateTime.now();
+        markAsDeleted();
     }
 }

@@ -14,6 +14,8 @@ public interface TaskGroupRepository {
 
     TaskGroup save(TaskGroup group);
 
+    void saveAll(List<TaskGroup> groups);
+
     Optional<TaskGroup> findById(UUID id);
 
     /** Finds a group even if it has been soft-deleted (for restore/permanent-delete flows). */
@@ -27,6 +29,8 @@ public interface TaskGroupRepository {
 
     /** Returns soft-deleted (trashed) groups for a board. */
     List<TaskGroup> findTrashedByBoardId(UUID boardId);
+
+    List<TaskGroup> findByBoardId(UUID boardId);
 
     /** Returns the current maximum position value across all groups in a board. */
     Double getMaxPositionByBoardId(UUID boardId);

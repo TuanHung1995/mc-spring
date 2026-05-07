@@ -29,6 +29,11 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
+    public void saveAll(List<Item> items) {
+        jpaRepository.saveAll(items.stream().map(mapper::toEntity).collect(Collectors.toList()));
+    }
+
+    @Override
     public Optional<Item> findById(UUID itemId) {
         return jpaRepository.findById(itemId).map(mapper::toDomain);
     }
