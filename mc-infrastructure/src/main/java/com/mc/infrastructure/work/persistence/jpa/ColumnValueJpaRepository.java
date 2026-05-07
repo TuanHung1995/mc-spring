@@ -19,6 +19,9 @@ public interface ColumnValueJpaRepository extends JpaRepository<ColumnValueJpaEn
     @Query("SELECT cv FROM ColumnValueJpaEntity cv WHERE cv.itemId = :itemId")
     List<ColumnValueJpaEntity> findByItemId(@Param("itemId") UUID itemId);
 
+    @Query("SELECT cv FROM ColumnValueJpaEntity cv WHERE cv.columnId = :columnId")
+    List<ColumnValueJpaEntity> findByColumnId(@Param("columnId") Long columnId);
+
     @Query("SELECT cv FROM ColumnValueJpaEntity cv WHERE cv.boardId = :boardId")
     List<ColumnValueJpaEntity> findByBoardId(@Param("boardId") UUID boardId);
 

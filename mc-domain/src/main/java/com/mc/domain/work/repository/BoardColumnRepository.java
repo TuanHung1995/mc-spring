@@ -14,6 +14,8 @@ public interface BoardColumnRepository {
 
     BoardColumn save(BoardColumn column);
 
+    void saveAll(List<BoardColumn> boardColumns);
+
     Optional<BoardColumn> findById(Long columnId);
 
     /** Returns all active (non-deleted) columns for a board, ordered by position. */

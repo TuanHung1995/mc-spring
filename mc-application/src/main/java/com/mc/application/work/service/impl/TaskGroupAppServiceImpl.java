@@ -73,7 +73,7 @@ public class TaskGroupAppServiceImpl implements TaskGroupAppService {
         TaskGroup group = requireGroup(groupId);
         group.update(request.getTitle(), request.getColor(), userId);
         TaskGroup saved = taskGroupRepository.save(group);
-//        publishEvent("GROUP_UPDATED", saved.getId(), saved.getBoardId());
+        publishEvent("GROUP_UPDATED", saved.getId(), saved.getBoardId());
         return toResponse(saved);
     }
 

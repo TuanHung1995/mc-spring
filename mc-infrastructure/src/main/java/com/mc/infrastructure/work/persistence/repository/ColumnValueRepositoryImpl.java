@@ -47,6 +47,12 @@ public class ColumnValueRepositoryImpl implements ColumnValueRepository {
     }
 
     @Override
+    public List<ColumnValue> findByColumnId(Long columnId) {
+        return jpaRepository.findByColumnId(columnId).stream()
+                .map(mapper::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
     public List<ColumnValue> findByBoardId(UUID boardId) {
         return jpaRepository.findByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());

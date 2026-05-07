@@ -30,6 +30,11 @@ public class TaskGroupRepositoryImpl implements TaskGroupRepository {
     }
 
     @Override
+    public void saveAll(List<TaskGroup> groups) {
+        jpaRepository.saveAll(groups.stream().map(mapper::toEntity).collect(Collectors.toList()));
+    }
+
+    @Override
     public Optional<TaskGroup> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
@@ -54,6 +59,12 @@ public class TaskGroupRepositoryImpl implements TaskGroupRepository {
     @Override
     public List<TaskGroup> findTrashedByBoardId(UUID boardId) {
         return jpaRepository.findTrashedByBoardId(boardId).stream()
+                .map(mapper::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TaskGroup> findByBoardId(UUID boardId) {
+        return jpaRepository.findByBoardId(boardId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 

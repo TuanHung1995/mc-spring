@@ -29,6 +29,11 @@ public class BoardColumnRepositoryImpl implements BoardColumnRepository {
     }
 
     @Override
+    public void saveAll(List<BoardColumn> boardColumns) {
+        jpaRepository.saveAll(boardColumns.stream().map(mapper::toEntity).collect(Collectors.toList()));
+    }
+
+    @Override
     public Optional<BoardColumn> findById(Long columnId) {
         return jpaRepository.findById(columnId).map(mapper::toDomain);
     }

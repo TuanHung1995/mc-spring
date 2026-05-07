@@ -5,10 +5,12 @@ import com.mc.application.work.dto.response.ColumnResponse;
 import com.mc.application.work.service.BoardColumnAppService;
 import com.mc.domain.core.event.BoardChangedEvent;
 import com.mc.domain.core.exception.ResourceNotFoundException;
+import com.mc.domain.work.model.entity.ColumnValue;
 import com.mc.domain.work.port.WorkUserContextPort;
 import com.mc.domain.work.model.entity.BoardColumn;
 import com.mc.domain.work.model.enums.BoardColumnType;
 import com.mc.domain.work.repository.BoardColumnRepository;
+import com.mc.domain.work.repository.ColumnValueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class BoardColumnAppServiceImpl implements BoardColumnAppService {
 
     private final BoardColumnRepository columnRepository;
+    private final ColumnValueRepository columnValueRepository;
     private final WorkUserContextPort workUserContextPort;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -81,8 +84,14 @@ public class BoardColumnAppServiceImpl implements BoardColumnAppService {
         BoardColumn col = requireColumn(columnId);
         UUID boardId = col.getBoardId();
         col.trash(userId);
+
+        List<ColumnValue> columnValues = columnValueRepository.findByColumnId(columnId);
+        columnValues.forEach(cv -> cv.trash(userId));
+
         columnRepository.delete(col);
-//        publishEvent("COLUMN_DELETED", columnId, boardId);
+        columnValueRepository.saveAll(columnValues);
+
+        publishEvent("COLUMN_DELETED", columnId, boardId);
     }
 
     // =================================================================

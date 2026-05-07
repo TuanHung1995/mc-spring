@@ -93,8 +93,23 @@ public class BoardAppServiceImpl implements BoardAppService {
         UUID userId = workUserContextPort.getCurrentUser().id();
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+
+        List<Item> items = itemRepository.findByBoardId(boardId);
+        List<TaskGroup> taskGroups = taskGroupRepository.findByBoardId(boardId);
+        List<BoardColumn> boardColumns = columnRepository.findAllByBoardId(boardId);
+        List<ColumnValue> columnValues = columnValueRepository.findByBoardId(boardId);
+
         board.trash(userId);
+        items.forEach(item -> item.trash(userId));
+        taskGroups.forEach(group -> group.trash(userId));
+        boardColumns.forEach(column -> column.trash(userId));
+        columnValues.forEach(cv -> cv.trash(userId));
+
         boardRepository.delete(board);
+        columnRepository.saveAll(boardColumns);
+        taskGroupRepository.saveAll(taskGroups);
+        itemRepository.saveAll(items);
+        columnValueRepository.saveAll(columnValues);
     }
 
     @Override

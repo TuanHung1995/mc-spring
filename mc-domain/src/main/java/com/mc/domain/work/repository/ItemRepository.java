@@ -14,6 +14,8 @@ public interface ItemRepository {
 
     Item save(Item item);
 
+    void saveAll(List<Item> items);
+
     Optional<Item> findById(UUID itemId);
 
     /** Returns all active items for a task group, ordered by position. */
