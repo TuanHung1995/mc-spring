@@ -2,19 +2,20 @@ package com.mc.application.organization.service.impl;
 
 import com.mc.application.organization.dto.response.TeamResponse;
 import com.mc.application.organization.service.TeamAppService;
+import com.mc.application.organization.utils.OrgConst;
 import com.mc.domain.core.event.broker.rabbitMQ.WorkspaceDeletedIntegrationEvent;
 import com.mc.domain.core.exception.ResourceNotFoundException;
 import com.mc.domain.organization.model.entity.Team;
-import com.mc.domain.organization.model.entity.Workspace;
+import com.mc.domain.organization.model.entity.TeamMember;
 import com.mc.domain.organization.port.OrgUserContextPort;
 import com.mc.domain.organization.port.OrgUserView;
 import com.mc.domain.organization.port.out.WorkspaceMessagePort;
+import com.mc.domain.organization.repository.TeamMemberRepository;
 import com.mc.domain.organization.repository.TeamRepository;
 import com.mc.domain.organization.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,12 +39,13 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
-@Component("orgTeamAppService")
+//@Component("orgTeamAppService")
 public class TeamAppServiceImpl implements TeamAppService {
 
     @Qualifier("orgTeamRepository")
     private final TeamRepository teamRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final WorkspaceMessagePort workspaceMessagePort;
     private final OrgUserContextPort orgUserContextPort;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -60,6 +62,8 @@ public class TeamAppServiceImpl implements TeamAppService {
         // Delegate creation to the domain factory — business invariants live there, not here
         Team team = Team.createDefault(name, ownerId);
         Team saved = teamRepository.save(team);
+        TeamMember ownerMember = TeamMember.createDefault(ownerId, saved.getId(), OrgConst.TEAM_OWNER_ID);
+        teamMemberRepository.addTeamMember(ownerMember);
         return toResponse(saved);
     }
 

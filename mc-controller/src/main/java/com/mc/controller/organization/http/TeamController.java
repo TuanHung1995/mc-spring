@@ -22,7 +22,7 @@ import java.util.UUID;
 @Component("orgTeamController")
 public class TeamController {
 
-    @Qualifier("orgTeamAppService")
+//    @Qualifier("orgTeamAppService")
     private final TeamAppService teamAppService;
 
     /**

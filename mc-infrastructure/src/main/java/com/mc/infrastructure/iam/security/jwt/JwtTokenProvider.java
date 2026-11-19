@@ -41,6 +41,7 @@ public class JwtTokenProvider implements TokenHelperPort {
     /**
      * Generate JWT from Spring Security Authentication.
      */
+    @Override
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         Date currentDate = new Date();
@@ -57,6 +58,7 @@ public class JwtTokenProvider implements TokenHelperPort {
     /**
      * Generate JWT from email (for refresh token flow).
      */
+    @Override
     public String generateTokenFromEmail(String email) {
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + jwtExpirationMs);
@@ -72,6 +74,7 @@ public class JwtTokenProvider implements TokenHelperPort {
     /**
      * Generate JWT with userId claim (for IAM domain model).
      */
+    @Override
     public String generateTokenWithUserId(String email, UUID userId) {
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + jwtExpirationMs);
@@ -109,6 +112,7 @@ public class JwtTokenProvider implements TokenHelperPort {
         return userIdStr != null ? UUID.fromString(userIdStr) : null;
     }
 
+    @Override
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()

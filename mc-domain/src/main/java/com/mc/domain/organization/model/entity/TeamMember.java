@@ -40,6 +40,8 @@ public class TeamMember extends BaseDomainEntity {
     /** When the user joined the team. Set on creation/invitation acceptance. */
     private LocalDateTime joinedAt;
 
+    private LocalDateTime deletedAt;
+
     // =================================================================
     // CONSTRUCTORS
     // =================================================================
@@ -50,12 +52,13 @@ public class TeamMember extends BaseDomainEntity {
 
     /** Full-arg reconstitution constructor — used only by the persistence mapper. */
     public TeamMember(UUID id, UUID teamId, UUID userId, Long roleId, LocalDateTime joinedAt,
-                      LocalDateTime createdAt, LocalDateTime updatedAt, boolean deleted) {
+                      LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, boolean deleted) {
         super(id, createdAt, updatedAt, deleted);
         this.teamId = teamId;
         this.userId = userId;
         this.roleId = roleId;
         this.joinedAt = joinedAt;
+        this.deletedAt = deletedAt;
     }
 
     // =================================================================
