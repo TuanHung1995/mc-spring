@@ -4,11 +4,14 @@ import com.mc.application.iam.dto.request.*;
 import com.mc.application.iam.dto.response.*;
 import com.mc.application.iam.mapper.UserDtoMapper;
 import com.mc.application.iam.service.AuthAppService;
+import com.mc.domain.core.event.broker.rabbitMQ.RegisterIntegrationEvent;
 import com.mc.domain.iam.exception.*;
 import com.mc.domain.iam.model.PasswordResetToken;
 import com.mc.domain.iam.model.RefreshToken;
 import com.mc.domain.iam.model.User;
 import com.mc.domain.iam.model.vo.Email;
+import com.mc.domain.iam.port.TokenHelperPort;
+import com.mc.domain.iam.port.out.AuthMessagePort;
 import com.mc.domain.iam.repository.PasswordResetTokenRepository;
 import com.mc.domain.iam.repository.RefreshTokenRepository;
 import com.mc.domain.iam.repository.TokenBlacklistRepository;
@@ -49,8 +52,9 @@ public class AuthAppServiceImpl implements AuthAppService {
 
     private final AuthenticationService authenticationService;
 
-    @Qualifier("iamJwtTokenProvider")
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthMessagePort authMessagePort;
+    private final TokenHelperPort tokenHelperPort;
+
     private final AuthenticationManager authenticationManager;
 
     @Value("${jwt.expiration:3600000}")
@@ -80,7 +84,7 @@ public class AuthAppServiceImpl implements AuthAppService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String accessToken = jwtTokenProvider.generateToken(authentication);
+            String accessToken = tokenHelperPort.generateToken(authentication);
             RefreshToken refreshToken = authenticationService.createRefreshToken(user.getId());
 
             log.info("User logged in successfully: {}", request.getEmail());
@@ -93,7 +97,7 @@ public class AuthAppServiceImpl implements AuthAppService {
             );
 
         } catch (BadCredentialsException e) {
-            String token = jwtTokenProvider.generateTokenFromEmail(request.getEmail());
+            String token = tokenHelperPort.generateTokenFromEmail(request.getEmail());
             authenticationService.handleFailedLogin(request.getEmail(), token);
             throw new InvalidCredentialsException();
         } catch (LockedException e) {
@@ -111,6 +115,8 @@ public class AuthAppServiceImpl implements AuthAppService {
         User savedUser = authenticationService.registerWithEmail(request.getEmail(), request.getPassword(), request.getFullName());
 
         log.info("New user registered: {}", savedUser.getEmail().getValue());
+
+        authMessagePort.publishRegisterEvent(new RegisterIntegrationEvent(savedUser.getId()));
 
         return RegisterResponse.success(
                 savedUser.getId(),
@@ -136,7 +142,7 @@ public class AuthAppServiceImpl implements AuthAppService {
         RefreshToken newRefreshToken = RefreshToken.create(user.getId(), refreshExpirationMs);
         refreshTokenRepository.save(newRefreshToken);
 
-        String accessToken = generateAccessToken(user);
+        String accessToken = tokenHelperPort.generateTokenWithUserId(user.getEmailValue(), user.getId());
 
         log.info("Token refreshed for user: {}", user.getEmailValue());
 
@@ -210,11 +216,11 @@ public class AuthAppServiceImpl implements AuthAppService {
     @Override
     public MessageResponse unlockAccount(String token) {
         // Validate JWT token for account unlock
-        if (!jwtTokenProvider.validateToken(token)) {
+        if (!tokenHelperPort.validateToken(token)) {
             throw new InvalidTokenException("Invalid unlock token");
         }
 
-        String email = jwtTokenProvider.getUsernameFromToken(token);
+        String email = tokenHelperPort.getUsernameFromToken(token);
 
         authenticationService.unlockAccount(email, token);
 
@@ -252,7 +258,7 @@ public class AuthAppServiceImpl implements AuthAppService {
      * Delegates to JwtTokenProvider in infrastructure layer.
      */
     private String generateAccessToken(User user) {
-        return jwtTokenProvider.generateTokenWithUserId(
+        return tokenHelperPort.generateTokenWithUserId(
                 user.getEmailValue(),
                 user.getId()
         );
